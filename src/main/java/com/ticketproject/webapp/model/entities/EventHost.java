@@ -9,9 +9,7 @@ import java.util.HashSet;
 
 @Entity
 @Table
-(
-    name = AppConstants.Database.EventHosts.TableNames.TABLE_NAME
-)
+(name = AppConstants.Database.EventHosts.TableNames.TABLE_NAME)
 public class EventHost
 {
     @Id
@@ -72,11 +70,16 @@ public class EventHost
     @Column
     (
         name = AppConstants.Database.EventHosts.TableNames.COLUMN_VERIFICATION_KEY,
+        nullable = false,
         length = AppConstants.Database.EventHosts.Sizes.VERIFICATION_KEY_LENGTH
     )
     private String verificationKey;
 
-    @Column(name = AppConstants.Database.EventHosts.TableNames.COLUMN_VERIFICATION_EXPIRES)
+    @Column
+    (
+        name = AppConstants.Database.EventHosts.TableNames.COLUMN_VERIFICATION_EXPIRES,
+        nullable = false
+    )
     private LocalDateTime verificationExpires;
 
     @OneToMany(mappedBy = AppConstants.Database.EventHosts.MappedByNames.MAPPED_BY_EVENT_HOST)

@@ -13,12 +13,7 @@ import java.time.LocalDateTime;
     uniqueConstraints =
     {
         @UniqueConstraint
-        (
-            columnNames =
-            {
-                AppConstants.Database.Sessions.TableNames.COLUMN_TOKEN_HASH
-            }
-        )
+        (columnNames = AppConstants.Database.Sessions.TableNames.COLUMN_TOKEN_HASH)
     }
 )
 public class Session

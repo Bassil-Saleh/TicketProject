@@ -18,9 +18,7 @@ import java.util.Set;
     uniqueConstraints =
     {
         @UniqueConstraint
-        (
-            columnNames = AppConstants.Database.Events.TableNames.COLUMN_PUBLIC_ID
-        )
+        (columnNames = AppConstants.Database.Events.TableNames.COLUMN_PUBLIC_ID)
     }
 )
 public class Event
@@ -70,6 +68,7 @@ public class Event
     @Column
     (
         name = AppConstants.Database.Events.TableNames.COLUMN_DESCRIPTION,
+        nullable = false,
         columnDefinition = AppConstants.Database.Events.Definitions.COLUMN_DESCRIPTION
     )
     private String description;

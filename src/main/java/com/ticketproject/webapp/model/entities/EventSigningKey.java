@@ -12,12 +12,7 @@ import java.time.LocalDateTime;
     uniqueConstraints =
     {
         @UniqueConstraint
-        (
-            columnNames =
-            {
-                AppConstants.Database.EventSigningKeys.TableNames.COLUMN_EVENT_ID
-            }
-        )
+        (columnNames = AppConstants.Database.EventSigningKeys.TableNames.COLUMN_EVENT_ID)
     }
 )
 public class EventSigningKey

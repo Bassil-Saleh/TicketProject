@@ -14,9 +14,7 @@ import java.util.HashSet;
     uniqueConstraints =
     {
         @UniqueConstraint
-        (
-            columnNames = AppConstants.Database.Attendees.TableNames.COLUMN_EMAIL
-        )
+        (columnNames = AppConstants.Database.Attendees.TableNames.COLUMN_EMAIL)
     }
 )
 public class Attendee
