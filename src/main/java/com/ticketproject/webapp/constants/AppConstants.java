@@ -89,6 +89,20 @@ public final class AppConstants
                 public static final String COLUMN_USED = "used";
                 public static final String COLUMN_EXPIRES = "expires";
             }
+
+            public static final class Sizes
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private Sizes()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+
+                public static final int TOKEN_LENGTH = 36;
+            }
         }
 
         public static final class Attendees
@@ -119,6 +133,34 @@ public final class AppConstants
                 public static final String COLUMN_LAST_NAME = "last_name";
                 public static final String COLUMN_EMAIL = "email";
                 public static final String COLUMN_CREATED = "created";
+            }
+
+            public static final class MappedByNames
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private MappedByNames()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+                public static final String MAPPED_BY_ATTENDEE = "attendee";
+            }
+
+            public static final class Sizes
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private Sizes()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+
+                public static final int NAME_LENGTH = 100;
+                public static final int EMAIL_LENGTH = 255;
             }
         }
 
@@ -152,6 +194,19 @@ public final class AppConstants
                 public static final String COLUMN_CREATED = "created";
                 public static final String COLUMN_REVOKED = "revoked";
             }
+
+            public static final class Definitions
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private Definitions()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+                public static final String COLUMN_REASON = "TEXT";
+            }
         }
 
         public static final class TicketScans
@@ -181,6 +236,21 @@ public final class AppConstants
                 public static final String COLUMN_SCANNED_BY = "scanned_by";
                 public static final String COLUMN_SCANNED_AT = "scanned_at";
                 public static final String COLUMN_DEVICE_INFO = "device_info";
+            }
+
+            public static final class Sizes
+            {
+
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private Sizes()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+
+                public static final int DEVICE_INFO_LENGTH = 255;
             }
         }
 
@@ -216,6 +286,34 @@ public final class AppConstants
                 public static final String COLUMN_CREATED = "created";
                 public static final String COLUMN_LAST_UPDATED = "last_updated";
                 public static final String COLUMN_DELETED_AT = "deleted_at";
+            }
+
+            public static final class MappedByNames
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private MappedByNames()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+
+                public static final String MAPPED_BY_TICKET = "ticket";
+            }
+
+            public static final class Sizes
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private Sizes()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+                public static final int PUBLIC_TOKEN_LENGTH = 512;
+                public static final int TOKEN_IDENTIFIER_LENGTH = 36;
             }
         }
 
@@ -255,6 +353,37 @@ public final class AppConstants
                 public static final String COLUMN_VERIFIED = "verified";
                 public static final String COLUMN_VERIFICATION_KEY = "verification_key";
                 public static final String COLUMN_VERIFICATION_EXPIRES = "verification_expires";
+            }
+
+            public static final class Sizes
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private Sizes()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+
+                public static final int NAME_LENGTH = 100;
+                public static final int VERIFICATION_KEY_LENGTH = 36;
+            }
+
+            public static final class MappedByNames
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private MappedByNames()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+
+                public static final String MAPPED_BY_EVENT_HOST = "eventHost";
+                public static final String MAPPED_BY_BLOCKED_BY = "blockedBy";
+                public static final String MAPPED_BY_SCANNED_BY = "scannedBy";
             }
         }
 
@@ -302,6 +431,58 @@ public final class AppConstants
                 public static final String COLUMN_REGISTRATION_STATUS = "registration_status";
                 public static final String COLUMN_EVENT_STATUS = "event_status";
             }
+
+            public static final class MappedByNames
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private MappedByNames()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+
+                public static final String MAPPED_BY_EVENT = "event";
+            }
+
+            public static final class Sizes
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private Sizes()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+
+                public static final int PUBLIC_ID_LENGTH = 36;
+                public static final int NAME_LENGTH = 255;
+                public static final int ADDRESS_LINE_LENGTH = 255;
+                public static final int CITY_LENGTH = 100;
+                public static final int STATE_LENGTH = 100;
+                public static final int POSTAL_CODE_LENGTH = 20;
+                public static final int COUNTRY_LENGTH = 100;
+                public static final int LATITUDE_PRECISION = 10;
+                public static final int LATITUDE_SCALE = 7;
+                public static final int LONGITUDE_PRECISION = 10;
+                public static final int LONGITUDE_SCALE = 7;
+            }
+
+            public static final class Definitions
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private Definitions()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+
+                public static final String COLUMN_DESCRIPTION = "TEXT";
+            }
         }
 
         public static final class Sessions
@@ -336,6 +517,21 @@ public final class AppConstants
                 public static final String COLUMN_EXPIRES = "expires";
                 public static final String COLUMN_REVOKED = "revoked";
             }
+
+            public static final class Sizes
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private Sizes()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+                public static final int TOKEN_HASH_LENGTH = 64;
+                public static final int IP_ADDRESS_LENGTH = 45;
+                public static final int USER_AGENT_LENGTH = 512;
+            }
         }
 
         public static final class EventSigningKeys
@@ -365,6 +561,21 @@ public final class AppConstants
                 public static final String COLUMN_PRIVATE_KEY = "private_key";
                 public static final String COLUMN_PUBLIC_KEY = "public_key";
                 public static final String COLUMN_CREATED = "created";
+            }
+
+            public static final class Definitions
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private Definitions()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+
+                public static final String COLUMN_PRIVATE_KEY = "VARBINARY(1024)";
+                public static final String COLUMN_PUBLIC_KEY = "VARBINARY(1024)";
             }
         }
     }
