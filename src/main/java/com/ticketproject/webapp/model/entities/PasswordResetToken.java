@@ -4,6 +4,7 @@ import com.ticketproject.webapp.constants.AppConstants;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = AppConstants.Database.PasswordResetTokens.TableNames.TABLE_NAME)
@@ -49,4 +50,88 @@ public class PasswordResetToken
         nullable = false
     )
     private LocalDateTime expires;
+
+    // ************************************************
+    // Constructors
+    // ************************************************
+    public PasswordResetToken() {}
+
+    public PasswordResetToken
+    (
+        EventHost eventHost,
+        String token,
+        LocalDateTime created,
+        LocalDateTime expires
+    )
+    {
+        this.eventHost = eventHost;
+        this.token = token;
+        this.created = created;
+        this.expires = expires;
+        this.used = false;
+    }
+
+    // ************************************************
+    // Getters
+    // ************************************************
+    public Long getId()               { return this.id; }
+    public EventHost getEventHost()   { return this.eventHost; }
+    public String getToken()          { return this.token; }
+    public LocalDateTime getCreated() { return this.created; }
+    public boolean isUsed()           { return this.used; }
+    public LocalDateTime getExpires() { return this.expires; }
+
+    // ************************************************
+    // Setters
+    // ************************************************
+    public void setId(Long id)                    { this.id = id; }
+    public void setEventHost(EventHost eventHost) { this.eventHost = eventHost; }
+    public void setToken(String token)            { this.token = token; }
+    public void setCreated(LocalDateTime created) { this.created = created; }
+    public void setUsed(boolean used)             { this.used = used; }
+    public void setExpires(LocalDateTime expires) { this.expires = expires; }
+
+    // ************************************************
+    // Convenience methods
+    // ************************************************
+    public boolean isExpired()
+    {
+        return LocalDateTime.now().isAfter(this.expires);
+    }
+
+    public boolean isValid()
+    {
+        return !this.used && !this.isExpired();
+    }
+
+    // ************************************************
+    // equals(), hashCode(), toString()
+    // ************************************************
+    @Override
+    public boolean equals(Object other)
+    {
+        if (this == other)
+            return true;
+        if (!(other instanceof PasswordResetToken that))
+            return false;
+        return this.id != null && Objects.equals(this.id, that.id);
+    }
+
+    @Override
+    public int hashCode() { return this.getClass().hashCode(); }
+
+    @Override
+    public String toString()
+    {
+        return "PasswordResetToken{" +
+               "id=" + this.id +
+               ", eventHost=" + (this.eventHost != null ? this.eventHost.getEmail() : null) +
+               ", used=" + this.used +
+               ", expires=" + this.expires +
+               '}';
+    }
+
+    // ************************************************
+    // TODO: Builder (to make entity creation easier)
+    // ************************************************
 }

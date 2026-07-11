@@ -4,6 +4,7 @@ import com.ticketproject.webapp.constants.AppConstants;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table
@@ -53,4 +54,71 @@ public class EventSigningKey
         nullable = false
     )
     private LocalDateTime created;
+
+    // ************************************************
+    // Constructors
+    // ************************************************
+    public EventSigningKey() {}
+
+    public EventSigningKey
+    (
+        Event event,
+        byte[] privateKey,
+        byte[] publicKey,
+        LocalDateTime created
+    )
+    {
+        this.event = event;
+        this.privateKey = privateKey;
+        this.publicKey = publicKey;
+        this.created = created;
+    }
+
+    // ************************************************
+    // Getters
+    // ************************************************
+    public Long getId()               { return this.id; }
+    public Event getEvent()           { return this.event; }
+    public byte[] getPrivateKey()     { return this.privateKey; }
+    public byte[] getPublicKey()      { return this.publicKey; }
+    public LocalDateTime getCreated() { return this.created; }
+
+    // ************************************************
+    // Setters
+    // ************************************************
+    public void setId(Long id)                    { this.id = id; }
+    public void setEvent(Event event)             { this.event = event; }
+    public void setPrivateKey(byte[] privateKey)  { this.privateKey = privateKey; }
+    public void setPublicKey(byte[] publicKey)    { this.publicKey = publicKey; }
+    public void setCreated(LocalDateTime created) { this.created = created; }
+
+    // ************************************************
+    // equals(), hashCode(), toString()
+    // ************************************************
+    @Override
+    public boolean equals(Object other)
+    {
+        if (this == other)
+            return true;
+        if (!(other instanceof EventSigningKey that))
+            return false;
+        return this.id != null && Objects.equals(this.id, that.id);
+    }
+
+    @Override
+    public int hashCode() { return this.getClass().hashCode(); }
+
+    @Override
+    public String toString()
+    {
+        return "EventSigningKey{" +
+               "id=" + this.id +
+               ", event=" + (this.event != null ? this.event.getName() : null) +
+               ", created=" + this.created +
+               '}';
+    }
+
+    // ************************************************
+    // TODO: Builder (to make entity creation easier)
+    // ************************************************
 }

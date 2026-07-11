@@ -5,6 +5,7 @@ import com.ticketproject.webapp.model.enums.InvitationStatus;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table
@@ -98,4 +99,93 @@ public class Ticket
 
     @OneToOne(mappedBy = AppConstants.Database.Tickets.MappedByNames.MAPPED_BY_TICKET)
     private TicketScan ticketScan;
+    // ************************************************
+    // Constructors
+    // ************************************************
+    public Ticket() {}
+
+    public Ticket
+    (
+        String publicToken,
+        String tokenIdentifier,
+        Attendee attendee,
+        Event event,
+        InvitationStatus invitationStatus
+    )
+    {
+        this.publicToken = publicToken;
+        this.tokenIdentifier = tokenIdentifier;
+        this.attendee = attendee;
+        this.event = event;
+        this.invitationStatus = invitationStatus;
+        this.present = false;
+    }
+
+    // ************************************************
+    // Getters
+    // ************************************************
+    public Long getId()                           { return this.id; }
+    public String getPublicToken()                { return this.publicToken; }
+    public String getTokenIdentifier()            { return this.tokenIdentifier; }
+    public Attendee getAttendee()                 { return this.attendee; }
+    public Event getEvent()                       { return this.event; }
+    public boolean isPresent()                    { return this.present; }
+    public InvitationStatus getInvitationStatus() { return this.invitationStatus; }
+    public LocalDateTime getCreated()             { return this.created; }
+    public LocalDateTime getLastUpdated()         { return this.lastUpdated; }
+    public LocalDateTime getDeletedAt()           { return this.deletedAt; }
+    public TicketScan getTicketScan()             { return this.ticketScan; }
+
+    // ************************************************
+    // Setters
+    // ************************************************
+    public void setId(Long id)                                         { this.id = id; }
+    public void setTicketScan(TicketScan ticketScan)                   { this.ticketScan = ticketScan; }
+    public void setPublicToken(String publicToken)                     { this.publicToken = publicToken; }
+    public void setTokenIdentifier(String tokenIdentifier)             { this.tokenIdentifier = tokenIdentifier; }
+    public void setAttendee(Attendee attendee)                         { this.attendee = attendee; }
+    public void setEvent(Event event)                                  { this.event = event; }
+    public void setPresent(boolean present)                            { this.present = present; }
+    public void setInvitationStatus(InvitationStatus invitationStatus) { this.invitationStatus = invitationStatus; }
+    public void setCreated(LocalDateTime created)                      { this.created = created; }
+    public void setLastUpdated(LocalDateTime lastUpdated)              { this.lastUpdated = lastUpdated; }
+    public void setDeletedAt(LocalDateTime deletedAt)                  { this.deletedAt = deletedAt; }
+
+    // ************************************************
+    // Convenience methods
+    // ************************************************
+    public boolean isDeleted() { return this.deletedAt != null; }
+
+    // ************************************************
+    // equals(), hashCode(), toString()
+    // ************************************************
+    @Override
+    public boolean equals(Object other)
+    {
+        if (this == other)
+            return true;
+        if (!(other instanceof Ticket that))
+            return false;
+        return this.id != null && Objects.equals(this.id, that.id);
+    }
+
+    @Override
+    public int hashCode() { return this.getClass().hashCode(); }
+
+    @Override
+    public String toString()
+    {
+        return "Ticket{" +
+               "id=" + this.id +
+               ", tokenIdentifier='" + this.tokenIdentifier + '\'' +
+               ", attendee=" + (this.attendee != null ? this.attendee.getEmail() : null) +
+               ", event=" + (this.event != null ? this.event.getName() : null) +
+               ", present=" + this.present +
+               ", invitationStatus=" + this.invitationStatus +
+               '}';
+    }
+
+    // ************************************************
+    // TODO: Builder (to make entity creation easier)
+    // ************************************************
 }

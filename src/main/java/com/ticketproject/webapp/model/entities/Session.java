@@ -5,6 +5,7 @@ import com.ticketproject.webapp.model.enums.ClientType;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table
@@ -76,4 +77,94 @@ public class Session
 
     @Column(name = AppConstants.Database.Sessions.TableNames.COLUMN_REVOKED)
     private LocalDateTime revoked;
+    // ************************************************
+    // Constructors
+    // ************************************************
+    public Session() {}
+
+    public Session
+    (
+        EventHost eventHost,
+        String tokenHash,
+        ClientType clientType,
+        String ipAddress,
+        String userAgent,
+        LocalDateTime created,
+        LocalDateTime expires
+    )
+    {
+        this.eventHost = eventHost;
+        this.tokenHash = tokenHash;
+        this.clientType = clientType;
+        this.ipAddress = ipAddress;
+        this.userAgent = userAgent;
+        this.created = created;
+        this.expires = expires;
+    }
+
+    // ************************************************
+    // Getters
+    // ************************************************
+    public Long getId()               { return this.id; }
+    public EventHost getEventHost()   { return this.eventHost; }
+    public String getTokenHash()      { return this.tokenHash; }
+    public ClientType getClientType() { return this.clientType; }
+    public String getIpAddress()      { return this.ipAddress; }
+    public String getUserAgent()      { return this.userAgent; }
+    public LocalDateTime getCreated() { return this.created; }
+    public LocalDateTime getExpires() { return this.expires; }
+    public LocalDateTime getRevoked() { return this.revoked; }
+
+    // ************************************************
+    // Setters
+    // ************************************************
+    public void setId(Long id)                       { this.id = id; }
+    public void setEventHost(EventHost eventHost)    { this.eventHost = eventHost; }
+    public void setTokenHash(String tokenHash)       { this.tokenHash = tokenHash; }
+    public void setClientType(ClientType clientType) { this.clientType = clientType; }
+    public void setIpAddress(String ipAddress)       { this.ipAddress = ipAddress; }
+    public void setUserAgent(String userAgent)       { this.userAgent = userAgent; }
+    public void setCreated(LocalDateTime created)    { this.created = created; }
+    public void setExpires(LocalDateTime expires)    { this.expires = expires; }
+    public void setRevoked(LocalDateTime revoked)    { this.revoked = revoked; }
+
+    // ************************************************
+    // Convenience methods
+    // ************************************************
+    public boolean isExpired() { return LocalDateTime.now().isAfter(this.expires); }
+
+    public boolean isRevoked() { return this.revoked != null; }
+
+    public boolean isActive() { return !isRevoked() && !isExpired(); }
+
+    // ************************************************
+    // equals(), hashCode(), toString()
+    // ************************************************
+    @Override
+    public boolean equals(Object other)
+    {
+        if (this == other)
+            return true;
+        if (!(other instanceof Session that))
+            return false;
+        return this.id != null && Objects.equals(this.id, that.id);
+    }
+
+    @Override
+    public int hashCode() { return this.getClass().hashCode(); }
+
+    @Override
+    public String toString()
+    {
+        return "Session{" +
+               "id=" + this.id +
+               ", eventHost=" + (this.eventHost != null ? this.eventHost.getEmail() : null) +
+               ", clientType=" + this.clientType +
+               ", active=" + this.isActive() +
+               '}';
+    }
+
+    // ************************************************
+    // TODO: Builder (to make entity creation easier)
+    // ************************************************
 }

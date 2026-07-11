@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Objects;
 
 @Entity
 @Table
@@ -192,4 +193,135 @@ public class Event
         orphanRemoval = true
     )
     private EventSigningKey signingKey;
+
+    // ************************************************
+    // Constructors
+    // ************************************************
+    public Event() {}
+
+    public Event
+    (
+        String publicId,
+        EventHost eventHost,
+        String name,
+        String description,
+        String addressLine1,
+        String addressLine2,
+        String city,
+        String state,
+        String postalCode,
+        String country,
+        BigDecimal latitude,
+        BigDecimal longitude,
+        LocalDateTime startDateTime,
+        LocalDateTime endDateTime,
+        EventType eventType,
+        Integer maxAttendees
+    )
+    {
+        this.publicId = publicId;
+        this.eventHost = eventHost;
+        this.name = name;
+        this.description = description;
+        this.addressLine1 = addressLine1;
+        this.addressLine2 = addressLine2;
+        this.city = city;
+        this.state = state;
+        this.postalCode = postalCode;
+        this.country = country;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+        this.eventType = eventType;
+        this.maxAttendees = maxAttendees;
+    }
+
+    // ************************************************
+    // Getters
+    // ************************************************
+    public Long getId()                                       { return this.id; }
+    public String getPublicId()                               { return this.publicId; }
+    public EventHost getEventHost()                           { return this.eventHost; }
+    public LocalDateTime getCreated()                         { return this.created; }
+    public LocalDateTime getLastUpdated()                     { return this.lastUpdated; }
+    public String getName()                                   { return this.name; }
+    public String getDescription()                            { return this.description; }
+    public String getAddressLine1()                           { return this.addressLine1; }
+    public String getAddressLine2()                           { return this.addressLine2; }
+    public String getCity()                                   { return this.city; }
+    public String getState()                                  { return this.state; }
+    public String getPostalCode()                             { return this.postalCode; }
+    public String getCountry()                                { return this.country; }
+    public BigDecimal getLatitude()                           { return this.latitude; }
+    public BigDecimal getLongitude()                          { return this.longitude; }
+    public LocalDateTime getStartDateTime()                   { return this.startDateTime; }
+    public LocalDateTime getEndDateTime()                     { return this.endDateTime; }
+    public EventType getEventType()                           { return this.eventType; }
+    public Integer getMaxAttendees()                          { return this.maxAttendees; }
+    public RegistrationStatus getRegistrationStatus()         { return this.registrationStatus; }
+    public EventStatus getEventStatus()                       { return this.eventStatus; }
+    public Set<Ticket> getTickets()                           { return this.tickets; }
+    public Set<BlockedRegistration> getBlockedRegistrations() { return this.blockedRegistrations; }
+    public EventSigningKey getSigningKey()                    { return this.signingKey; }
+
+    // ************************************************
+    // Setters
+    // ************************************************
+    public void setId(Long id)                                                         { this.id = id; }
+    public void setPublicId(String publicId)                                           { this.publicId = publicId; }
+    public void setEventHost(EventHost eventHost)                                      { this.eventHost = eventHost; }
+    public void setCreated(LocalDateTime created)                                      { this.created = created; }
+    public void setLastUpdated(LocalDateTime lastUpdated)                              { this.lastUpdated = lastUpdated; }
+    public void setName(String name)                                                   { this.name = name; }
+    public void setDescription(String description)                                     { this.description = description; }
+    public void setAddressLine1(String addressLine1)                                   { this.addressLine1 = addressLine1; }
+    public void setAddressLine2(String addressLine2)                                   { this.addressLine2 = addressLine2; }
+    public void setCity(String city)                                                   { this.city = city; }
+    public void setState(String state)                                                 { this.state = state; }
+    public void setPostalCode(String postalCode)                                       { this.postalCode = postalCode; }
+    public void setCountry(String country)                                             { this.country = country; }
+    public void setLatitude(BigDecimal latitude)                                       { this.latitude = latitude; }
+    public void setLongitude(BigDecimal longitude)                                     { this.longitude = longitude; }
+    public void setStartDateTime(LocalDateTime startDateTime)                          { this.startDateTime = startDateTime; }
+    public void setEndDateTime(LocalDateTime endDateTime)                              { this.endDateTime = endDateTime; }
+    public void setEventType(EventType eventType)                                      { this.eventType = eventType; }
+    public void setMaxAttendees(Integer maxAttendees)                                  { this.maxAttendees = maxAttendees; }
+    public void setRegistrationStatus(RegistrationStatus registrationStatus)           { this.registrationStatus = registrationStatus; }
+    public void setEventStatus(EventStatus status)                                     { this.eventStatus = status; }
+    public void setTickets(Set<Ticket> tickets)                                        { this.tickets = tickets; }
+    public void setBlockedRegistrations(Set<BlockedRegistration> blockedRegistrations) { this.blockedRegistrations = blockedRegistrations; }
+    public void setSigningKey(EventSigningKey signingKey)                              { this.signingKey = signingKey; }
+
+    // ************************************************
+    // equals(), hashCode(), toString()
+    // ************************************************
+    @Override
+    public boolean equals(Object other)
+    {
+        if (this == other)
+            return true;
+        if (!(other instanceof Event that))
+            return false;
+        return this.id != null && Objects.equals(this.id, that.id);
+    }
+
+    @Override
+    public int hashCode() { return this.getClass().hashCode(); }
+
+    @Override
+    public String toString()
+    {
+        return "Event{" +
+               "id=" + this.id +
+               ", publicId='" + this.publicId + '\'' +
+               ", name='" + this.name + '\'' +
+               ", eventType=" + this.eventType +
+               ", eventStatus=" + this.eventStatus +
+               '}';
+    }
+
+    // ************************************************
+    // TODO: Builder (to make entity creation easier)
+    // ************************************************
 }
