@@ -186,6 +186,56 @@ public class Ticket
     }
 
     // ************************************************
-    // TODO: Builder (to make entity creation easier)
+    // Builder (to make entity creation easier)
     // ************************************************
+    public static class Builder
+    {
+        private String publicToken;
+        private String tokenIdentifier;
+        private Attendee attendee;
+        private Event event;
+        private InvitationStatus invitationStatus;
+
+        public Builder publicToken(String publicToken)
+        {
+            this.publicToken = publicToken;
+            return this;
+        }
+
+        public Builder tokenIdentifier(String tokenIdentifier)
+        {
+            this.tokenIdentifier = tokenIdentifier;
+            return this;
+        }
+
+        public Builder attendee(Attendee attendee)
+        {
+            this.attendee = attendee;
+            return this;
+        }
+
+        public Builder event(Event event)
+        {
+            this.event = event;
+            return this;
+        }
+
+        public Builder invitationStatus(InvitationStatus invitationStatus)
+        {
+            this.invitationStatus = invitationStatus;
+            return this;
+        }
+
+        public Ticket build()
+        {
+            return new Ticket
+            (
+                publicToken,
+                tokenIdentifier,
+                attendee,
+                event,
+                invitationStatus
+            );
+        }
+    }
 }

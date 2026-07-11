@@ -119,6 +119,42 @@ public class EventSigningKey
     }
 
     // ************************************************
-    // TODO: Builder (to make entity creation easier)
+    // Builder (to make entity creation easier)
     // ************************************************
+    public static class Builder
+    {
+        private Event event;
+        private byte[] privateKey;
+        private byte[] publicKey;
+        private LocalDateTime created;
+
+        public Builder event(Event event)
+        {
+            this.event = event;
+            return this;
+        }
+
+        public Builder privateKey(byte[] privateKey)
+        {
+            this.privateKey = privateKey;
+            return this;
+        }
+
+        public Builder publicKey(byte[] publicKey)
+        {
+            this.publicKey = publicKey;
+            return this;
+        }
+
+        public Builder created(LocalDateTime created)
+        {
+            this.created = created;
+            return this;
+        }
+
+        public EventSigningKey build()
+        {
+            return new EventSigningKey(event, privateKey, publicKey, created);
+        }
+    }
 }

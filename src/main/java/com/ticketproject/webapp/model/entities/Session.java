@@ -165,6 +165,72 @@ public class Session
     }
 
     // ************************************************
-    // TODO: Builder (to make entity creation easier)
+    // Builder (to make entity creation easier)
     // ************************************************
+    public static class Builder
+    {
+        private EventHost eventHost;
+        private String tokenHash;
+        private ClientType clientType;
+        private String ipAddress;
+        private String userAgent;
+        private LocalDateTime created;
+        private LocalDateTime expires;
+
+        public Builder eventHost(EventHost eventHost)
+        {
+            this.eventHost = eventHost;
+            return this;
+        }
+
+        public Builder tokenHash(String tokenHash)
+        {
+            this.tokenHash = tokenHash;
+            return this;
+        }
+
+        public Builder clientType(ClientType clientType)
+        {
+            this.clientType = clientType;
+            return this;
+        }
+
+        public Builder ipAddress(String ipAddress)
+        {
+            this.ipAddress = ipAddress;
+            return this;
+        }
+
+        public Builder userAgent(String userAgent)
+        {
+            this.userAgent = userAgent;
+            return this;
+        }
+
+        public Builder created(LocalDateTime created)
+        {
+            this.created = created;
+            return this;
+        }
+
+        public Builder expires(LocalDateTime expires)
+        {
+            this.expires = expires;
+            return this;
+        }
+
+        public Session build()
+        {
+            return new Session
+            (
+                eventHost,
+                tokenHash,
+                clientType,
+                ipAddress,
+                userAgent,
+                created,
+                expires
+            );
+        }
+    }
 }

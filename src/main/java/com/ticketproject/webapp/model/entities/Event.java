@@ -322,6 +322,144 @@ public class Event
     }
 
     // ************************************************
-    // TODO: Builder (to make entity creation easier)
+    // Builder (to make entity creation easier)
     // ************************************************
+    public static class Builder
+    {
+        private String publicId;
+        private EventHost eventHost;
+        private String name;
+        private String description;
+        private String addressLine1;
+        private String addressLine2;
+        private String city;
+        private String state;
+        private String postalCode;
+        private String country;
+        private BigDecimal latitude;
+        private BigDecimal longitude;
+        private LocalDateTime startDateTime;
+        private LocalDateTime endDateTime;
+        private EventType eventType;
+        private Integer maxAttendees;
+
+        public Builder publicId(String publicId)
+        {
+            this.publicId = publicId;
+            return this;
+        }
+
+        public Builder eventHost(EventHost eventHost)
+        {
+            this.eventHost = eventHost;
+            return this;
+        }
+
+        public Builder name(String name)
+        {
+            this.name = name;
+            return this;
+        }
+
+        public Builder description(String description)
+        {
+            this.description = description;
+            return this;
+        }
+
+        public Builder addressLine1(String addressLine1)
+        {
+            this.addressLine1 = addressLine1;
+            return this;
+        }
+
+        public Builder addressLine2(String addressLine2)
+        {
+            this.addressLine2 = addressLine2;
+            return this;
+        }
+
+        public Builder city(String city)
+        {
+            this.city = city;
+            return this;
+        }
+
+        public Builder state(String state)
+        {
+            this.state = state;
+            return this;
+        }
+
+        public Builder postalCode(String postalCode)
+        {
+            this.postalCode = postalCode;
+            return this;
+        }
+
+        public Builder country(String country)
+        {
+            this.country = country;
+            return this;
+        }
+
+        public Builder latitude(BigDecimal latitude)
+        {
+            this.latitude = latitude;
+            return this;
+        }
+
+        public Builder longitude(BigDecimal longitude)
+        {
+            this.longitude = longitude;
+            return this;
+        }
+
+        public Builder startDateTime(LocalDateTime startDateTime)
+        {
+            this.startDateTime = startDateTime;
+            return this;
+        }
+
+        public Builder endDateTime(LocalDateTime endDateTime)
+        {
+            this.endDateTime = endDateTime;
+            return this;
+        }
+
+        public Builder eventType(EventType eventType)
+        {
+            this.eventType = eventType;
+            return this;
+        }
+
+        public Builder maxAttendees(Integer maxAttendees)
+        {
+            this.maxAttendees = maxAttendees;
+            return this;
+        }
+
+        public Event build()
+        {
+            return new Event
+            (
+                publicId,
+                eventHost,
+                name,
+                description,
+                addressLine1,
+                addressLine2,
+                city,
+                state,
+                postalCode,
+                country,
+                latitude,
+                longitude,
+                startDateTime,
+                endDateTime,
+                eventType,
+                maxAttendees
+            );
+        }
+    }
 }

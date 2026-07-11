@@ -107,6 +107,28 @@ public class AddressBookContact
     }
 
     // ************************************************
-    // TODO: Builder (to make entity creation easier)
+    // Builder (to make entity creation easier)
     // ************************************************
+    public static class Builder
+    {
+        private Attendee attendee;
+        private EventHost eventHost;
+
+        public Builder attendee(Attendee attendee)
+        {
+            this.attendee = attendee;
+            return this;
+        }
+
+        public Builder eventHost(EventHost eventHost)
+        {
+            this.eventHost = eventHost;
+            return this;
+        }
+
+        public AddressBookContact build()
+        {
+            return new AddressBookContact(attendee, eventHost);
+        }
+    }
 }

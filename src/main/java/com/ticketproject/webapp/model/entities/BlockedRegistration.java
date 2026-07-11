@@ -142,6 +142,49 @@ public class BlockedRegistration
     }
 
     // ************************************************
-    // TODO: Builder (to make entity creation easier)
+    // Builder (to make entity creation easier)
     // ************************************************
+    public static class Builder
+    {
+        private Attendee attendee;
+        private Event event;
+        private EventHost blockedBy;
+        private String reason;
+        private LocalDateTime created;
+
+        public Builder attendee(Attendee attendee)
+        {
+            this.attendee = attendee;
+            return this;
+        }
+
+        public Builder event(Event event)
+        {
+            this.event = event;
+            return this;
+        }
+
+        public Builder blockedBy(EventHost eventHost)
+        {
+            this.blockedBy = eventHost;
+            return this;
+        }
+
+        public Builder reason(String reason)
+        {
+            this.reason = reason;
+            return this;
+        }
+
+        public Builder created(LocalDateTime created)
+        {
+            this.created = created;
+            return this;
+        }
+
+        public BlockedRegistration build()
+        {
+            return new BlockedRegistration(attendee, event, blockedBy, reason, created);
+        }
+    }
 }

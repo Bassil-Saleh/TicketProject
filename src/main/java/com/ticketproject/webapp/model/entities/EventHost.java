@@ -236,6 +236,64 @@ public class EventHost
     }
 
     // ************************************************
-    // TODO: Builder (to make entity creation easier)
+    // Builder (to make entity creation easier)
     // ************************************************
+    public static class Builder
+    {
+        private String firstName;
+        private String middleName;
+        private String lastName;
+        private LocalDate dateOfBirth;
+        private String email;
+        private String passwordHash;
+
+        public Builder firstName(String firstName)
+        {
+            this.firstName = firstName;
+            return this;
+        }
+
+        public Builder middleName(String middleName)
+        {
+            this.middleName = middleName;
+            return this;
+        }
+
+        public Builder lastName(String lastName)
+        {
+            this.lastName = lastName;
+            return this;
+        }
+
+        public Builder dateOfBirth(LocalDate dateOfBirth)
+        {
+            this.dateOfBirth = dateOfBirth;
+            return this;
+        }
+
+        public Builder email(String email)
+        {
+            this.email = email;
+            return this;
+        }
+
+        public Builder passwordHash(String passwordHash)
+        {
+            this.passwordHash = passwordHash;
+            return this;
+        }
+
+        public EventHost build()
+        {
+            return new EventHost
+            (
+                firstName,
+                middleName,
+                lastName,
+                dateOfBirth,
+                email,
+                passwordHash
+            );
+        }
+    }
 }

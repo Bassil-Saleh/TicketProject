@@ -132,6 +132,42 @@ public class PasswordResetToken
     }
 
     // ************************************************
-    // TODO: Builder (to make entity creation easier)
+    // Builder (to make entity creation easier)
     // ************************************************
+    public static class Builder
+    {
+        private EventHost eventHost;
+        private String token;
+        private LocalDateTime created;
+        private LocalDateTime expires;
+
+        public Builder eventHost(EventHost eventHost)
+        {
+            this.eventHost = eventHost;
+            return this;
+        }
+
+        public Builder token(String token)
+        {
+            this.token = token;
+            return this;
+        }
+
+        public Builder created(LocalDateTime created)
+        {
+            this.created = created;
+            return this;
+        }
+
+        public Builder expires(LocalDateTime expires)
+        {
+            this.expires = expires;
+            return this;
+        }
+
+        public PasswordResetToken build()
+        {
+            return new PasswordResetToken(eventHost, token, created, expires);
+        }
+    }
 }

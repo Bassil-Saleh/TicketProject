@@ -117,6 +117,42 @@ public class TicketScan
     }
 
     // ************************************************
-    // TODO: Builder (to make entity creation easier)
+    // Builder (to make entity creation easier)
     // ************************************************
+    public static class Builder
+    {
+        private Ticket ticket;
+        private EventHost scannedBy;
+        private LocalDateTime scannedAt;
+        private String deviceInfo;
+
+        public Builder ticket(Ticket ticket)
+        {
+            this.ticket = ticket;
+            return this;
+        }
+
+        public Builder scannedBy(EventHost eventHost)
+        {
+            this.scannedBy = eventHost;
+            return this;
+        }
+
+        public Builder scannedAt(LocalDateTime scannedAt)
+        {
+            this.scannedAt = scannedAt;
+            return this;
+        }
+
+        public Builder deviceInfo(String deviceInfo)
+        {
+            this.deviceInfo = deviceInfo;
+            return this;
+        }
+
+        public TicketScan build()
+        {
+            return new TicketScan(ticket, scannedBy, scannedAt, deviceInfo);
+        }
+    }
 }
