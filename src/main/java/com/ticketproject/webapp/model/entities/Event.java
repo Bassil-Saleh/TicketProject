@@ -7,7 +7,6 @@ import com.ticketproject.webapp.model.enums.EventType;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Objects;
@@ -74,69 +73,17 @@ public class Event
     )
     private String description;
 
-    @Column
+    @OneToOne
     (
-        name = AppConstants.Database.Events.TableNames.COLUMN_ADDRESS_LINE_1,
-        nullable = false,
-        length = AppConstants.Database.Events.Sizes.ADDRESS_LINE_LENGTH
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
     )
-    private String addressLine1;
-
-    @Column
+    @JoinColumn
     (
-        name = AppConstants.Database.Events.TableNames.COLUMN_ADDRESS_LINE_2,
-        length = AppConstants.Database.Events.Sizes.ADDRESS_LINE_LENGTH
+        name = AppConstants.Database.Events.TableNames.COLUMN_EVENT_ADDRESS_ID,
+        nullable = false
     )
-    private String addressLine2;
-
-    @Column
-    (
-        name = AppConstants.Database.Events.TableNames.COLUMN_CITY,
-        nullable = false,
-        length = AppConstants.Database.Events.Sizes.CITY_LENGTH
-    )
-    private String city;
-
-    @Column
-    (
-        name = AppConstants.Database.Events.TableNames.COLUMN_STATE,
-        nullable = false,
-        length = AppConstants.Database.Events.Sizes.STATE_LENGTH
-    )
-    private String state;
-
-    @Column
-    (
-        name = AppConstants.Database.Events.TableNames.COLUMN_POSTAL_CODE,
-        nullable = false,
-        length = AppConstants.Database.Events.Sizes.POSTAL_CODE_LENGTH
-    )
-    private String postalCode;
-
-    @Column
-    (
-        name = AppConstants.Database.Events.TableNames.COLUMN_COUNTRY,
-        nullable = false,
-        length = AppConstants.Database.Events.Sizes.COUNTRY_LENGTH
-    )
-    private String country;
-
-    @Column
-    (
-        name = AppConstants.Database.Events.TableNames.COLUMN_LATITUDE,
-        precision = AppConstants.Database.Events.Sizes.LATITUDE_PRECISION,
-        scale = AppConstants.Database.Events.Sizes.LATITUDE_SCALE
-    )
-    private BigDecimal latitude;
-
-
-    @Column
-    (
-        name = AppConstants.Database.Events.TableNames.COLUMN_LONGITUDE,
-        precision = AppConstants.Database.Events.Sizes.LONGITUDE_PRECISION,
-        scale = AppConstants.Database.Events.Sizes.LONGITUDE_SCALE
-    )
-    private BigDecimal longitude;
+    private EventAddress eventAddress;
 
     @Column
     (
@@ -205,14 +152,6 @@ public class Event
         EventHost eventHost,
         String name,
         String description,
-        String addressLine1,
-        String addressLine2,
-        String city,
-        String state,
-        String postalCode,
-        String country,
-        BigDecimal latitude,
-        BigDecimal longitude,
         LocalDateTime startDateTime,
         LocalDateTime endDateTime,
         EventType eventType,
@@ -223,14 +162,6 @@ public class Event
         this.eventHost = eventHost;
         this.name = name;
         this.description = description;
-        this.addressLine1 = addressLine1;
-        this.addressLine2 = addressLine2;
-        this.city = city;
-        this.state = state;
-        this.postalCode = postalCode;
-        this.country = country;
-        this.latitude = latitude;
-        this.longitude = longitude;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
         this.eventType = eventType;
@@ -247,14 +178,7 @@ public class Event
     public LocalDateTime getLastUpdated()                     { return this.lastUpdated; }
     public String getName()                                   { return this.name; }
     public String getDescription()                            { return this.description; }
-    public String getAddressLine1()                           { return this.addressLine1; }
-    public String getAddressLine2()                           { return this.addressLine2; }
-    public String getCity()                                   { return this.city; }
-    public String getState()                                  { return this.state; }
-    public String getPostalCode()                             { return this.postalCode; }
-    public String getCountry()                                { return this.country; }
-    public BigDecimal getLatitude()                           { return this.latitude; }
-    public BigDecimal getLongitude()                          { return this.longitude; }
+    public EventAddress getEventAddress()                     { return this.eventAddress; }
     public LocalDateTime getStartDateTime()                   { return this.startDateTime; }
     public LocalDateTime getEndDateTime()                     { return this.endDateTime; }
     public EventType getEventType()                           { return this.eventType; }
@@ -275,14 +199,7 @@ public class Event
     public void setLastUpdated(LocalDateTime lastUpdated)                              { this.lastUpdated = lastUpdated; }
     public void setName(String name)                                                   { this.name = name; }
     public void setDescription(String description)                                     { this.description = description; }
-    public void setAddressLine1(String addressLine1)                                   { this.addressLine1 = addressLine1; }
-    public void setAddressLine2(String addressLine2)                                   { this.addressLine2 = addressLine2; }
-    public void setCity(String city)                                                   { this.city = city; }
-    public void setState(String state)                                                 { this.state = state; }
-    public void setPostalCode(String postalCode)                                       { this.postalCode = postalCode; }
-    public void setCountry(String country)                                             { this.country = country; }
-    public void setLatitude(BigDecimal latitude)                                       { this.latitude = latitude; }
-    public void setLongitude(BigDecimal longitude)                                     { this.longitude = longitude; }
+    public void setEventAddress(EventAddress eventAddress)                             { this.eventAddress = eventAddress; }
     public void setStartDateTime(LocalDateTime startDateTime)                          { this.startDateTime = startDateTime; }
     public void setEndDateTime(LocalDateTime endDateTime)                              { this.endDateTime = endDateTime; }
     public void setEventType(EventType eventType)                                      { this.eventType = eventType; }
@@ -330,14 +247,6 @@ public class Event
         private EventHost eventHost;
         private String name;
         private String description;
-        private String addressLine1;
-        private String addressLine2;
-        private String city;
-        private String state;
-        private String postalCode;
-        private String country;
-        private BigDecimal latitude;
-        private BigDecimal longitude;
         private LocalDateTime startDateTime;
         private LocalDateTime endDateTime;
         private EventType eventType;
@@ -364,54 +273,6 @@ public class Event
         public Builder description(String description)
         {
             this.description = description;
-            return this;
-        }
-
-        public Builder addressLine1(String addressLine1)
-        {
-            this.addressLine1 = addressLine1;
-            return this;
-        }
-
-        public Builder addressLine2(String addressLine2)
-        {
-            this.addressLine2 = addressLine2;
-            return this;
-        }
-
-        public Builder city(String city)
-        {
-            this.city = city;
-            return this;
-        }
-
-        public Builder state(String state)
-        {
-            this.state = state;
-            return this;
-        }
-
-        public Builder postalCode(String postalCode)
-        {
-            this.postalCode = postalCode;
-            return this;
-        }
-
-        public Builder country(String country)
-        {
-            this.country = country;
-            return this;
-        }
-
-        public Builder latitude(BigDecimal latitude)
-        {
-            this.latitude = latitude;
-            return this;
-        }
-
-        public Builder longitude(BigDecimal longitude)
-        {
-            this.longitude = longitude;
             return this;
         }
 
@@ -447,14 +308,6 @@ public class Event
                 eventHost,
                 name,
                 description,
-                addressLine1,
-                addressLine2,
-                city,
-                state,
-                postalCode,
-                country,
-                latitude,
-                longitude,
                 startDateTime,
                 endDateTime,
                 eventType,

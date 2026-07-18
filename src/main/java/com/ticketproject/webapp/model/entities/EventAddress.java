@@ -93,6 +93,10 @@ public class EventAddress
     )
     private BigDecimal longitude;
 
+    @OneToOne
+    (mappedBy = AppConstants.Database.EventAddresses.MappedByNames.MAPPED_BY_EVENT_ADDRESS)
+    private Event event;
+
     // ************************************************
     // Constructors
     // ************************************************

@@ -416,14 +416,7 @@ public final class AppConstants
                 public static final String COLUMN_LAST_UPDATED = "last_updated";
                 public static final String COLUMN_NAME = "name";
                 public static final String COLUMN_DESCRIPTION = "description";
-                public static final String COLUMN_ADDRESS_LINE_1 = "address_line_1";
-                public static final String COLUMN_ADDRESS_LINE_2 = "address_line_2";
-                public static final String COLUMN_CITY = "city";
-                public static final String COLUMN_STATE = "state";
-                public static final String COLUMN_POSTAL_CODE = "postal_code";
-                public static final String COLUMN_COUNTRY = "country";
-                public static final String COLUMN_LATITUDE = "latitude";
-                public static final String COLUMN_LONGITUDE = "longitude";
+                public static final String COLUMN_EVENT_ADDRESS_ID = "event_address_id";
                 public static final String COLUMN_START_DATE_TIME = "start_date_time";
                 public static final String COLUMN_END_DATE_TIME = "end_date_time";
                 public static final String COLUMN_EVENT_TYPE = "event_type";
@@ -542,6 +535,20 @@ public final class AppConstants
                 public static final int LATITUDE_SCALE = 7;
                 public static final int LONGITUDE_PRECISION = 10;
                 public static final int LONGITUDE_SCALE = 7;
+            }
+
+            public static final class MappedByNames
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private MappedByNames()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+
+                public static final String MAPPED_BY_EVENT_ADDRESS = "eventAddress";
             }
         }
 
