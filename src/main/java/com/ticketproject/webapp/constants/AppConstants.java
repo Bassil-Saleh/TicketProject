@@ -485,6 +485,66 @@ public final class AppConstants
             }
         }
 
+        public static final class EventAddresses
+        {
+            /**
+             * Private constructor. Not meant to be used.
+             * @throws UnsupportedOperationException
+             */
+            private EventAddresses()
+            {
+                throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+            }
+
+            public static final class TableNames
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private TableNames()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+                public static final String TABLE_NAME = "event_addresses";
+                public static final String COLUMN_ID = "id";
+                public static final String COLUMN_CREATED = "created";
+                public static final String COLUMN_LAST_UPDATED = "last_updated";
+                public static final String COLUMN_ADDRESS_LINE_1 = "address_line_1";
+                public static final String COLUMN_ADDRESS_LINE_2 = "address_line_2";
+                public static final String COLUMN_CITY = "city";
+                public static final String COLUMN_STATE = "state";
+                public static final String COLUMN_POSTAL_CODE = "postal_code";
+                public static final String COLUMN_COUNTRY = "country";
+                public static final String COLUMN_LATITUDE = "latitude";
+                public static final String COLUMN_LONGITUDE = "longitude";
+            }
+
+            public static final class Sizes
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private Sizes()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+
+                public static final int PUBLIC_ID_LENGTH = 36;
+                public static final int NAME_LENGTH = 255;
+                public static final int ADDRESS_LINE_LENGTH = 255;
+                public static final int CITY_LENGTH = 100;
+                public static final int STATE_LENGTH = 100;
+                public static final int POSTAL_CODE_LENGTH = 20;
+                public static final int COUNTRY_LENGTH = 100;
+                public static final int LATITUDE_PRECISION = 10;
+                public static final int LATITUDE_SCALE = 7;
+                public static final int LONGITUDE_PRECISION = 10;
+                public static final int LONGITUDE_SCALE = 7;
+            }
+        }
+
         public static final class Sessions
         {
             /**
