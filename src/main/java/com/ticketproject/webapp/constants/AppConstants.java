@@ -554,6 +554,26 @@ public final class AppConstants
 
                 public static final String MAPPED_BY_EVENT_ADDRESS = "eventAddress";
             }
+
+            public static final class Definitions
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private Definitions()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+
+                public static final String COLUMN_ADDRESS_LINE = "VARBINARY(1024)";
+                public static final String COLUMN_CITY = "VARBINARY(1024)";
+                public static final String COLUMN_STATE = "VARBINARY(1024)";
+                public static final String COLUMN_POSTAL_CODE = "VARBINARY(1024)";
+                public static final String COLUMN_COUNTRY = "VARBINARY(1024)";
+                public static final String COLUMN_LATITUDE = "VARBINARY(1024)";
+                public static final String COLUMN_LONGITUDE = "VARBINARY(1024)";
+            }
         }
 
         public static final class Sessions

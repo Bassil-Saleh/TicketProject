@@ -1,6 +1,8 @@
 package com.ticketproject.webapp.model.entities;
 
 import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.model.converters.EncryptedStringConverter;
+import com.ticketproject.webapp.model.converters.EncryptedBigDecimalConverter;
 
 import jakarta.persistence.*;
 
@@ -30,66 +32,72 @@ public class EventAddress
     )
     private LocalDateTime lastUpdated;
 
+    @Convert(converter = EncryptedStringConverter.class)
     @Column
     (
         name = AppConstants.Database.EventAddresses.TableNames.COLUMN_ADDRESS_LINE_1,
         nullable = false,
-        length = AppConstants.Database.EventAddresses.Sizes.ADDRESS_LINE_LENGTH
+        columnDefinition = AppConstants.Database.EventAddresses.Definitions.COLUMN_ADDRESS_LINE
     )
     private String addressLine1;
 
+    @Convert(converter = EncryptedStringConverter.class)
     @Column
     (
         name = AppConstants.Database.EventAddresses.TableNames.COLUMN_ADDRESS_LINE_2,
-        length = AppConstants.Database.EventAddresses.Sizes.ADDRESS_LINE_LENGTH
+        columnDefinition = AppConstants.Database.EventAddresses.Definitions.COLUMN_ADDRESS_LINE
     )
     private String addressLine2;
 
+    @Convert(converter = EncryptedStringConverter.class)
     @Column
     (
         name = AppConstants.Database.EventAddresses.TableNames.COLUMN_CITY,
         nullable = false,
-        length = AppConstants.Database.EventAddresses.Sizes.CITY_LENGTH
+        columnDefinition = AppConstants.Database.EventAddresses.Definitions.COLUMN_CITY
     )
     private String city;
 
+    @Convert(converter = EncryptedStringConverter.class)
     @Column
     (
         name = AppConstants.Database.EventAddresses.TableNames.COLUMN_STATE,
         nullable = false,
-        length = AppConstants.Database.EventAddresses.Sizes.STATE_LENGTH
+        columnDefinition = AppConstants.Database.EventAddresses.Definitions.COLUMN_STATE
     )
     private String state;
 
+    @Convert(converter = EncryptedStringConverter.class)
     @Column
     (
         name = AppConstants.Database.EventAddresses.TableNames.COLUMN_POSTAL_CODE,
         nullable = false,
-        length = AppConstants.Database.EventAddresses.Sizes.POSTAL_CODE_LENGTH
+        columnDefinition = AppConstants.Database.EventAddresses.Definitions.COLUMN_POSTAL_CODE
     )
     private String postalCode;
 
+    @Convert(converter = EncryptedStringConverter.class)
     @Column
     (
         name = AppConstants.Database.EventAddresses.TableNames.COLUMN_COUNTRY,
         nullable = false,
-        length = AppConstants.Database.EventAddresses.Sizes.COUNTRY_LENGTH
+        columnDefinition = AppConstants.Database.EventAddresses.Definitions.COLUMN_COUNTRY
     )
     private String country;
 
+    @Convert(converter = EncryptedBigDecimalConverter.class)
     @Column
     (
         name = AppConstants.Database.EventAddresses.TableNames.COLUMN_LATITUDE,
-        precision = AppConstants.Database.EventAddresses.Sizes.LATITUDE_PRECISION,
-        scale = AppConstants.Database.EventAddresses.Sizes.LATITUDE_SCALE
+        columnDefinition = AppConstants.Database.EventAddresses.Definitions.COLUMN_LATITUDE
     )
     private BigDecimal latitude;
 
+    @Convert(converter = EncryptedBigDecimalConverter.class)
     @Column
     (
         name = AppConstants.Database.EventAddresses.TableNames.COLUMN_LONGITUDE,
-        precision = AppConstants.Database.EventAddresses.Sizes.LONGITUDE_PRECISION,
-        scale = AppConstants.Database.EventAddresses.Sizes.LONGITUDE_SCALE
+        columnDefinition = AppConstants.Database.EventAddresses.Definitions.COLUMN_LONGITUDE
     )
     private BigDecimal longitude;
 
@@ -179,14 +187,14 @@ public class EventAddress
     {
         return "EventAddress{" +
                "id=" + this.id +
-               ", addressLine1=" + this.addressLine1 +
-               ", addressLine2=" + this.addressLine2 +
-               ", city=" + this.city +
-               ", state=" + this.state +
-               ", postalCode=" + this.postalCode +
-               ", country=" + this.country +
-               ", latitude=" + this.latitude +
-               ", longitude=" + this.longitude +
+               ", addressLine1=[ENCRYPTED]" +
+               ", addressLine2=[ENCRYPTED]" +
+               ", city=[ENCRYPTED]" +
+               ", state=[ENCRYPTED]" +
+               ", postalCode=[ENCRYPTED]" +
+               ", country=[ENCRYPTED]" +
+               ", latitude=[ENCRYPTED]" +
+               ", longitude=[ENCRYPTED]" +
                '}';
     }
 
