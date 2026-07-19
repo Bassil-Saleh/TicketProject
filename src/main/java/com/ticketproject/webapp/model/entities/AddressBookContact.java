@@ -101,8 +101,8 @@ public class AddressBookContact
     {
         return "AddressBookContact{" +
                "id=" + this.id +
-               ", attendee=" + (this.attendee != null ? this.attendee.getEmail() : null) +
-               ", eventHost=" + (this.eventHost != null ? this.eventHost.getEmail() : null) +
+               ", attendeeId=" + (this.attendee != null ? this.attendee.getId() : null) +
+               ", eventHostId=" + (this.eventHost != null ? this.eventHost.getId() : null) +
                '}';
     }
 

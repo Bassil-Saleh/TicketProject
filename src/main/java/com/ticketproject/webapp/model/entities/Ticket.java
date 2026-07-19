@@ -178,7 +178,7 @@ public class Ticket
         return "Ticket{" +
                "id=" + this.id +
                ", tokenIdentifier='" + this.tokenIdentifier + '\'' +
-               ", attendee=" + (this.attendee != null ? this.attendee.getEmail() : null) +
+               ", attendeeId=" + (this.attendee != null ? this.attendee.getId() : null) +
                ", event=" + (this.event != null ? this.event.getName() : null) +
                ", present=" + this.present +
                ", invitationStatus=" + this.invitationStatus +

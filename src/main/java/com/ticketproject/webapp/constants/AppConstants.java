@@ -131,7 +131,8 @@ public final class AppConstants
                 public static final String COLUMN_FIRST_NAME = "first_name";
                 public static final String COLUMN_MIDDLE_NAME = "middle_name";
                 public static final String COLUMN_LAST_NAME = "last_name";
-                public static final String COLUMN_EMAIL = "email";
+                public static final String COLUMN_EMAIL_CIPHERTEXT = "email_ciphertext";
+                public static final String COLUMN_EMAIL_BLIND_INDEX = "email_blind_index";
                 public static final String COLUMN_CREATED = "created";
             }
 
@@ -344,7 +345,8 @@ public final class AppConstants
                 public static final String COLUMN_MIDDLE_NAME = "middle_name";
                 public static final String COLUMN_LAST_NAME = "last_name";
                 public static final String COLUMN_DATE_OF_BIRTH = "date_of_birth";
-                public static final String COLUMN_EMAIL = "email";
+                public static final String COLUMN_EMAIL_CIPHERTEXT = "email_ciphertext";
+                public static final String COLUMN_EMAIL_BLIND_INDEX = "email_blind_index";
                 public static final String COLUMN_PASSWORD_HASH = "password_hash";
                 public static final String COLUMN_CREATED = "created";
                 public static final String COLUMN_LAST_LOGIN = "last_login";

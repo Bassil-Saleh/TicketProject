@@ -111,7 +111,7 @@ public class TicketScan
         return "TicketScan{" +
                "id=" + this.id +
                ", ticketId=" + (this.ticket != null ? this.ticket.getId() : null) +
-               ", scannedBy=" + (this.scannedBy != null ? this.scannedBy.getEmail() : null) +
+               ", scannedByHostId=" + (this.scannedBy != null ? this.scannedBy.getId() : null) +
                ", scannedAt=" + this.scannedAt +
                '}';
     }

@@ -125,7 +125,7 @@ public class PasswordResetToken
     {
         return "PasswordResetToken{" +
                "id=" + this.id +
-               ", eventHost=" + (this.eventHost != null ? this.eventHost.getEmail() : null) +
+               ", eventHostId=" + (this.eventHost != null ? this.eventHost.getId() : null) +
                ", used=" + this.used +
                ", expires=" + this.expires +
                '}';

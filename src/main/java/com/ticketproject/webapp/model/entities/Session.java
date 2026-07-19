@@ -158,7 +158,7 @@ public class Session
     {
         return "Session{" +
                "id=" + this.id +
-               ", eventHost=" + (this.eventHost != null ? this.eventHost.getEmail() : null) +
+               ", eventHostId=" + (this.eventHost != null ? this.eventHost.getId() : null) +
                ", clientType=" + this.clientType +
                ", active=" + this.isActive() +
                '}';

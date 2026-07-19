@@ -17,7 +17,7 @@ import java.util.Objects;
     uniqueConstraints =
     {
         @UniqueConstraint
-        (columnNames = AppConstants.Database.EventHosts.TableNames.COLUMN_EMAIL)
+        (columnNames = AppConstants.Database.EventHosts.TableNames.COLUMN_EMAIL_BLIND_INDEX)
     }
 )
 public class EventHost
@@ -58,10 +58,17 @@ public class EventHost
 
     @Column
     (
-        name = AppConstants.Database.EventHosts.TableNames.COLUMN_EMAIL,
+        name = AppConstants.Database.EventHosts.TableNames.COLUMN_EMAIL_CIPHERTEXT,
         nullable = false
     )
-    private String email;
+    private String emailCiphertext;
+
+    @Column
+    (
+        name = AppConstants.Database.EventHosts.TableNames.COLUMN_EMAIL_BLIND_INDEX,
+        nullable = false
+    )
+    private String emailBlindIndex;
 
     @Column
     (
@@ -146,7 +153,8 @@ public class EventHost
         String middleName,
         String lastName,
         LocalDate dateOfBirth,
-        String email,
+        String emailCiphertext,
+        String emailBlindIndex,
         String passwordHash
     )
     {
@@ -154,7 +162,8 @@ public class EventHost
         this.middleName = middleName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
-        this.email = email;
+        this.emailCiphertext = emailCiphertext;
+        this.emailBlindIndex = emailBlindIndex;
         this.passwordHash = passwordHash;
     }
 
@@ -166,7 +175,8 @@ public class EventHost
     public String getMiddleName()                             { return this.middleName; }
     public String getLastName()                               { return this.lastName; }
     public LocalDate getDateOfBirth()                         { return this.dateOfBirth; }
-    public String getEmail()                                  { return this.email; }
+    public String getEmailCiphertext()                        { return this.emailCiphertext; }
+    public String getEmailBlindIndex()                        { return this.emailBlindIndex; }
     public String getPasswordHash()                           { return this.passwordHash; }
     public LocalDateTime getCreated()                         { return this.created; }
     public LocalDateTime getLastLogin()                       { return this.lastLogin; }
@@ -189,7 +199,8 @@ public class EventHost
     public void setMiddleName(String middleName)                                       { this.middleName = middleName; }
     public void setLastName(String lastName)                                           { this.lastName = lastName; }
     public void setDateOfBirth(LocalDate dateOfBirth)                                  { this.dateOfBirth = dateOfBirth; }
-    public void setEmail(String email)                                                 { this.email = email; }
+    public void setEmailCiphertext(String emailCiphertext)                             { this.emailCiphertext = emailCiphertext; }
+    public void setEmailBlindIndex(String emailBlindIndex)                             { this.emailBlindIndex = emailBlindIndex; }
     public void setPasswordHash(String passwordHash)                                   { this.passwordHash = passwordHash; }
     public void setCreated(LocalDateTime created)                                      { this.created = created; }
     public void setLastLogin(LocalDateTime lastLogin)                                  { this.lastLogin = lastLogin; }
@@ -229,7 +240,6 @@ public class EventHost
     {
         return "EventHost{" +
                "id=" + this.id +
-               ", email='" + this.email + '\'' +
                ", firstName='" + this.firstName + '\'' +
                ", lastName='" + this.lastName + '\'' +
                '}';
@@ -244,7 +254,8 @@ public class EventHost
         private String middleName;
         private String lastName;
         private LocalDate dateOfBirth;
-        private String email;
+        private String emailCiphertext;
+        private String emailBlindIndex;
         private String passwordHash;
 
         public Builder firstName(String firstName)
@@ -271,9 +282,15 @@ public class EventHost
             return this;
         }
 
-        public Builder email(String email)
+        public Builder emailCiphertext(String emailCiphertext)
         {
-            this.email = email;
+            this.emailCiphertext = emailCiphertext;
+            return this;
+        }
+
+        public Builder emailBlindIndex(String emailBlindIndex)
+        {
+            this.emailBlindIndex = emailBlindIndex;
             return this;
         }
 
@@ -291,7 +308,8 @@ public class EventHost
                 middleName,
                 lastName,
                 dateOfBirth,
-                email,
+                emailCiphertext,
+                emailBlindIndex,
                 passwordHash
             );
         }
