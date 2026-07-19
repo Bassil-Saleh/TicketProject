@@ -648,4 +648,21 @@ public final class AppConstants
             }
         }
     }
+
+    public static final class Crypto
+    {
+        /**
+         * Private constructor. Not meant to be used.
+         * @throws UnsupportedOperationException
+         */
+        private Crypto()
+        {
+            throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+        }
+
+        public static final String ENCRYPTION_ALGORITHM = "AES/GCM/NoPadding";
+        public static final String SECRET_KEY_ALGORITHM = "AES";
+        public static final int GCM_IV_LENGTH_BYTES = 12;
+        public static final int GCM_TAG_LENGTH_BITS = 128;
+    }
 }
