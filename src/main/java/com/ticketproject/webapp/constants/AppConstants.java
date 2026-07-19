@@ -84,7 +84,7 @@ public final class AppConstants
                 public static final String TABLE_NAME = "password_reset_tokens";
                 public static final String COLUMN_ID = "id";
                 public static final String COLUMN_EVENT_HOST_ID = "event_host_id";
-                public static final String COLUMN_TOKEN = "token";
+                public static final String COLUMN_TOKEN_HASH = "token_hash";
                 public static final String COLUMN_CREATED = "created";
                 public static final String COLUMN_USED = "used";
                 public static final String COLUMN_EXPIRES = "expires";

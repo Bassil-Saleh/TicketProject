@@ -24,11 +24,10 @@ public class PasswordResetToken
 
     @Column
     (
-        name = AppConstants.Database.PasswordResetTokens.TableNames.COLUMN_TOKEN,
-        nullable = false,
-        length = AppConstants.Database.PasswordResetTokens.Sizes.TOKEN_LENGTH
+        name = AppConstants.Database.PasswordResetTokens.TableNames.COLUMN_TOKEN_HASH,
+        nullable = false
     )
-    private String token;
+    private String tokenHash;
 
     @Column
     (
@@ -59,13 +58,13 @@ public class PasswordResetToken
     public PasswordResetToken
     (
         EventHost eventHost,
-        String token,
+        String tokenHash,
         LocalDateTime created,
         LocalDateTime expires
     )
     {
         this.eventHost = eventHost;
-        this.token = token;
+        this.tokenHash = tokenHash;
         this.created = created;
         this.expires = expires;
         this.used = false;
@@ -76,7 +75,7 @@ public class PasswordResetToken
     // ************************************************
     public Long getId()               { return this.id; }
     public EventHost getEventHost()   { return this.eventHost; }
-    public String getToken()          { return this.token; }
+    public String getTokenHash()      { return this.tokenHash; }
     public LocalDateTime getCreated() { return this.created; }
     public boolean isUsed()           { return this.used; }
     public LocalDateTime getExpires() { return this.expires; }
@@ -86,7 +85,7 @@ public class PasswordResetToken
     // ************************************************
     public void setId(Long id)                    { this.id = id; }
     public void setEventHost(EventHost eventHost) { this.eventHost = eventHost; }
-    public void setToken(String token)            { this.token = token; }
+    public void setTokenHash(String tokenHash)    { this.tokenHash = tokenHash; }
     public void setCreated(LocalDateTime created) { this.created = created; }
     public void setUsed(boolean used)             { this.used = used; }
     public void setExpires(LocalDateTime expires) { this.expires = expires; }
@@ -137,7 +136,7 @@ public class PasswordResetToken
     public static class Builder
     {
         private EventHost eventHost;
-        private String token;
+        private String tokenHash;
         private LocalDateTime created;
         private LocalDateTime expires;
 
@@ -147,9 +146,9 @@ public class PasswordResetToken
             return this;
         }
 
-        public Builder token(String token)
+        public Builder tokenHash(String tokenHash)
         {
-            this.token = token;
+            this.tokenHash = tokenHash;
             return this;
         }
 
@@ -167,7 +166,7 @@ public class PasswordResetToken
 
         public PasswordResetToken build()
         {
-            return new PasswordResetToken(eventHost, token, created, expires);
+            return new PasswordResetToken(eventHost, tokenHash, created, expires);
         }
     }
 }
