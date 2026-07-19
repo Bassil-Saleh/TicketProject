@@ -163,8 +163,67 @@ public class EventAddress
     public void setState(String state)                    { this.state = state; }
     public void setPostalCode(String postalCode)          { this.postalCode = postalCode; }
     public void setCountry(String country)                { this.country = country; }
-    public void setLatitude(BigDecimal latitude)          { this.latitude = latitude; }
-    public void setLongitude(BigDecimal longitude)        { this.longitude = longitude; }
+    public void setLatitude(BigDecimal latitude)
+    {
+        if
+        (
+            latitude != null &&
+            latitude.scale() > AppConstants.Database.EventAddresses.Sizes.LATITUDE_SCALE
+        )
+        {
+            throw new IllegalArgumentException
+            (
+                "Latitude must not exceed " +
+                AppConstants.Database.EventAddresses.Sizes.LATITUDE_SCALE +
+                " decimal places"
+            );
+        }
+        if
+        (
+            latitude != null &&
+            latitude.precision() > AppConstants.Database.EventAddresses.Sizes.LATITUDE_PRECISION
+        )
+        {
+            throw new IllegalArgumentException
+            (
+                "Latitude precision must not exceed " +
+                AppConstants.Database.EventAddresses.Sizes.LATITUDE_PRECISION +
+                " digits"
+            );
+        }
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(BigDecimal longitude)
+    {
+        if
+        (
+            longitude != null &&
+            longitude.scale() > AppConstants.Database.EventAddresses.Sizes.LONGITUDE_SCALE
+        )
+        {
+            throw new IllegalArgumentException
+            (
+                "Longitude must not exceed " +
+                AppConstants.Database.EventAddresses.Sizes.LONGITUDE_SCALE +
+                " decimal places"
+            );
+        }
+        if
+        (
+            longitude != null &&
+            longitude.precision() > AppConstants.Database.EventAddresses.Sizes.LONGITUDE_PRECISION
+        )
+        {
+            throw new IllegalArgumentException
+            (
+                "Longitude precision must not exceed " +
+                AppConstants.Database.EventAddresses.Sizes.LONGITUDE_PRECISION +
+                " digits"
+            );
+        }
+        this.longitude = longitude;
+    }
 
 
     // ************************************************
