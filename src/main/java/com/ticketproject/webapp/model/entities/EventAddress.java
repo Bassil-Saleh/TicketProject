@@ -180,13 +180,13 @@ public class EventAddress
         return "EventAddress{" +
                "id=" + this.id +
                ", addressLine1=" + this.addressLine1 +
-               ", addressLine2=" + (this.addressLine2 == null ? "null" : this.addressLine2) +
+               ", addressLine2=" + this.addressLine2 +
                ", city=" + this.city +
                ", state=" + this.state +
                ", postalCode=" + this.postalCode +
                ", country=" + this.country +
-               ", latitude=" + (this.latitude == null ? "null" : this.latitude) +
-               ", longitude=" + (this.longitude == null ? "null" : this.longitude) +
+               ", latitude=" + this.latitude +
+               ", longitude=" + this.longitude +
                '}';
     }
 
