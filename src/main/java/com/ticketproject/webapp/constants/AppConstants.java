@@ -353,7 +353,7 @@ public final class AppConstants
                 public static final String COLUMN_LAST_UPDATED = "last_updated";
                 public static final String COLUMN_ACTIVE = "active";
                 public static final String COLUMN_VERIFIED = "verified";
-                public static final String COLUMN_VERIFICATION_KEY = "verification_key";
+                public static final String COLUMN_VERIFICATION_KEY_HASH = "verification_key_hash";
                 public static final String COLUMN_VERIFICATION_EXPIRES = "verification_expires";
             }
 

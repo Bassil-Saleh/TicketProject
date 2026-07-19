@@ -114,11 +114,10 @@ public class EventHost
 
     @Column
     (
-        name = AppConstants.Database.EventHosts.TableNames.COLUMN_VERIFICATION_KEY,
-        nullable = false,
-        length = AppConstants.Database.EventHosts.Sizes.VERIFICATION_KEY_LENGTH
+        name = AppConstants.Database.EventHosts.TableNames.COLUMN_VERIFICATION_KEY_HASH,
+        nullable = false
     )
-    private String verificationKey;
+    private String verificationKeyHash;
 
     @Column
     (
@@ -183,7 +182,7 @@ public class EventHost
     public LocalDateTime getLastUpdated()                     { return this.lastUpdated; }
     public boolean isActive()                                 { return this.active; }
     public boolean isVerified()                               { return this.verified; }
-    public String getVerificationKey()                        { return this.verificationKey; }
+    public String getVerificationKeyHash()                    { return this.verificationKeyHash; }
     public LocalDateTime getVerificationExpires()             { return this.verificationExpires; }
     public Set<Event> getEvents()                             { return this.events; }
     public Set<AddressBookContact> getAddressBookContacts()   { return this.addressBookContacts; }
@@ -207,7 +206,7 @@ public class EventHost
     public void setLastUpdated(LocalDateTime lastUpdated)                              { this.lastUpdated = lastUpdated; }
     public void setActive(boolean active)                                              { this.active = active; }
     public void setVerified(boolean verified)                                          { this.verified = verified; }
-    public void setVerificationKey(String verificationKey)                             { this.verificationKey = verificationKey; }
+    public void setVerificationKeyHash(String verificationKeyHash)                     { this.verificationKeyHash = verificationKeyHash; }
     public void setVerificationExpires(LocalDateTime verificationExpires)              { this.verificationExpires = verificationExpires; }
     public void setEvents(Set<Event> events)                                           { this.events = events; }
     public void setAddressBookContacts(Set<AddressBookContact> addressBookContacts)    { this.addressBookContacts = addressBookContacts; }
