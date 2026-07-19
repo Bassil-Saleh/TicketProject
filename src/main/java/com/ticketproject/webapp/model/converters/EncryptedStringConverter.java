@@ -30,7 +30,7 @@ public class EncryptedStringConverter implements AttributeConverter<String, byte
         }
         catch (GeneralSecurityException e)
         {
-            return null;
+            throw new RuntimeException("Failed to encrypt field", e);
         }
     }
 
@@ -45,11 +45,11 @@ public class EncryptedStringConverter implements AttributeConverter<String, byte
         }
         catch (AEADBadTagException e)
         {
-            return null;
+            throw new RuntimeException("GCM authentication tag mismatch - wrong key or tampered data", e);
         }
         catch (GeneralSecurityException e)
         {
-            return null;
+            throw new RuntimeException("Failed to decrypt field", e);
         }
     }
 }
