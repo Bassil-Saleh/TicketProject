@@ -1,6 +1,7 @@
 package com.ticketproject.webapp.model.converters;
 
 import java.security.GeneralSecurityException;
+import java.time.LocalDateTime;
 
 import javax.crypto.AEADBadTagException;
 
@@ -8,7 +9,7 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter
-public class EncryptedStringConverter implements AttributeConverter<String, byte[]>
+public class EncryptedLocalDateTimeConverter implements AttributeConverter<LocalDateTime, byte[]>
 {
     private CryptoService cryptoService;
 
@@ -20,28 +21,28 @@ public class EncryptedStringConverter implements AttributeConverter<String, byte
     }
 
     @Override
-    public byte[] convertToDatabaseColumn(String plaintext)
+    public byte[] convertToDatabaseColumn(LocalDateTime dateTime)
     {
-        if (plaintext == null || plaintext.isEmpty())
+        if (dateTime == null)
             return null;
         try
         {
-            return getCryptoService().encryptString(plaintext);
+            return getCryptoService().encryptLocalDateTime(dateTime);
         }
         catch (GeneralSecurityException e)
         {
-            throw new RuntimeException("Failed to encrypt String", e);
+            throw new RuntimeException("Failed to encrypt LocalDateTime", e);
         }
     }
 
     @Override
-    public String convertToEntityAttribute(byte[] ciphertext)
+    public LocalDateTime convertToEntityAttribute(byte[] ciphertext)
     {
         if (ciphertext == null || ciphertext.length == 0)
             return null;
         try
         {
-            return getCryptoService().decryptString(ciphertext);
+            return getCryptoService().decryptLocalDateTime(ciphertext);
         }
         catch (AEADBadTagException e)
         {
@@ -49,7 +50,7 @@ public class EncryptedStringConverter implements AttributeConverter<String, byte
         }
         catch (GeneralSecurityException e)
         {
-            throw new RuntimeException("Failed to decrypt String", e);
+            throw new RuntimeException("Failed to decrypt LocalDateTime", e);
         }
     }
 }

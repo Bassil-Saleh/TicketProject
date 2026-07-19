@@ -1,5 +1,6 @@
 package com.ticketproject.webapp.model.converters;
 
+import java.math.BigDecimal;
 import java.security.GeneralSecurityException;
 
 import javax.crypto.AEADBadTagException;
@@ -8,7 +9,7 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter
-public class EncryptedStringConverter implements AttributeConverter<String, byte[]>
+public class EncryptedBigDecimalConverter implements AttributeConverter<BigDecimal, byte[]>
 {
     private CryptoService cryptoService;
 
@@ -20,28 +21,28 @@ public class EncryptedStringConverter implements AttributeConverter<String, byte
     }
 
     @Override
-    public byte[] convertToDatabaseColumn(String plaintext)
+    public byte[] convertToDatabaseColumn(BigDecimal decimal)
     {
-        if (plaintext == null || plaintext.isEmpty())
+        if (decimal == null)
             return null;
         try
         {
-            return getCryptoService().encryptString(plaintext);
+            return getCryptoService().encryptBigDecimal(decimal);
         }
         catch (GeneralSecurityException e)
         {
-            throw new RuntimeException("Failed to encrypt String", e);
+            throw new RuntimeException("Failed to encrypt BigDecimal", e);
         }
     }
 
     @Override
-    public String convertToEntityAttribute(byte[] ciphertext)
+    public BigDecimal convertToEntityAttribute(byte[] ciphertext)
     {
         if (ciphertext == null || ciphertext.length == 0)
             return null;
         try
         {
-            return getCryptoService().decryptString(ciphertext);
+            return getCryptoService().decryptBigDecimal(ciphertext);
         }
         catch (AEADBadTagException e)
         {
@@ -49,7 +50,7 @@ public class EncryptedStringConverter implements AttributeConverter<String, byte
         }
         catch (GeneralSecurityException e)
         {
-            throw new RuntimeException("Failed to decrypt String", e);
+            throw new RuntimeException("Failed to decrypt BigDecimal", e);
         }
     }
 }
