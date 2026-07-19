@@ -5,11 +5,13 @@ import com.ticketproject.webapp.constants.AppConstants;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.Base64;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.crypto.AEADBadTagException;
 import javax.crypto.Cipher;
@@ -76,19 +78,6 @@ public class CryptoService
     }
 
     /**
-     * Encrypt a String into IV + ciphertext.
-     * @param plaintext the String to be encrypted
-     * @return a byte[] of the IV + ciphertext
-     * @throws GeneralSecurityException if the encryption process fails
-     */
-    public byte[] encryptString(String plaintext) throws GeneralSecurityException
-    {
-        if (plaintext == null)
-            return null;
-        return encrypt(plaintext.getBytes(StandardCharsets.UTF_8));
-    }
-
-    /**
      * Decrypts bytes of IV + ciphertext into plaintext bytes
      * @param combined the byte array to be decrypted
      * @return a byte array of plaintext
@@ -131,6 +120,30 @@ public class CryptoService
     }
 
     /**
+     * Generate a byte array containing bytes of an initialization vector.
+     * @return a byte array containing bytes of an initialization vector
+     */
+    private byte[] generateIv()
+    {
+        byte[] iv = new byte[AppConstants.Crypto.GCM_IV_LENGTH_BYTES];
+        new SecureRandom().nextBytes(iv);
+        return iv;
+    }
+
+    /**
+     * Encrypt a String into IV + ciphertext.
+     * @param plaintext the String to be encrypted
+     * @return a byte[] of the IV + ciphertext
+     * @throws GeneralSecurityException if the encryption process fails
+     */
+    public byte[] encryptString(String plaintext) throws GeneralSecurityException
+    {
+        if (plaintext == null)
+            return null;
+        return encrypt(plaintext.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
      * Decrypt bytes of IV + ciphertext and return the plaintext as a String.
      * If null is provided, return null.
      * @param combined the byte array to be decrypted
@@ -148,14 +161,49 @@ public class CryptoService
         return new String(decrypt(combined), StandardCharsets.UTF_8);
     }
 
-    /**
-     * Generate a byte array containing bytes of an initialization vector.
-     * @return a byte array containing bytes of an initialization vector
-     */
-    private byte[] generateIv()
+    public byte[] encryptLocalDate(LocalDate date) throws GeneralSecurityException
     {
-        byte[] iv = new byte[AppConstants.Crypto.GCM_IV_LENGTH_BYTES];
-        new SecureRandom().nextBytes(iv);
-        return iv;
+        if (date == null)
+            return null;
+        return encryptString(date.format(AppConstants.Crypto.DATE_FORMAT));
+    }
+
+    public LocalDate decryptLocalDate(byte[] ciphertext)
+    throws AEADBadTagException, GeneralSecurityException
+    {
+        if (ciphertext == null)
+            return null;
+        return LocalDate.parse(decryptString(ciphertext), AppConstants.Crypto.DATE_FORMAT);
+    }
+
+    public byte[] encryptLocalDateTime(LocalDateTime dateTime) throws GeneralSecurityException
+    {
+        if (dateTime == null)
+            return null;
+        return encryptString(dateTime.format(AppConstants.Crypto.DATE_TIME_FORMAT));
+    }
+
+    public LocalDateTime decryptLocalDateTime(byte[] ciphertext)
+    throws AEADBadTagException, GeneralSecurityException
+    {
+        if (ciphertext == null)
+            return null;
+        return LocalDateTime.parse(decryptString(ciphertext), AppConstants.Crypto.DATE_TIME_FORMAT);
+    }
+
+    public byte[] encryptBigDecimal(BigDecimal value) throws GeneralSecurityException
+    {
+        if (value == null)
+            return null;
+        // toPlainString avoids scientific notation (i.e. "0.01", not "1E-2")
+        return encryptString(value.toPlainString());
+    }
+
+    public BigDecimal decryptBigDecimal(byte[] ciphertext)
+    throws AEADBadTagException, GeneralSecurityException
+    {
+        if (ciphertext == null)
+            return null;
+        return new BigDecimal(decryptString(ciphertext));
     }
 }

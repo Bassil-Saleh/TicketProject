@@ -1,5 +1,7 @@
 package com.ticketproject.webapp.constants;
 
+import java.time.format.DateTimeFormatter;
+
 /**
  * AppConstants is a utility class for holding different constants
  * used throughout this project.
@@ -664,5 +666,7 @@ public final class AppConstants
         public static final String SECRET_KEY_ALGORITHM = "AES";
         public static final int GCM_IV_LENGTH_BYTES = 12;
         public static final int GCM_TAG_LENGTH_BITS = 128;
+        public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE;
+        public static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     }
 }
