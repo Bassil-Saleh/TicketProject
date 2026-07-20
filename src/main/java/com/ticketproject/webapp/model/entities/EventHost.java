@@ -65,7 +65,7 @@ public class EventHost
     (
         name = AppConstants.Database.EventHosts.TableNames.COLUMN_EMAIL,
         nullable = false,
-        columnDefinition = AppConstants.Database.EventHosts.TableNames.COLUMN_EMAIL
+        columnDefinition = AppConstants.Database.EventHosts.Definitions.COLUMN_EMAIL
     )
     private String email;
 
