@@ -133,7 +133,7 @@ public final class AppConstants
                 public static final String COLUMN_FIRST_NAME = "first_name";
                 public static final String COLUMN_MIDDLE_NAME = "middle_name";
                 public static final String COLUMN_LAST_NAME = "last_name";
-                public static final String COLUMN_EMAIL_CIPHERTEXT = "email_ciphertext";
+                public static final String COLUMN_EMAIL = "email";
                 public static final String COLUMN_EMAIL_BLIND_INDEX = "email_blind_index";
                 public static final String COLUMN_CREATED = "created";
             }
@@ -164,6 +164,21 @@ public final class AppConstants
 
                 public static final int NAME_LENGTH = 100;
                 public static final int EMAIL_LENGTH = 255;
+            }
+
+            public static final class Definitions
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private Definitions()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+
+                public static final String COLUMN_EMAIL = "VARBINARY(512)";
+                public static final String COLUMN_EMAIL_BLIND_INDEX = "VARBINARY(32)";
             }
         }
 

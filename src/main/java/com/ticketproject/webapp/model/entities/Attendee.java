@@ -1,6 +1,7 @@
 package com.ticketproject.webapp.model.entities;
 
 import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.model.converters.EncryptedStringConverter;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -47,19 +48,22 @@ public class Attendee
     )
     private String lastName;
 
+    @Convert(converter = EncryptedStringConverter.class)
     @Column
     (
-        name = AppConstants.Database.Attendees.TableNames.COLUMN_EMAIL_CIPHERTEXT,
-        nullable = false
+        name = AppConstants.Database.Attendees.TableNames.COLUMN_EMAIL,
+        nullable = false,
+        columnDefinition = AppConstants.Database.Attendees.Definitions.COLUMN_EMAIL
     )
-    private String emailCiphertext;
+    private String email;
 
     @Column
     (
         name = AppConstants.Database.Attendees.TableNames.COLUMN_EMAIL_BLIND_INDEX,
-        nullable = false
+        nullable = false,
+        columnDefinition = AppConstants.Database.Attendees.Definitions.COLUMN_EMAIL_BLIND_INDEX
     )
-    private String emailBlindIndex;
+    private byte[] emailBlindIndex;
 
     @Column
     (
@@ -87,14 +91,14 @@ public class Attendee
         String firstName,
         String middleName,
         String lastName,
-        String emailCiphertext,
-        String emailBlindIndex
+        String email,
+        byte[] emailBlindIndex
     )
     {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
-        this.emailCiphertext = emailCiphertext;
+        this.email = email;
         this.emailBlindIndex = emailBlindIndex;
     }
 
@@ -105,8 +109,8 @@ public class Attendee
     public String getFirstName()                              { return this.firstName; }
     public String getMiddleName()                             { return this.middleName; }
     public String getLastName()                               { return this.lastName; }
-    public String getEmailCiphertext()                        { return this.emailCiphertext; }
-    public String getEmailBlindIndex()                        { return this.emailBlindIndex; }
+    public String getEmail()                                  { return this.email; }
+    public byte[] getEmailBlindIndex()                        { return this.emailBlindIndex; }
     public LocalDateTime getCreated()                         { return this.created; }
     public Set<Ticket> getTickets()                           { return this.tickets; }
     public Set<AddressBookContact> getAddressBookContacts()   { return this.addressBookContacts; }
@@ -119,8 +123,8 @@ public class Attendee
     public void setFirstName(String firstName)                                         { this.firstName = firstName; }
     public void setMiddleName(String middleName)                                       { this.middleName = middleName; }
     public void setLastName(String lastName)                                           { this.lastName = lastName; }
-    public void setEmailCiphertext(String emailCiphertext)                             { this.emailCiphertext = emailCiphertext; }
-    public void setEmailBlindIndex(String emailBlindIndex)                             { this.emailBlindIndex = emailBlindIndex; }
+    public void setEmail(String email)                                                 { this.email = email; }
+    public void setEmailBlindIndex(byte[] emailBlindIndex)                             { this.emailBlindIndex = emailBlindIndex; }
     public void setCreated(LocalDateTime created)                                      { this.created = created; }
     public void setTickets(Set<Ticket> tickets)                                        { this.tickets = tickets; }
     public void setAddressBookContacts(Set<AddressBookContact> addressBookContacts)    { this.addressBookContacts = addressBookContacts; }
@@ -174,8 +178,8 @@ public class Attendee
         private String firstName;
         private String middleName;
         private String lastName;
-        private String emailCiphertext;
-        private String emailBlindIndex;
+        private String email;
+        private byte[] emailBlindIndex;
 
         public Builder firstName(String firstName)
         {
@@ -195,13 +199,13 @@ public class Attendee
             return this;
         }
 
-        public Builder emailCiphertext(String emailCiphertext)
+        public Builder email(String email)
         {
-            this.emailCiphertext = emailCiphertext;
+            this.email = email;
             return this;
         }
 
-        public Builder emailBlindIndex(String emailBlindIndex)
+        public Builder emailBlindIndex(byte[] emailBlindIndex)
         {
             this.emailBlindIndex = emailBlindIndex;
             return this;
@@ -214,7 +218,7 @@ public class Attendee
                 firstName,
                 middleName,
                 lastName,
-                emailCiphertext,
+                email,
                 emailBlindIndex
             );
         }
