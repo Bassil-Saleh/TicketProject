@@ -1,6 +1,7 @@
 package com.ticketproject.webapp.model.entities;
 
 import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.model.converters.EncryptedPrivateKeyConverter;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -30,7 +31,7 @@ public class EventSigningKey
     )
     private Event event;
 
-    @Lob
+    @Convert(converter = EncryptedPrivateKeyConverter.class)
     @Column
     (
         name = AppConstants.Database.EventSigningKeys.TableNames.COLUMN_PRIVATE_KEY,
@@ -39,7 +40,6 @@ public class EventSigningKey
     )
     private byte[] privateKey;
 
-    @Lob
     @Column
     (
         name = AppConstants.Database.EventSigningKeys.TableNames.COLUMN_PUBLIC_KEY,
