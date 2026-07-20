@@ -362,7 +362,7 @@ public final class AppConstants
                 public static final String COLUMN_MIDDLE_NAME = "middle_name";
                 public static final String COLUMN_LAST_NAME = "last_name";
                 public static final String COLUMN_DATE_OF_BIRTH = "date_of_birth";
-                public static final String COLUMN_EMAIL_CIPHERTEXT = "email_ciphertext";
+                public static final String COLUMN_EMAIL = "email";
                 public static final String COLUMN_EMAIL_BLIND_INDEX = "email_blind_index";
                 public static final String COLUMN_PASSWORD_HASH = "password_hash";
                 public static final String COLUMN_CREATED = "created";
@@ -403,6 +403,21 @@ public final class AppConstants
                 public static final String MAPPED_BY_EVENT_HOST = "eventHost";
                 public static final String MAPPED_BY_BLOCKED_BY = "blockedBy";
                 public static final String MAPPED_BY_SCANNED_BY = "scannedBy";
+            }
+
+            public static final class Definitions
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private Definitions()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+                public static final String COLUMN_DATE_OF_BIRTH = "VARBINARY(128)";
+                public static final String COLUMN_EMAIL = "VARBINARY(512)";
+                public static final String COLUMN_EMAIL_BLIND_INDEX = "VARBINARY(32)";
             }
         }
 

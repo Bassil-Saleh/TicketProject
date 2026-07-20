@@ -1,6 +1,8 @@
 package com.ticketproject.webapp.model.entities;
 
 import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.model.converters.EncryptedLocalDateConverter;
+import com.ticketproject.webapp.model.converters.EncryptedStringConverter;
 
 import jakarta.persistence.*;
 
@@ -49,26 +51,31 @@ public class EventHost
     )
     private String lastName;
 
+    @Convert(converter = EncryptedLocalDateConverter.class)
     @Column
     (
         name = AppConstants.Database.EventHosts.TableNames.COLUMN_DATE_OF_BIRTH,
-        nullable = false
+        nullable = false,
+        columnDefinition = AppConstants.Database.EventHosts.Definitions.COLUMN_DATE_OF_BIRTH
     )
     private LocalDate dateOfBirth;
 
+    @Convert(converter = EncryptedStringConverter.class)
     @Column
     (
-        name = AppConstants.Database.EventHosts.TableNames.COLUMN_EMAIL_CIPHERTEXT,
-        nullable = false
+        name = AppConstants.Database.EventHosts.TableNames.COLUMN_EMAIL,
+        nullable = false,
+        columnDefinition = AppConstants.Database.EventHosts.TableNames.COLUMN_EMAIL
     )
-    private String emailCiphertext;
+    private String email;
 
     @Column
     (
         name = AppConstants.Database.EventHosts.TableNames.COLUMN_EMAIL_BLIND_INDEX,
-        nullable = false
+        nullable = false,
+        columnDefinition = AppConstants.Database.EventHosts.Definitions.COLUMN_EMAIL_BLIND_INDEX
     )
-    private String emailBlindIndex;
+    private byte[] emailBlindIndex;
 
     @Column
     (
@@ -152,8 +159,8 @@ public class EventHost
         String middleName,
         String lastName,
         LocalDate dateOfBirth,
-        String emailCiphertext,
-        String emailBlindIndex,
+        String email,
+        byte[] emailBlindIndex,
         String passwordHash
     )
     {
@@ -161,7 +168,7 @@ public class EventHost
         this.middleName = middleName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
-        this.emailCiphertext = emailCiphertext;
+        this.email = email;
         this.emailBlindIndex = emailBlindIndex;
         this.passwordHash = passwordHash;
     }
@@ -174,8 +181,8 @@ public class EventHost
     public String getMiddleName()                             { return this.middleName; }
     public String getLastName()                               { return this.lastName; }
     public LocalDate getDateOfBirth()                         { return this.dateOfBirth; }
-    public String getEmailCiphertext()                        { return this.emailCiphertext; }
-    public String getEmailBlindIndex()                        { return this.emailBlindIndex; }
+    public String getEmail()                                  { return this.email; }
+    public byte[] getEmailBlindIndex()                        { return this.emailBlindIndex; }
     public String getPasswordHash()                           { return this.passwordHash; }
     public LocalDateTime getCreated()                         { return this.created; }
     public LocalDateTime getLastLogin()                       { return this.lastLogin; }
@@ -198,8 +205,8 @@ public class EventHost
     public void setMiddleName(String middleName)                                       { this.middleName = middleName; }
     public void setLastName(String lastName)                                           { this.lastName = lastName; }
     public void setDateOfBirth(LocalDate dateOfBirth)                                  { this.dateOfBirth = dateOfBirth; }
-    public void setEmailCiphertext(String emailCiphertext)                             { this.emailCiphertext = emailCiphertext; }
-    public void setEmailBlindIndex(String emailBlindIndex)                             { this.emailBlindIndex = emailBlindIndex; }
+    public void setEmail(String email)                                                 { this.email = email; }
+    public void setEmailBlindIndex(byte[] emailBlindIndex)                             { this.emailBlindIndex = emailBlindIndex; }
     public void setPasswordHash(String passwordHash)                                   { this.passwordHash = passwordHash; }
     public void setCreated(LocalDateTime created)                                      { this.created = created; }
     public void setLastLogin(LocalDateTime lastLogin)                                  { this.lastLogin = lastLogin; }
@@ -253,8 +260,8 @@ public class EventHost
         private String middleName;
         private String lastName;
         private LocalDate dateOfBirth;
-        private String emailCiphertext;
-        private String emailBlindIndex;
+        private String email;
+        private byte[] emailBlindIndex;
         private String passwordHash;
 
         public Builder firstName(String firstName)
@@ -281,13 +288,13 @@ public class EventHost
             return this;
         }
 
-        public Builder emailCiphertext(String emailCiphertext)
+        public Builder email(String email)
         {
-            this.emailCiphertext = emailCiphertext;
+            this.email = email;
             return this;
         }
 
-        public Builder emailBlindIndex(String emailBlindIndex)
+        public Builder emailBlindIndex(byte[] emailBlindIndex)
         {
             this.emailBlindIndex = emailBlindIndex;
             return this;
@@ -307,7 +314,7 @@ public class EventHost
                 middleName,
                 lastName,
                 dateOfBirth,
-                emailCiphertext,
+                email,
                 emailBlindIndex,
                 passwordHash
             );
