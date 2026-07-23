@@ -1,11 +1,14 @@
 package com.ticketproject.webapp.model.entities;
 
 import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.model.converters.BlindIndexService;
 import com.ticketproject.webapp.model.converters.EncryptedLocalDateConverter;
 import com.ticketproject.webapp.model.converters.EncryptedStringConverter;
+import com.ticketproject.webapp.model.converters.SpringContextBridge;
 
 import jakarta.persistence.*;
 
+import java.security.MessageDigest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -162,7 +165,6 @@ public class EventHost
         String lastName,
         LocalDate dateOfBirth,
         String email,
-        byte[] emailBlindIndex,
         String passwordHash
     )
     {
@@ -170,8 +172,7 @@ public class EventHost
         this.middleName = middleName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
-        this.email = email;
-        this.emailBlindIndex = emailBlindIndex;
+        this.setEmail(email);
         this.passwordHash = passwordHash;
     }
 
@@ -207,8 +208,13 @@ public class EventHost
     public void setMiddleName(String middleName)                                       { this.middleName = middleName; }
     public void setLastName(String lastName)                                           { this.lastName = lastName; }
     public void setDateOfBirth(LocalDate dateOfBirth)                                  { this.dateOfBirth = dateOfBirth; }
-    public void setEmail(String email)                                                 { this.email = email; }
-    public void setEmailBlindIndex(byte[] emailBlindIndex)                             { this.emailBlindIndex = emailBlindIndex; }
+    public void setEmail(String email)
+    {
+        this.email = email;
+        this.emailBlindIndex = SpringContextBridge
+            .getBean(BlindIndexService.class)
+            .computeIndex(email);
+    }
     public void setPasswordHash(String passwordHash)                                   { this.passwordHash = passwordHash; }
     public void setCreated(LocalDateTime created)                                      { this.created = created; }
     public void setLastLogin(LocalDateTime lastLogin)                                  { this.lastLogin = lastLogin; }
@@ -222,7 +228,25 @@ public class EventHost
     public void setPasswordResetTokens(Set<PasswordResetToken> passwordResetTokens)    { this.passwordResetTokens = passwordResetTokens; }
     public void setBlockedRegistrations(Set<BlockedRegistration> blockedRegistrations) { this.blockedRegistrations = blockedRegistrations; }
     public void setTicketScans(Set<TicketScan> ticketScans)                            { this.ticketScans = ticketScans; }
-
+    /**
+     * To handle edge cases where JPA loads a partially-constructed
+     * entity or when someone uses reflection.
+     */
+    @PrePersist
+    @PreUpdate
+    private void syncBlindIndex()
+    {
+        if (this.email != null)
+        {
+            byte[] computed = SpringContextBridge
+                .getBean(BlindIndexService.class)
+                .computeIndex(this.email);
+            if (this.emailBlindIndex == null || !MessageDigest.isEqual(this.emailBlindIndex, computed))
+            {
+                this.emailBlindIndex = computed;
+            }
+        }
+    }
 
     // ************************************************
     // equals(), hashCode(), toString()
@@ -263,7 +287,6 @@ public class EventHost
         private String lastName;
         private LocalDate dateOfBirth;
         private String email;
-        private byte[] emailBlindIndex;
         private String passwordHash;
 
         public Builder firstName(String firstName)
@@ -296,12 +319,6 @@ public class EventHost
             return this;
         }
 
-        public Builder emailBlindIndex(byte[] emailBlindIndex)
-        {
-            this.emailBlindIndex = emailBlindIndex;
-            return this;
-        }
-
         public Builder passwordHash(String passwordHash)
         {
             this.passwordHash = passwordHash;
@@ -317,7 +334,6 @@ public class EventHost
                 lastName,
                 dateOfBirth,
                 email,
-                emailBlindIndex,
                 passwordHash
             );
         }

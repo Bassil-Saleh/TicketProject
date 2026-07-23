@@ -1,9 +1,13 @@
 package com.ticketproject.webapp.model.entities;
 
 import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.model.converters.BlindIndexService;
 import com.ticketproject.webapp.model.converters.EncryptedStringConverter;
+import com.ticketproject.webapp.model.converters.SpringContextBridge;
 
 import jakarta.persistence.*;
+
+import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.HashSet;
@@ -91,15 +95,13 @@ public class Attendee
         String firstName,
         String middleName,
         String lastName,
-        String email,
-        byte[] emailBlindIndex
+        String email
     )
     {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
-        this.email = email;
-        this.emailBlindIndex = emailBlindIndex;
+        this.setEmail(email);
     }
 
     // ************************************************
@@ -123,12 +125,36 @@ public class Attendee
     public void setFirstName(String firstName)                                         { this.firstName = firstName; }
     public void setMiddleName(String middleName)                                       { this.middleName = middleName; }
     public void setLastName(String lastName)                                           { this.lastName = lastName; }
-    public void setEmail(String email)                                                 { this.email = email; }
-    public void setEmailBlindIndex(byte[] emailBlindIndex)                             { this.emailBlindIndex = emailBlindIndex; }
+    public void setEmail(String email)
+    {
+        this.email = email;
+        this.emailBlindIndex = SpringContextBridge
+            .getBean(BlindIndexService.class)
+            .computeIndex(email);
+    }
     public void setCreated(LocalDateTime created)                                      { this.created = created; }
     public void setTickets(Set<Ticket> tickets)                                        { this.tickets = tickets; }
     public void setAddressBookContacts(Set<AddressBookContact> addressBookContacts)    { this.addressBookContacts = addressBookContacts; }
     public void setBlockedRegistrations(Set<BlockedRegistration> blockedRegistrations) { this.blockedRegistrations = blockedRegistrations; }
+    /**
+     * To handle edge cases where JPA loads a partially-constructed
+     * entity or when someone uses reflection.
+     */
+    @PrePersist
+    @PreUpdate
+    private void syncBlindIndex()
+    {
+        if (this.email != null)
+        {
+            byte[] computed = SpringContextBridge
+                .getBean(BlindIndexService.class)
+                .computeIndex(this.email);
+            if (this.emailBlindIndex == null || !MessageDigest.isEqual(this.emailBlindIndex, computed))
+            {
+                this.emailBlindIndex = computed;
+            }
+        }
+    }
 
     // ************************************************
     // Convenience methods
@@ -179,7 +205,6 @@ public class Attendee
         private String middleName;
         private String lastName;
         private String email;
-        private byte[] emailBlindIndex;
 
         public Builder firstName(String firstName)
         {
@@ -205,12 +230,6 @@ public class Attendee
             return this;
         }
 
-        public Builder emailBlindIndex(byte[] emailBlindIndex)
-        {
-            this.emailBlindIndex = emailBlindIndex;
-            return this;
-        }
-
         public Attendee build()
         {
             return new Attendee
@@ -218,8 +237,7 @@ public class Attendee
                 firstName,
                 middleName,
                 lastName,
-                email,
-                emailBlindIndex
+                email
             );
         }
     }

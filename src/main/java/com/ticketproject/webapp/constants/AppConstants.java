@@ -747,5 +747,6 @@ public final class AppConstants
         public static final int GCM_TAG_LENGTH_BITS = 128;
         public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE;
         public static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        public static final String BLIND_INDEX_KEY_ALGORITHM = "HmacSHA256";
     }
 }
