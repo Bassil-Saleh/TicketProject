@@ -105,6 +105,19 @@ public final class AppConstants
 
                 public static final int TOKEN_LENGTH = 36;
             }
+
+            public static final class Definitions
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private Definitions()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+                public static final String COLUMN_TOKEN_HASH = "VARBINARY(32)";
+            }
         }
 
         public static final class Attendees
@@ -418,6 +431,8 @@ public final class AppConstants
                 public static final String COLUMN_DATE_OF_BIRTH = "VARBINARY(128)";
                 public static final String COLUMN_EMAIL = "VARBINARY(512)";
                 public static final String COLUMN_EMAIL_BLIND_INDEX = "VARBINARY(32)";
+                public static final String COLUMN_PASSWORD_HASH = "VARCHAR(255)";
+                public static final String COLUMN_VERIFICATION_KEY_HASH = "VARBINARY(32)";
             }
         }
 
@@ -652,6 +667,19 @@ public final class AppConstants
                 public static final int TOKEN_HASH_LENGTH = 64;
                 public static final int IP_ADDRESS_LENGTH = 45;
                 public static final int USER_AGENT_LENGTH = 512;
+            }
+
+            public static final class Definitions
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private Definitions()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+                public static final String COLUMN_TOKEN_HASH = "VARBINARY(32)";
             }
         }
 

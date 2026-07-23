@@ -25,7 +25,8 @@ public class PasswordResetToken
     @Column
     (
         name = AppConstants.Database.PasswordResetTokens.TableNames.COLUMN_TOKEN_HASH,
-        nullable = false
+        nullable = false,
+        columnDefinition = AppConstants.Database.PasswordResetTokens.Definitions.COLUMN_TOKEN_HASH
     )
     private String tokenHash;
 

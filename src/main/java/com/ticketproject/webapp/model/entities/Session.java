@@ -35,7 +35,7 @@ public class Session
     (
         name = AppConstants.Database.Sessions.TableNames.COLUMN_TOKEN_HASH,
         nullable = false,
-        length = AppConstants.Database.Sessions.Sizes.TOKEN_HASH_LENGTH
+        columnDefinition = AppConstants.Database.Sessions.Definitions.COLUMN_TOKEN_HASH
     )
     private String tokenHash;
 

@@ -80,7 +80,8 @@ public class EventHost
     @Column
     (
         name = AppConstants.Database.EventHosts.TableNames.COLUMN_PASSWORD_HASH,
-        nullable = false
+        nullable = false,
+        columnDefinition = AppConstants.Database.EventHosts.Definitions.COLUMN_PASSWORD_HASH
     )
     private String passwordHash;
 
@@ -122,7 +123,8 @@ public class EventHost
     @Column
     (
         name = AppConstants.Database.EventHosts.TableNames.COLUMN_VERIFICATION_KEY_HASH,
-        nullable = false
+        nullable = false,
+        columnDefinition = AppConstants.Database.EventHosts.Definitions.COLUMN_VERIFICATION_KEY_HASH
     )
     private String verificationKeyHash;
 
