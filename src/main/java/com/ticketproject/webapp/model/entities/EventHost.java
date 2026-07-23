@@ -5,6 +5,7 @@ import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.converters.EncryptedLocalDateConverter;
 import com.ticketproject.webapp.converters.EncryptedStringConverter;
 import com.ticketproject.webapp.services.BlindIndexService;
+import com.ticketproject.webapp.services.HashingService;
 
 import jakarta.persistence.*;
 
@@ -164,8 +165,7 @@ public class EventHost
         String middleName,
         String lastName,
         LocalDate dateOfBirth,
-        String email,
-        String passwordHash
+        String email
     )
     {
         this.firstName = firstName;
@@ -173,7 +173,6 @@ public class EventHost
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
         this.setEmail(email);
-        this.passwordHash = passwordHash;
     }
 
     // ************************************************
@@ -214,13 +213,28 @@ public class EventHost
             .getBean(BlindIndexService.class)
             .computeIndex(email);
     }
-    public void setPasswordHash(String passwordHash)                                   { this.passwordHash = passwordHash; }
+    public void setPassword(String plaintextPassword)
+    {
+        HashingService hasher = SpringContextBridge.getBean(HashingService.class);
+        this.passwordHash = hasher.hashPassword(plaintextPassword);
+    }
     public void setCreated(LocalDateTime created)                                      { this.created = created; }
     public void setLastLogin(LocalDateTime lastLogin)                                  { this.lastLogin = lastLogin; }
     public void setLastUpdated(LocalDateTime lastUpdated)                              { this.lastUpdated = lastUpdated; }
     public void setActive(boolean active)                                              { this.active = active; }
     public void setVerified(boolean verified)                                          { this.verified = verified; }
-    public void setVerificationKeyHash(byte[] verificationKeyHash)                     { this.verificationKeyHash = verificationKeyHash; }
+    /**
+     * Generate a verification token, store its hash, then return the raw token
+     * (i.e. to use in a URL in an account verification email).
+     * @return the raw verification token
+     */
+    public String generateVerificationToken()
+    {
+        HashingService hasher = SpringContextBridge.getBean(HashingService.class);
+        HashingService.GeneratedToken token = hasher.generateVerificationToken();
+        this.verificationKeyHash = token.tokenHash();
+        return token.rawToken();
+    }
     public void setVerificationExpires(LocalDateTime verificationExpires)              { this.verificationExpires = verificationExpires; }
     public void setEvents(Set<Event> events)                                           { this.events = events; }
     public void setAddressBookContacts(Set<AddressBookContact> addressBookContacts)    { this.addressBookContacts = addressBookContacts; }
@@ -286,7 +300,6 @@ public class EventHost
         private String lastName;
         private LocalDate dateOfBirth;
         private String email;
-        private String passwordHash;
 
         public Builder firstName(String firstName)
         {
@@ -318,12 +331,6 @@ public class EventHost
             return this;
         }
 
-        public Builder passwordHash(String passwordHash)
-        {
-            this.passwordHash = passwordHash;
-            return this;
-        }
-
         public EventHost build()
         {
             return new EventHost
@@ -332,8 +339,7 @@ public class EventHost
                 middleName,
                 lastName,
                 dateOfBirth,
-                email,
-                passwordHash
+                email
             );
         }
     }
