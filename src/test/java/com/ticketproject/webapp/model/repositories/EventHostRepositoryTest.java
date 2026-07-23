@@ -98,5 +98,21 @@ class EventHostRepositoryTest
             assertThat(found).isPresent();
             assertThat(found.get().getEmail()).isEqualTo("bob@example.com");
         }
+
+        @Test
+        @DisplayName("Normalized email lookup: whitespace and case")
+        void blindIndexIsNormalized()
+        {
+            EventHost host = createHost("   CaRoL@eXaMpLe.cOm    ");
+            eventHostRepository.save(host);
+
+            // Should match since normalization strips trailing & leading whitespace
+            // and also converts the email to lowercase.
+            byte[] index = blindIndexService.computeIndex("carol@example.com");
+
+            Optional<EventHost> found = eventHostRepository.findByEmailIndex(index);
+
+            assertThat(found).isPresent();
+        }
     }
 }
