@@ -131,4 +131,24 @@ class EventHostRepositoryTest
             assertThat(cammyIndex).isNotEqualTo(jerryIndex);
         }
     }
+
+    @Nested
+    @DisplayName("Password hashing")
+    class PasswordHashing
+    {
+        @Test
+        @DisplayName("Password is hashed, not stored in plaintext")
+        void passwordIsHashed()
+        {
+            EventHost host = createHost("darla@respectableDomain.net");
+            eventHostRepository.save(host);
+
+            EventHost loaded = eventHostRepository.findById(host.getId()).orElseThrow();
+
+            // The stored hash should NOT be the plaintext password.
+            assertThat(loaded.getPasswordHash())
+                .isNotEqualTo("blahBlah123")
+                .startsWith("$2a$"); // bcrypt format indicator
+        }
+    }
 }
