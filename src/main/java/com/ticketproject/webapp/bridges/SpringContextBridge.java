@@ -1,4 +1,4 @@
-package com.ticketproject.webapp.model.converters;
+package com.ticketproject.webapp.bridges;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;

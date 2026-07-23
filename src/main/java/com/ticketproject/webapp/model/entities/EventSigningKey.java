@@ -1,7 +1,7 @@
 package com.ticketproject.webapp.model.entities;
 
 import com.ticketproject.webapp.constants.AppConstants;
-import com.ticketproject.webapp.model.converters.EncryptedPrivateKeyConverter;
+import com.ticketproject.webapp.converters.EncryptedPrivateKeyConverter;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

@@ -1,4 +1,4 @@
-package com.ticketproject.webapp.model.converters;
+package com.ticketproject.webapp.converters;
 
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
@@ -7,7 +7,9 @@ import java.security.spec.PKCS8EncodedKeySpec;
 
 import javax.crypto.AEADBadTagException;
 
+import com.ticketproject.webapp.bridges.SpringContextBridge;
 import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.services.CryptoService;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

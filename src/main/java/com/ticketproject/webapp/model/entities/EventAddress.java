@@ -1,8 +1,8 @@
 package com.ticketproject.webapp.model.entities;
 
 import com.ticketproject.webapp.constants.AppConstants;
-import com.ticketproject.webapp.model.converters.EncryptedStringConverter;
-import com.ticketproject.webapp.model.converters.EncryptedBigDecimalConverter;
+import com.ticketproject.webapp.converters.EncryptedBigDecimalConverter;
+import com.ticketproject.webapp.converters.EncryptedStringConverter;
 
 import jakarta.persistence.*;
 

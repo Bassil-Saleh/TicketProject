@@ -1,15 +1,17 @@
-package com.ticketproject.webapp.model.converters;
+package com.ticketproject.webapp.converters;
 
 import java.security.GeneralSecurityException;
-import java.time.LocalDate;
 
 import javax.crypto.AEADBadTagException;
+
+import com.ticketproject.webapp.bridges.SpringContextBridge;
+import com.ticketproject.webapp.services.CryptoService;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter
-public class EncryptedLocalDateConverter implements AttributeConverter<LocalDate, byte[]>
+public class EncryptedStringConverter implements AttributeConverter<String, byte[]>
 {
     private CryptoService cryptoService;
 
@@ -21,28 +23,28 @@ public class EncryptedLocalDateConverter implements AttributeConverter<LocalDate
     }
 
     @Override
-    public byte[] convertToDatabaseColumn(LocalDate date)
+    public byte[] convertToDatabaseColumn(String plaintext)
     {
-        if (date == null)
+        if (plaintext == null || plaintext.isEmpty())
             return null;
         try
         {
-            return getCryptoService().encryptLocalDate(date);
+            return getCryptoService().encryptString(plaintext);
         }
         catch (GeneralSecurityException e)
         {
-            throw new RuntimeException("Failed to encrypt LocalDate", e);
+            throw new RuntimeException("Failed to encrypt String", e);
         }
     }
 
     @Override
-    public LocalDate convertToEntityAttribute(byte[] ciphertext)
+    public String convertToEntityAttribute(byte[] ciphertext)
     {
         if (ciphertext == null || ciphertext.length == 0)
             return null;
         try
         {
-            return getCryptoService().decryptLocalDate(ciphertext);
+            return getCryptoService().decryptString(ciphertext);
         }
         catch (AEADBadTagException e)
         {
@@ -50,7 +52,7 @@ public class EncryptedLocalDateConverter implements AttributeConverter<LocalDate
         }
         catch (GeneralSecurityException e)
         {
-            throw new RuntimeException("Failed to decrypt LocalDate", e);
+            throw new RuntimeException("Failed to decrypt String", e);
         }
     }
 }

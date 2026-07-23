@@ -1,4 +1,4 @@
-package com.ticketproject.webapp.model.converters;
+package com.ticketproject.webapp.services;
 
 import com.ticketproject.webapp.constants.AppConstants;
 
