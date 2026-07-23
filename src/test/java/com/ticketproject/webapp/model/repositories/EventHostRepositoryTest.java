@@ -114,5 +114,21 @@ class EventHostRepositoryTest
 
             assertThat(found).isPresent();
         }
+
+        @Test
+        @DisplayName("Different emails produce different blind indexes")
+        void uniqueBlindIndexes()
+        {
+            EventHost cammy = createHost("cammy@boringStupidWebsite.com");
+            EventHost jerry = createHost("jerry@reallyCoolWebsite.org");
+
+            eventHostRepository.save(cammy);
+            eventHostRepository.save(jerry);
+
+            byte[] cammyIndex = blindIndexService.computeIndex("cammy@boringStupidWebsite.com");
+            byte[] jerryIndex = blindIndexService.computeIndex("jerry@reallyCoolWebsite.org");
+
+            assertThat(cammyIndex).isNotEqualTo(jerryIndex);
+        }
     }
 }
