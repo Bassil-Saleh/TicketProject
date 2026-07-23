@@ -223,6 +223,45 @@ public class EventAddress
         }
         this.longitude = longitude;
     }
+    @PostLoad
+    private void validateCoordinatesOnLoad()
+    {
+        this.validateCoordinates();
+    }
+    @PrePersist
+    @PreUpdate
+    private void validateCoordinatesBeforeWrite()
+    {
+        this.validateCoordinates();
+    }
+    /**
+     * Used to detect if coordinate data in the database has become corrupted.
+     */
+    private void validateCoordinates()
+    {
+        int latitudeScale = AppConstants.Database.EventAddresses.Sizes.LATITUDE_SCALE;
+        int latitudePrecision = AppConstants.Database.EventAddresses.Sizes.LATITUDE_PRECISION;
+        int longitudeScale = AppConstants.Database.EventAddresses.Sizes.LONGITUDE_SCALE;
+        int longitudePrecision = AppConstants.Database.EventAddresses.Sizes.LONGITUDE_PRECISION;
+
+        if (this.latitude != null && this.latitude.scale() > latitudeScale)
+        {
+            throw new IllegalStateException("Latitude scale exceeds maximum " + latitudeScale + ": " + this.latitude.toPlainString());
+        }
+        if (this.latitude != null && this.latitude.precision() > latitudePrecision)
+        {
+            throw new IllegalStateException("Latitude precision exceeds maximum " + latitudePrecision + ": " + this.latitude.toPlainString());
+        }
+
+        if (this.longitude != null && this.longitude.scale() > longitudeScale)
+        {
+            throw new IllegalStateException("Longitude scale exceeds maximum " + longitudeScale + ": " + this.longitude.toPlainString());
+        }
+        if (this.longitude != null && this.longitude.precision() > longitudePrecision)
+        {
+            throw new IllegalStateException("Longitude precision exceeds maximum " + longitudePrecision + ": " + this.longitude.toPlainString());
+        }
+    }
 
 
     // ************************************************
