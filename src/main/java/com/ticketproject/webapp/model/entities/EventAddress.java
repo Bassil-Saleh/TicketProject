@@ -154,7 +154,6 @@ public class EventAddress
     // ************************************************
     // Setters
     // ************************************************
-    public void setId(Long id)                            { this.id = id; }
     public void setCreated(LocalDateTime created)         { this.created = created; }
     public void setLastUpdated(LocalDateTime lastUpdated) { this.lastUpdated = lastUpdated; }
     public void setAddressLine1(String addressLine1)      { this.addressLine1 = addressLine1; }

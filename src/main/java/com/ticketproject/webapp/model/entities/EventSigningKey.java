@@ -86,7 +86,6 @@ public class EventSigningKey
     // ************************************************
     // Setters
     // ************************************************
-    public void setId(Long id)                    { this.id = id; }
     public void setEvent(Event event)             { this.event = event; }
     public void setPrivateKey(byte[] privateKey)  { this.privateKey = privateKey; }
     public void setPublicKey(byte[] publicKey)    { this.publicKey = publicKey; }

@@ -100,7 +100,6 @@ public class BlockedRegistration
     // ************************************************
     // Setters
     // ************************************************
-    public void setId(Long id)                    { this.id = id; }
     public void setAttendee(Attendee attendee)    { this.attendee = attendee; }
     public void setEvent(Event event)             { this.event = event; }
     public void setBlockedBy(EventHost blockedBy) { this.blockedBy = blockedBy; }

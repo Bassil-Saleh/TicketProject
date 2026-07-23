@@ -192,7 +192,6 @@ public class Event
     // ************************************************
     // Setters
     // ************************************************
-    public void setId(Long id)                                                         { this.id = id; }
     public void setPublicId(String publicId)                                           { this.publicId = publicId; }
     public void setEventHost(EventHost eventHost)                                      { this.eventHost = eventHost; }
     public void setCreated(LocalDateTime created)                                      { this.created = created; }

@@ -83,7 +83,6 @@ public class TicketScan
     // ************************************************
     // Setters
     // ************************************************
-    public void setId(Long id)                        { this.id = id; }
     public void setTicket(Ticket ticket)              { this.ticket = ticket; }
     public void setScannedBy(EventHost scannedBy)     { this.scannedBy = scannedBy; }
     public void setScannedAt(LocalDateTime scannedAt) { this.scannedAt = scannedAt; }

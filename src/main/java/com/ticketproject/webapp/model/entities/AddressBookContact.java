@@ -73,9 +73,6 @@ public class AddressBookContact
     // ************************************************
     // Setters
     // ************************************************
-    // Is a setter for the record's ID really necessary?
-    // I don't expect a record's ID to change at all once it's created.
-    public void setId(Long id)                    { this.id = id; }
     public void setAttendee(Attendee attendee)    { this.attendee = attendee; }
     public void setEventHost(EventHost eventHost) { this.eventHost = eventHost; }
     public void setCreated(LocalDateTime created) { this.created = created; }

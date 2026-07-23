@@ -203,7 +203,6 @@ public class EventHost
     // ************************************************
     // Setters
     // ************************************************
-    public void setId(Long id)                                                         { this.id = id; }
     public void setFirstName(String firstName)                                         { this.firstName = firstName; }
     public void setMiddleName(String middleName)                                       { this.middleName = middleName; }
     public void setLastName(String lastName)                                           { this.lastName = lastName; }

@@ -118,7 +118,6 @@ public class Session
     // ************************************************
     // Setters
     // ************************************************
-    public void setId(Long id)                       { this.id = id; }
     public void setEventHost(EventHost eventHost)    { this.eventHost = eventHost; }
     public void setTokenHash(byte[] tokenHash)       { this.tokenHash = tokenHash; }
     public void setClientType(ClientType clientType) { this.clientType = clientType; }

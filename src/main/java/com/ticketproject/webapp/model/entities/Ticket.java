@@ -139,7 +139,6 @@ public class Ticket
     // ************************************************
     // Setters
     // ************************************************
-    public void setId(Long id)                                         { this.id = id; }
     public void setTicketScan(TicketScan ticketScan)                   { this.ticketScan = ticketScan; }
     public void setPublicToken(String publicToken)                     { this.publicToken = publicToken; }
     public void setTokenIdentifier(String tokenIdentifier)             { this.tokenIdentifier = tokenIdentifier; }
