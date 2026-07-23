@@ -37,7 +37,7 @@ public class Session
         nullable = false,
         columnDefinition = AppConstants.Database.Sessions.Definitions.COLUMN_TOKEN_HASH
     )
-    private String tokenHash;
+    private byte[] tokenHash;
 
     @Enumerated(EnumType.STRING)
     @Column
@@ -85,7 +85,7 @@ public class Session
     public Session
     (
         EventHost eventHost,
-        String tokenHash,
+        byte[] tokenHash,
         ClientType clientType,
         String ipAddress,
         String userAgent,
@@ -107,7 +107,7 @@ public class Session
     // ************************************************
     public Long getId()               { return this.id; }
     public EventHost getEventHost()   { return this.eventHost; }
-    public String getTokenHash()      { return this.tokenHash; }
+    public byte[] getTokenHash()      { return this.tokenHash; }
     public ClientType getClientType() { return this.clientType; }
     public String getIpAddress()      { return this.ipAddress; }
     public String getUserAgent()      { return this.userAgent; }
@@ -120,7 +120,7 @@ public class Session
     // ************************************************
     public void setId(Long id)                       { this.id = id; }
     public void setEventHost(EventHost eventHost)    { this.eventHost = eventHost; }
-    public void setTokenHash(String tokenHash)       { this.tokenHash = tokenHash; }
+    public void setTokenHash(byte[] tokenHash)       { this.tokenHash = tokenHash; }
     public void setClientType(ClientType clientType) { this.clientType = clientType; }
     public void setIpAddress(String ipAddress)       { this.ipAddress = ipAddress; }
     public void setUserAgent(String userAgent)       { this.userAgent = userAgent; }
@@ -170,7 +170,7 @@ public class Session
     public static class Builder
     {
         private EventHost eventHost;
-        private String tokenHash;
+        private byte[] tokenHash;
         private ClientType clientType;
         private String ipAddress;
         private String userAgent;
@@ -183,7 +183,7 @@ public class Session
             return this;
         }
 
-        public Builder tokenHash(String tokenHash)
+        public Builder tokenHash(byte[] tokenHash)
         {
             this.tokenHash = tokenHash;
             return this;

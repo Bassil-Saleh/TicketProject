@@ -126,7 +126,7 @@ public class EventHost
         nullable = false,
         columnDefinition = AppConstants.Database.EventHosts.Definitions.COLUMN_VERIFICATION_KEY_HASH
     )
-    private String verificationKeyHash;
+    private byte[] verificationKeyHash;
 
     @Column
     (
@@ -191,7 +191,7 @@ public class EventHost
     public LocalDateTime getLastUpdated()                     { return this.lastUpdated; }
     public boolean isActive()                                 { return this.active; }
     public boolean isVerified()                               { return this.verified; }
-    public String getVerificationKeyHash()                    { return this.verificationKeyHash; }
+    public byte[] getVerificationKeyHash()                    { return this.verificationKeyHash; }
     public LocalDateTime getVerificationExpires()             { return this.verificationExpires; }
     public Set<Event> getEvents()                             { return this.events; }
     public Set<AddressBookContact> getAddressBookContacts()   { return this.addressBookContacts; }
@@ -215,7 +215,7 @@ public class EventHost
     public void setLastUpdated(LocalDateTime lastUpdated)                              { this.lastUpdated = lastUpdated; }
     public void setActive(boolean active)                                              { this.active = active; }
     public void setVerified(boolean verified)                                          { this.verified = verified; }
-    public void setVerificationKeyHash(String verificationKeyHash)                     { this.verificationKeyHash = verificationKeyHash; }
+    public void setVerificationKeyHash(byte[] verificationKeyHash)                     { this.verificationKeyHash = verificationKeyHash; }
     public void setVerificationExpires(LocalDateTime verificationExpires)              { this.verificationExpires = verificationExpires; }
     public void setEvents(Set<Event> events)                                           { this.events = events; }
     public void setAddressBookContacts(Set<AddressBookContact> addressBookContacts)    { this.addressBookContacts = addressBookContacts; }

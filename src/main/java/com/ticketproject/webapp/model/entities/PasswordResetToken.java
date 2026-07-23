@@ -28,7 +28,7 @@ public class PasswordResetToken
         nullable = false,
         columnDefinition = AppConstants.Database.PasswordResetTokens.Definitions.COLUMN_TOKEN_HASH
     )
-    private String tokenHash;
+    private byte[] tokenHash;
 
     @Column
     (
@@ -59,7 +59,7 @@ public class PasswordResetToken
     public PasswordResetToken
     (
         EventHost eventHost,
-        String tokenHash,
+        byte[] tokenHash,
         LocalDateTime created,
         LocalDateTime expires
     )
@@ -76,7 +76,7 @@ public class PasswordResetToken
     // ************************************************
     public Long getId()               { return this.id; }
     public EventHost getEventHost()   { return this.eventHost; }
-    public String getTokenHash()      { return this.tokenHash; }
+    public byte[] getTokenHash()      { return this.tokenHash; }
     public LocalDateTime getCreated() { return this.created; }
     public boolean isUsed()           { return this.used; }
     public LocalDateTime getExpires() { return this.expires; }
@@ -86,7 +86,7 @@ public class PasswordResetToken
     // ************************************************
     public void setId(Long id)                    { this.id = id; }
     public void setEventHost(EventHost eventHost) { this.eventHost = eventHost; }
-    public void setTokenHash(String tokenHash)    { this.tokenHash = tokenHash; }
+    public void setTokenHash(byte[] tokenHash)    { this.tokenHash = tokenHash; }
     public void setCreated(LocalDateTime created) { this.created = created; }
     public void setUsed(boolean used)             { this.used = used; }
     public void setExpires(LocalDateTime expires) { this.expires = expires; }
@@ -137,7 +137,7 @@ public class PasswordResetToken
     public static class Builder
     {
         private EventHost eventHost;
-        private String tokenHash;
+        private byte[] tokenHash;
         private LocalDateTime created;
         private LocalDateTime expires;
 
@@ -147,7 +147,7 @@ public class PasswordResetToken
             return this;
         }
 
-        public Builder tokenHash(String tokenHash)
+        public Builder tokenHash(byte[] tokenHash)
         {
             this.tokenHash = tokenHash;
             return this;
