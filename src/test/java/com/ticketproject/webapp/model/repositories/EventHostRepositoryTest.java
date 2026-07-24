@@ -150,5 +150,21 @@ class EventHostRepositoryTest
                 .isNotEqualTo("blahBlah123")
                 .startsWith("$2a$"); // bcrypt format indicator
         }
+
+        @Test
+        @DisplayName("Password verification works after round-trip")
+        void passwordVerification()
+        {
+            EventHost host = createHost("steve@yourNeighbor.com");
+            eventHostRepository.save(host);
+
+            EventHost loaded = eventHostRepository.findById(host.getId()).orElseThrow();
+
+            boolean correctPassword = hashingService.verifyPassword("blahBlah123", loaded.getPasswordHash());
+            boolean wrongPassword = hashingService.verifyPassword("Wrongamundo, bub!", loaded.getPasswordHash());
+
+            assertThat(correctPassword).isTrue();
+            assertThat(wrongPassword).isFalse();
+        }
     }
 }
