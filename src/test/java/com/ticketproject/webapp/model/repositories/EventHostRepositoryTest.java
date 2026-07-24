@@ -1,7 +1,6 @@
 package com.ticketproject.webapp.model.repositories;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Nested;
@@ -48,16 +47,10 @@ class EventHostRepositoryTest
             .lastName("Doe")
             .dateOfBirth(LocalDate.of(1990, 1, 1))
             .email(email)
+            .plaintextPassword("blahBlah123")
             .build();
-        
-        host.setPassword("blahBlah123");
-        host.setCreated(LocalDateTime.now());
-        host.setLastLogin(LocalDateTime.now());
-        host.setLastUpdated(LocalDateTime.now());
-        host.setActive(false);
-        host.generateVerificationToken();
-        host.setVerified(false);
-        host.setVerificationExpires(LocalDateTime.now().plusHours(1));
+
+            host.generateVerificationToken();
 
         return host;
     }

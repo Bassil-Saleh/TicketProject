@@ -400,6 +400,7 @@ public final class AppConstants
 
                 public static final int NAME_LENGTH = 100;
                 public static final int VERIFICATION_KEY_LENGTH = 36;
+                public static final int VERIFICATION_DURATION_HOURS = 1;
             }
 
             public static final class MappedByNames

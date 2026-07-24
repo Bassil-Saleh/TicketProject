@@ -165,14 +165,36 @@ public class EventHost
         String middleName,
         String lastName,
         LocalDate dateOfBirth,
-        String email
+        String email,
+        String plaintextPassword
     )
     {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
+        // There's a converter to automatically encrypt/decrypt this field.
         this.setEmail(email);
+        // Just store the password's hash, NEVER the plaintext password.
+        this.setPassword(plaintextPassword);
+        // Should not be changed after creation.
+        this.created = LocalDateTime.now();
+        // Technically, an account is updated when it is first created.
+        this.lastUpdated = LocalDateTime.now();
+        this.active = true;
+        // Technically, the user logged in when they first create their account.
+        this.lastLogin = LocalDateTime.now();
+        // New users need to verify their account before
+        // they can start using all its features.
+        this.verified = false;
+        // Since the database only stores the hashed verification token, the verification token
+        // should be generated outside of this constructor. That way:
+        // - The raw verification token can still be sent to the user
+        //   (i.e. as part of a URL for an account verification email).
+        // - If for whatever reason the application fails to send the
+        //   raw verification token to the user, then the application
+        //   can avoid creating a database record for an account which
+        //   the user would have no way to verify.
     }
 
     // ************************************************
@@ -205,7 +227,11 @@ public class EventHost
     public void setFirstName(String firstName)                                         { this.firstName = firstName; }
     public void setMiddleName(String middleName)                                       { this.middleName = middleName; }
     public void setLastName(String lastName)                                           { this.lastName = lastName; }
-    public void setDateOfBirth(LocalDate dateOfBirth)                                  { this.dateOfBirth = dateOfBirth; }
+    /**
+     * Given a plaintext email, encrypt it, compute its blind index,
+     * and update the event host's record. (i.e. they want to change it).
+     * @param email the new plaintext email
+     */
     public void setEmail(String email)
     {
         this.email = email;
@@ -213,12 +239,16 @@ public class EventHost
             .getBean(BlindIndexService.class)
             .computeIndex(email);
     }
+    /**
+     * Given a new plaintext password, compute its hash and update
+     * the event host's password hash (i.e. they want to change it).
+     * @param plaintextPassword the new plaintext password
+     */
     public void setPassword(String plaintextPassword)
     {
         HashingService hasher = SpringContextBridge.getBean(HashingService.class);
         this.passwordHash = hasher.hashPassword(plaintextPassword);
     }
-    public void setCreated(LocalDateTime created)                                      { this.created = created; }
     public void setLastLogin(LocalDateTime lastLogin)                                  { this.lastLogin = lastLogin; }
     public void setLastUpdated(LocalDateTime lastUpdated)                              { this.lastUpdated = lastUpdated; }
     public void setActive(boolean active)                                              { this.active = active; }
@@ -226,6 +256,10 @@ public class EventHost
     /**
      * Generate a verification token, store its hash, then return the raw token
      * (i.e. to use in a URL in an account verification email).
+     * 
+     * Since the server only stores the hash of this token when constructing
+     * a new EventHost object, this method should be used right after creating
+     * a new event host account, so that the user can still get the raw token.
      * @return the raw verification token
      */
     public String generateVerificationToken()
@@ -233,9 +267,11 @@ public class EventHost
         HashingService hasher = SpringContextBridge.getBean(HashingService.class);
         HashingService.GeneratedToken token = hasher.generateVerificationToken();
         this.verificationKeyHash = token.tokenHash();
+        this.verificationExpires = LocalDateTime
+            .now()
+            .plusHours(AppConstants.Database.EventHosts.Sizes.VERIFICATION_DURATION_HOURS);
         return token.rawToken();
     }
-    public void setVerificationExpires(LocalDateTime verificationExpires)              { this.verificationExpires = verificationExpires; }
     public void setEvents(Set<Event> events)                                           { this.events = events; }
     public void setAddressBookContacts(Set<AddressBookContact> addressBookContacts)    { this.addressBookContacts = addressBookContacts; }
     public void setPasswordResetTokens(Set<PasswordResetToken> passwordResetTokens)    { this.passwordResetTokens = passwordResetTokens; }
@@ -300,6 +336,7 @@ public class EventHost
         private String lastName;
         private LocalDate dateOfBirth;
         private String email;
+        private String plaintextPassword;
 
         public Builder firstName(String firstName)
         {
@@ -331,6 +368,12 @@ public class EventHost
             return this;
         }
 
+        public Builder plaintextPassword(String plaintextPassword)
+        {
+            this.plaintextPassword = plaintextPassword;
+            return this;
+        }
+
         public EventHost build()
         {
             return new EventHost
@@ -339,7 +382,8 @@ public class EventHost
                 middleName,
                 lastName,
                 dateOfBirth,
-                email
+                email,
+                plaintextPassword
             );
         }
     }
