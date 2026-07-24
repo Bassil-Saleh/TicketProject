@@ -1,7 +1,6 @@
 package com.ticketproject.webapp.model.repositories;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Nested;
@@ -10,7 +9,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -20,7 +18,6 @@ import com.ticketproject.webapp.services.BlindIndexService;
 import com.ticketproject.webapp.services.CryptoService;
 import com.ticketproject.webapp.services.HashingService;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
