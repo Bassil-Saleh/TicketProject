@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * EventHostRepository is used to perform CRUD operations with EventHost entities.
+ */
 @Repository
 public interface EventHostRepository extends JpaRepository<EventHost, Long>
 {

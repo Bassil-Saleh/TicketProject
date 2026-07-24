@@ -5,6 +5,9 @@ import com.ticketproject.webapp.model.entities.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+/**
+ * EventRepository is used to perform CRUD operations with Event entities.
+ */
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long>
 {

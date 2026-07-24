@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * AttendeeRepository is used to perform CRUD operations with Attendee entities.
+ */
 @Repository
 public interface AttendeeRepository extends JpaRepository<Attendee, Long>
 {
