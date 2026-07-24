@@ -16,7 +16,7 @@ public interface EventHostRepository extends JpaRepository<EventHost, Long>
     Optional<EventHost> findByEmailIndex(@Param("index") byte[] index);
 
     @Query("SELECT COUNT(eh) > 0 FROM EventHost eh WHERE eh.emailBlindIndex = :index")
-    boolean existsByEmailIndex(byte[] index);
+    boolean existsByEmailIndex(@Param("index") byte[] index);
 
     @Query("SELECT eh FROM EventHost eh WHERE eh.verificationKeyHash = :hash")
     Optional<EventHost> findByVerificationKeyHash(@Param("hash") byte[] hash);

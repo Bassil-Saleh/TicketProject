@@ -102,6 +102,7 @@ public class Attendee
         this.middleName = middleName;
         this.lastName = lastName;
         this.setEmail(email);
+        this.created = LocalDateTime.now();
     }
 
     // ************************************************
@@ -131,7 +132,6 @@ public class Attendee
             .getBean(BlindIndexService.class)
             .computeIndex(email);
     }
-    public void setCreated(LocalDateTime created)                                      { this.created = created; }
     public void setTickets(Set<Ticket> tickets)                                        { this.tickets = tickets; }
     public void setAddressBookContacts(Set<AddressBookContact> addressBookContacts)    { this.addressBookContacts = addressBookContacts; }
     public void setBlockedRegistrations(Set<BlockedRegistration> blockedRegistrations) { this.blockedRegistrations = blockedRegistrations; }
