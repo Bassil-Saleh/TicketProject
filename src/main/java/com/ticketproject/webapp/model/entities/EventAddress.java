@@ -241,6 +241,13 @@ public class EventAddress
      */
     private void validateCoordinates()
     {
+        // I don't think it makes sense if the latitude is null
+        // but the longitude is null (or vice versa).
+        if (latitude == null && longitude != null)
+            throw new IllegalStateException("If longitude is not null, then latitude cannot be null");
+        if (latitude != null && longitude == null)
+            throw new IllegalStateException("If latitude is not null, then longitude cannot be null");
+
         int latitudeScale = AppConstants.Database.EventAddresses.Sizes.LATITUDE_SCALE;
         int latitudePrecision = AppConstants.Database.EventAddresses.Sizes.LATITUDE_PRECISION;
         int longitudeScale = AppConstants.Database.EventAddresses.Sizes.LONGITUDE_SCALE;

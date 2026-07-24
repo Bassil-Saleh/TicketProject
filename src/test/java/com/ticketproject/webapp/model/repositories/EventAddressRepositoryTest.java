@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.ticketproject.webapp.bridges.SpringContextBridge;
@@ -20,6 +21,7 @@ import com.ticketproject.webapp.services.CryptoService;
 import com.ticketproject.webapp.services.HashingService;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
@@ -52,8 +54,8 @@ class EventAddressRepositoryTest
     }
 
     @Nested
-    @DisplayName("Data range constraints")
-    class DataRangeConstraints
+    @DisplayName("Data constraints")
+    class DataConstraints
     {
         @Test
         @DisplayName("Incorrect precision/scale for latitude and longitude throws exception")
@@ -79,8 +81,8 @@ class EventAddressRepositoryTest
         }
 
         @Test
-        @DisplayName("Passing non-null latitude and null longitude (or vice versa) throws exception")
-        void nullAndNonNullThrowsException()
+        @DisplayName("Passing non-null latitude and null longitude (or vice versa) to constructor throws exception")
+        void nullAndNonNullConstructionThrowsException()
         {
             // Null latitude, non-null longitude
             assertThatThrownBy(() -> createEventAddress(null, new BigDecimal("3.141592653")))
@@ -88,6 +90,57 @@ class EventAddressRepositoryTest
             // Non-null latitude, null longitude
             assertThatThrownBy(() -> createEventAddress(new BigDecimal("3.141592653"), null))
             .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("Writing a record with non-null latitude & longitude and then updating one of them to null throws exception")
+        void nullAndNonNullUpdateThrowsException()
+        {
+            EventAddress address1 = createEventAddress(new BigDecimal("3.141592"), new BigDecimal("3.141592"));
+            eventAddressRepository.saveAndFlush(address1);
+            EventAddress address2 = createEventAddress(new BigDecimal("3.141592"), new BigDecimal("3.141592"));
+            eventAddressRepository.saveAndFlush(address2);
+
+            Optional<EventAddress> loaded1 = eventAddressRepository.findById(address1.getId());
+            Optional<EventAddress> loaded2 = eventAddressRepository.findById(address2.getId());
+
+            loaded1.get().setLatitude(null);
+            loaded2.get().setLongitude(null);
+
+            assertThatThrownBy(() -> eventAddressRepository.saveAndFlush(loaded1.get()))
+            .isInstanceOf(InvalidDataAccessApiUsageException.class);
+            assertThatThrownBy(() -> eventAddressRepository.saveAndFlush(loaded2.get()))
+            .isInstanceOf(InvalidDataAccessApiUsageException.class);
+        }
+
+        @Test
+        @DisplayName("Update a record with both null latitude & longitude to non-null latitude & longitude")
+        void updateNullToNonNull()
+        {
+            EventAddress address = createEventAddress(null, null);
+            eventAddressRepository.saveAndFlush(address);
+
+            Optional<EventAddress> loaded = eventAddressRepository.findById(address.getId());
+
+            loaded.get().setLatitude(new BigDecimal("3.141592"));
+            loaded.get().setLongitude(new BigDecimal("3.141592"));
+
+            assertThatNoException().isThrownBy(() -> eventAddressRepository.saveAndFlush(loaded.get()));;
+        }
+
+        @Test
+        @DisplayName("Update a record with both non-null latitude & longitude to null latitude & longitude")
+        void updateNonNullToNull()
+        {
+            EventAddress address = createEventAddress(new BigDecimal("3.141592"), new BigDecimal("3.141592"));
+            eventAddressRepository.saveAndFlush(address);
+
+            Optional<EventAddress> loaded = eventAddressRepository.findById(address.getId());
+
+            loaded.get().setLatitude(null);
+            loaded.get().setLongitude(null);
+
+            assertThatNoException().isThrownBy(() -> eventAddressRepository.saveAndFlush(loaded.get()));
         }
     }
 }
