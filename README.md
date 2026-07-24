@@ -47,5 +47,16 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MariaDBDialect
 
 # For encrypting and encrypting database fields with sensitive information
 app.encryption.key-base64=your_first_base64_encoded_secret_key_goes_here
+# For computing blind indexes
 app.blind-index.key-base64=your_second_base64_encoded_secret_key_goes_here
+```
+
+5a. To run the application, use this command:
+```
+./mvnw spring-boot:run
+```
+
+5b. To run the application's tests, use this command:
+```
+./mvnw test
 ```
