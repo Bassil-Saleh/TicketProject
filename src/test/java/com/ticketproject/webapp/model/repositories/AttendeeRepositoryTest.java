@@ -1,6 +1,5 @@
 package com.ticketproject.webapp.model.repositories;
 
-import java.time.LocalDate;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Nested;
@@ -14,7 +13,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.ticketproject.webapp.bridges.SpringContextBridge;
 import com.ticketproject.webapp.model.entities.Attendee;
-import com.ticketproject.webapp.model.entities.EventHost;
 import com.ticketproject.webapp.services.BlindIndexService;
 import com.ticketproject.webapp.services.CryptoService;
 import com.ticketproject.webapp.services.HashingService;
@@ -118,5 +116,24 @@ class AttendeeRepositoryTest
 
             assertThat(cammyIndex).isNotEqualTo(jerryIndex);
         }
+
+    @Nested
+    @DisplayName("Uniqueness constraint")
+    class UniquenessConstraint
+    {
+        @Test
+        @DisplayName("Duplicate email blind index violates unique constraint")
+        void duplicateBlindIndexThrowsException()
+        {
+            Attendee attendee1 = createAttendee("hugo@yourBank.com");
+            attendeeRepository.saveAndFlush(attendee1);
+            Attendee attendee2 = createAttendee("hugo@yourBank.com");
+
+            // This should throw an exception because
+            // emailBlindIndex has a UNIQUE constraint.
+            assertThatThrownBy(() -> attendeeRepository.saveAndFlush(attendee2))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+    }
     }
 }
