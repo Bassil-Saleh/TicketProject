@@ -19,8 +19,6 @@ import com.ticketproject.webapp.services.BlindIndexService;
 import com.ticketproject.webapp.services.CryptoService;
 import com.ticketproject.webapp.services.HashingService;
 
-import jakarta.persistence.PersistenceException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
