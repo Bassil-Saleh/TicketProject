@@ -12,11 +12,18 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
+/**
+ * HashingService is used to compute hashes for database table data, as well as
+ * generate cryptographically random tokens (and their corresponding hashes).
+ */
 @Component
 public class HashingService
 {
     private final PasswordEncoder passwordEncoder;
     
+    /**
+     * Constructor that initializes the password encoder.
+     */
     public HashingService()
     {
         this.passwordEncoder = new BCryptPasswordEncoder();

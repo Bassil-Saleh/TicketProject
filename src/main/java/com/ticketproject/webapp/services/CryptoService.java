@@ -20,14 +20,23 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
 
+/**
+ * CryptoService is used to encrypt and decrypt
+ * database table fields with sensitive information.
+ */
 @Component
 public class CryptoService
 {
-
+    // Your can load your own key into this application from
+    // your installation's configuration or from a keystore.
+    // NEVER hardcode your key into the source code!
     private final SecretKey secretKey;
 
-    // Load your key from your application's configuration or from a keystore.
-    // NEVER hardcode your key into the source code!
+    /**
+     * Constructor that takes a secret key encoded in Base64.
+     * @param keyBase64 secret key encoded in Base64. NEVER hardcode it in your code!
+     * @throws IllegalArgumentException if the key's length is incorrect
+     */
     public CryptoService(@Value("${app.encryption.key-base64}") String keyBase64)
     throws IllegalArgumentException
     {
@@ -161,6 +170,12 @@ public class CryptoService
         return new String(decrypt(combined), StandardCharsets.UTF_8);
     }
 
+    /**
+     * Encrypt a LocalDate object.
+     * @param date a LocalDate object
+     * @return the resulting ciphertext bytes
+     * @throws GeneralSecurityException if the encryption fails
+     */
     public byte[] encryptLocalDate(LocalDate date) throws GeneralSecurityException
     {
         if (date == null)
@@ -168,6 +183,15 @@ public class CryptoService
         return encryptString(date.format(AppConstants.Crypto.DATE_FORMAT));
     }
 
+    /**
+     * Decrypt a LocalDate object.
+     * @param ciphertext the ciphertext bytes storing the LocalDate object data
+     * @return the resulting LocalDate object
+     * @throws AEADBadTagException  if a GCM authentication tag
+     * mismatch is detected (can be caused if the data was tampered
+     * with, or if an incorrect key was used)
+     * @throws GeneralSecurityException if the decryption fails
+     */
     public LocalDate decryptLocalDate(byte[] ciphertext)
     throws AEADBadTagException, GeneralSecurityException
     {
@@ -176,6 +200,12 @@ public class CryptoService
         return LocalDate.parse(decryptString(ciphertext), AppConstants.Crypto.DATE_FORMAT);
     }
 
+    /**
+     * Encrypt a LocalDateTime object.
+     * @param date a LocalDateTime object
+     * @return the resulting ciphertext bytes
+     * @throws GeneralSecurityException if the encryption fails
+     */
     public byte[] encryptLocalDateTime(LocalDateTime dateTime) throws GeneralSecurityException
     {
         if (dateTime == null)
@@ -183,6 +213,15 @@ public class CryptoService
         return encryptString(dateTime.format(AppConstants.Crypto.DATE_TIME_FORMAT));
     }
 
+    /**
+     * Decrypt a LocalDateTime object.
+     * @param ciphertext the ciphertext bytes storing the LocalDateTime object data
+     * @return the resulting LocalDateTime object
+     * @throws AEADBadTagException  if a GCM authentication tag
+     * mismatch is detected (can be caused if the data was tampered
+     * with, or if an incorrect key was used)
+     * @throws GeneralSecurityException if the decryption fails
+     */
     public LocalDateTime decryptLocalDateTime(byte[] ciphertext)
     throws AEADBadTagException, GeneralSecurityException
     {
@@ -191,6 +230,12 @@ public class CryptoService
         return LocalDateTime.parse(decryptString(ciphertext), AppConstants.Crypto.DATE_TIME_FORMAT);
     }
 
+    /**
+     * Encrypt a BigDecimal object.
+     * @param date a BigDecimal object
+     * @return the resulting ciphertext bytes
+     * @throws GeneralSecurityException if the encryption fails
+     */
     public byte[] encryptBigDecimal(BigDecimal value) throws GeneralSecurityException
     {
         if (value == null)
@@ -199,6 +244,15 @@ public class CryptoService
         return encryptString(value.toPlainString());
     }
 
+    /**
+     * Decrypt a BigDecimal object.
+     * @param ciphertext the ciphertext bytes storing the BigDecimal object data
+     * @return the resulting BigDecimal object
+     * @throws AEADBadTagException  if a GCM authentication tag
+     * mismatch is detected (can be caused if the data was tampered
+     * with, or if an incorrect key was used)
+     * @throws GeneralSecurityException if the decryption fails
+     */
     public BigDecimal decryptBigDecimal(byte[] ciphertext)
     throws AEADBadTagException, GeneralSecurityException
     {
