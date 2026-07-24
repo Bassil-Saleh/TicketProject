@@ -33,6 +33,9 @@ public final class AppConstants
             throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
         }
 
+        /**
+         * AddressBookContacts holds constants related to the address book contacts database table.
+         */
         public static final class AddressBookContacts
         {
             /**
@@ -62,6 +65,9 @@ public final class AppConstants
             }
         }
 
+        /**
+         * PasswordResetTokens holds constants related to the password reset tokens database table.
+         */
         public static final class PasswordResetTokens
         {
             /**
@@ -121,6 +127,9 @@ public final class AppConstants
             }
         }
 
+        /**
+         * Attendees holds constants related to the attendees database table.
+         */
         public static final class Attendees
         {
             /**
@@ -196,6 +205,9 @@ public final class AppConstants
             }
         }
 
+        /**
+         * BlockedRegistrations holds constants related to the blocked registrations database table.
+         */
         public static final class BlockedRegistrations
         {
             /**
@@ -241,6 +253,9 @@ public final class AppConstants
             }
         }
 
+        /**
+         * TicketScans holds constants related to the ticket scans database table.
+         */
         public static final class TicketScans
         {
             /**
@@ -286,6 +301,9 @@ public final class AppConstants
             }
         }
 
+        /**
+         * Tickets holds constants related to the tickets database table.
+         */
         public static final class Tickets
         {
             /**
@@ -349,6 +367,9 @@ public final class AppConstants
             }
         }
 
+        /**
+         * EventHosts holds constants related to the event hosts database table.
+         */
         public static final class EventHosts
         {
             /**
@@ -438,6 +459,9 @@ public final class AppConstants
             }
         }
 
+        /**
+         * Events holds constants related to the events database table.
+         */
         public static final class Events
         {
             /**
@@ -529,6 +553,9 @@ public final class AppConstants
             }
         }
 
+        /**
+         * EventAddresses holds constants related to the event addresses database table.
+         */
         public static final class EventAddresses
         {
             /**
@@ -623,6 +650,9 @@ public final class AppConstants
             }
         }
 
+        /**
+         * Sessions holds constants related to the sessions database table.
+         */
         public static final class Sessions
         {
             /**
@@ -686,6 +716,9 @@ public final class AppConstants
             }
         }
 
+        /**
+         * EventSigningKeys holds constants related to the event signing keys database table.
+         */
         public static final class EventSigningKeys
         {
             /**
@@ -732,6 +765,15 @@ public final class AppConstants
         }
     }
 
+    /**
+     * The Crypto inner class holds constants related to things such as:
+     * - Choice of encryption algorithm
+     * - Choice of hash algorithm
+     * - Key lengths
+     * - Hash lengths
+     * - How complex data such as dates and times should be
+     *   represented in the database during encryption/decryption
+     */
     public static final class Crypto
     {
         /**
