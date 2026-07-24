@@ -9,6 +9,10 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * Session is an entity representing a record of info used
+ * to maintain an event host's login session.
+ */
 @Entity
 @Table
 (
@@ -21,10 +25,17 @@ import java.util.Objects;
 )
 public class Session
 {
+    /**
+     * The primary key.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * An event host can have multiple login sessions over the lifespan of their account,
+     * but each session can only belong to a single event host.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     (
@@ -33,6 +44,11 @@ public class Session
     )
     private EventHost eventHost;
 
+    /**
+     * The hashed token of the login session. After logging in, the event host's device
+     * receives the raw token, and the application compares the hash of the raw token
+     * it receives to the hash stored in the database.
+     */
     @Column
     (
         name = AppConstants.Database.Sessions.TableNames.COLUMN_TOKEN_HASH,
@@ -41,6 +57,9 @@ public class Session
     )
     private byte[] tokenHash;
 
+    /**
+     * How the event host is accessing the application (through the Web or through the Android app).
+     */
     @Enumerated(EnumType.STRING)
     @Column
     (
@@ -49,6 +68,9 @@ public class Session
     )
     private ClientType clientType;
 
+    /**
+     * The IP address where the log in originated from.
+     */
     @Column
     (
         name = AppConstants.Database.Sessions.TableNames.COLUMN_IP_ADDRESS,
@@ -56,6 +78,9 @@ public class Session
     )
     private String ipAddress;
 
+    /**
+     * Stores info about the device which the event host is logged in from.
+     */
     @Column
     (
         name = AppConstants.Database.Sessions.TableNames.COLUMN_USER_AGENT,
@@ -63,13 +88,20 @@ public class Session
     )
     private String userAgent;
 
+    /**
+     * When the record was first created. Should not be changed.
+     */
     @Column
     (
         name = AppConstants.Database.Sessions.TableNames.COLUMN_CREATED,
+        updatable = false,
         nullable = false
     )
     private LocalDateTime created;
 
+    /**
+     * When the login session expires.
+     */
     @Column
     (
         name = AppConstants.Database.Sessions.TableNames.COLUMN_EXPIRES,
@@ -77,6 +109,9 @@ public class Session
     )
     private LocalDateTime expires;
 
+    /**
+     * When the login session was revoked.
+     */
     @Column(name = AppConstants.Database.Sessions.TableNames.COLUMN_REVOKED)
     private LocalDateTime revoked;
     // ************************************************
@@ -97,6 +132,13 @@ public class Session
         this.ipAddress = ipAddress;
         this.userAgent = userAgent;
         this.created = LocalDateTime.now();
+        // Since the database only stores the hashed session token, the token
+        // should be generated outside of this constructor. That way:
+        // - The raw token can still be sent to the user.
+        // - If for whatever reason the application fails to send the
+        //   raw token to the user, then the application can avoid
+        //   creating a database record for a login session token
+        //   which the user cannot obtain.
     }
 
     // ************************************************

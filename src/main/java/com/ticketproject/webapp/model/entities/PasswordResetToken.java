@@ -8,14 +8,25 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * PasswordResetToken is an entity representing a record on
+ * a password reset token sent to an event host.
+ */
 @Entity
 @Table(name = AppConstants.Database.PasswordResetTokens.TableNames.TABLE_NAME)
 public class PasswordResetToken
 {
+    /**
+     * The primary key.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * A single event host can have many password reset tokens, but each password reset token
+     * should only belong to a single event host.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     (
@@ -24,6 +35,11 @@ public class PasswordResetToken
     )
     private EventHost eventHost;
 
+    /**
+     * The hashed token that gets stored on the server. When the event host's device
+     * sends the raw token, the application should hash it and compare it to
+     * the hash stored in the database.
+     */
     @Column
     (
         name = AppConstants.Database.PasswordResetTokens.TableNames.COLUMN_TOKEN_HASH,
@@ -32,13 +48,20 @@ public class PasswordResetToken
     )
     private byte[] tokenHash;
 
+    /**
+     * When the record was created. Should not be changed.
+     */
     @Column
     (
         name = AppConstants.Database.PasswordResetTokens.TableNames.COLUMN_CREATED,
+        updatable = false,
         nullable = false
     )
     private LocalDateTime created;
 
+    /**
+     * Whether or not the password reset token was already used.
+     */
     @Column
     (
         name = AppConstants.Database.PasswordResetTokens.TableNames.COLUMN_USED,
@@ -46,6 +69,9 @@ public class PasswordResetToken
     )
     private boolean used;
 
+    /**
+     * When the password reset token expires.
+     */
     @Column
     (
         name = AppConstants.Database.PasswordResetTokens.TableNames.COLUMN_EXPIRES,

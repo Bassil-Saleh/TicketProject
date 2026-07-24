@@ -15,14 +15,25 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+/**
+ * BlockedRegistration is an entity representing a record on someone
+ * whose registration to an event has been blocked by the event host.
+ */
 @Entity
 @Table(name = AppConstants.Database.BlockedRegistrations.TableNames.TABLE_NAME)
 public class BlockedRegistration
 {
+    /**
+     * The primary key.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * An attendee can be blocked from multiple events, but each block
+     * can only be associated with a single attendee.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     (
@@ -31,6 +42,10 @@ public class BlockedRegistration
     )
     private Attendee attendee;
 
+    /**
+     * An event can have multiple registration blocks, but each block
+     * can only be associated with a single event.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     (
@@ -39,6 +54,10 @@ public class BlockedRegistration
     )
     private Event event;
 
+    /**
+     * An event host can block multiple registrations, but each block can only be
+     * authored by a single event host.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     (
@@ -47,6 +66,9 @@ public class BlockedRegistration
     )
     private EventHost blockedBy;
 
+    /**
+     * Why someone was blocked from an event (optional).
+     */
     @Column
     (
         name = AppConstants.Database.BlockedRegistrations.TableNames.COLUMN_REASON,
@@ -54,13 +76,20 @@ public class BlockedRegistration
     )
     private String reason;
 
+    /**
+     * When the record was first created. Should not be changed.
+     */
     @Column
     (
         name = AppConstants.Database.BlockedRegistrations.TableNames.COLUMN_CREATED,
+        updatable = false,
         nullable = false
     )
     private LocalDateTime created;
 
+    /**
+     * When the registration block was revoked by the event host.
+     */
     @Column
     (name = AppConstants.Database.BlockedRegistrations.TableNames.COLUMN_REVOKED)
     private LocalDateTime revoked;

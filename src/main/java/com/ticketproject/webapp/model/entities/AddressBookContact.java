@@ -6,6 +6,15 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * AddressBookContact is an entity representing a record on someone
+ * which an event host has previously invited to a private event.
+ * 
+ * It is meant to provide event hosts a way to look up past invitees
+ * for convenience, so that if the event host wants to invite the
+ * same people to different events, the event host does not need to
+ * manually re-type those people's information over and over again.
+ */
 @Entity
 @Table
 (
@@ -24,10 +33,18 @@ import java.util.Objects;
 )
 public class AddressBookContact
 {
+    /**
+     * The primary key.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * It is possible for an attendee to be associated with many different address book records
+     * (i.e. if multiple different hosts invite the same person to their own private events),
+     * but every address book record should only be associated with a single attendee.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     (
@@ -36,6 +53,10 @@ public class AddressBookContact
     )
     private Attendee attendee;
 
+    /**
+     * It is possible for an event host's address book to have many address book records,
+     * but each address book record must only belong to a single event host.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     (
@@ -44,9 +65,13 @@ public class AddressBookContact
     )
     private EventHost eventHost;
 
+    /**
+     * When the address book record was first created. Should not be changed.
+     */
     @Column
     (
         name = AppConstants.Database.AddressBookContacts.TableNames.COLUMN_CREATED,
+        updatable = false,
         nullable = false
     )
     private LocalDateTime created;

@@ -10,21 +10,34 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * EventAddress is an entity representing a record on an event's physical address.
+ */
 @Entity
 @Table(name = AppConstants.Database.EventAddresses.TableNames.TABLE_NAME)
 public class EventAddress
 {
+    /**
+     * The primary key.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * When the record was created. Should not be changed.
+     */
     @Column
     (
         name = AppConstants.Database.EventAddresses.TableNames.COLUMN_CREATED,
+        updatable = false,
         nullable = false
     )
     private LocalDateTime created;
 
+    /**
+     * When the record was last updated.
+     */
     @Column
     (
         name = AppConstants.Database.EventAddresses.TableNames.COLUMN_LAST_UPDATED,
@@ -32,6 +45,9 @@ public class EventAddress
     )
     private LocalDateTime lastUpdated;
 
+    /**
+     * The first address line of the event.
+     */
     @Convert(converter = EncryptedStringConverter.class)
     @Column
     (
@@ -41,6 +57,9 @@ public class EventAddress
     )
     private String addressLine1;
 
+    /**
+     * The second address line of the event (optional).
+     */
     @Convert(converter = EncryptedStringConverter.class)
     @Column
     (
@@ -49,6 +68,9 @@ public class EventAddress
     )
     private String addressLine2;
 
+    /**
+     * The city of the event.
+     */
     @Convert(converter = EncryptedStringConverter.class)
     @Column
     (
@@ -58,6 +80,9 @@ public class EventAddress
     )
     private String city;
 
+    /**
+     * The state of the event.
+     */
     @Convert(converter = EncryptedStringConverter.class)
     @Column
     (
@@ -67,6 +92,10 @@ public class EventAddress
     )
     private String state;
 
+    /**
+     * The postal code of the event. Note that some parts of the world include non-digit characters
+     * in postal codes, hence why this is a String.
+     */
     @Convert(converter = EncryptedStringConverter.class)
     @Column
     (
@@ -76,6 +105,9 @@ public class EventAddress
     )
     private String postalCode;
 
+    /**
+     * The country of the event.
+     */
     @Convert(converter = EncryptedStringConverter.class)
     @Column
     (
@@ -85,6 +117,10 @@ public class EventAddress
     )
     private String country;
 
+    /**
+     * The latitude coordinates of the event's precise location
+     * (optional, as long as longitude is not set either).
+     */
     @Convert(converter = EncryptedBigDecimalConverter.class)
     @Column
     (
@@ -93,6 +129,10 @@ public class EventAddress
     )
     private BigDecimal latitude;
 
+    /**
+     * The longitude coordinates of the event's precise location
+     * (optional, as long as latitude is not set either).
+     */
     @Convert(converter = EncryptedBigDecimalConverter.class)
     @Column
     (
@@ -101,6 +141,10 @@ public class EventAddress
     )
     private BigDecimal longitude;
 
+    /**
+     * An event can only have a single address, and each address can
+     * only be associated with a single event.
+     */
     @OneToOne
     (mappedBy = AppConstants.Database.EventAddresses.MappedByNames.MAPPED_BY_EVENT_ADDRESS)
     private Event event;
@@ -164,6 +208,12 @@ public class EventAddress
     public void setState(String state)                    { this.state = state; }
     public void setPostalCode(String postalCode)          { this.postalCode = postalCode; }
     public void setCountry(String country)                { this.country = country; }
+    /**
+     * Update the latitude coordinate of an address.
+     * @param latitude the latitude coordinate
+     * @throws IllegalArgumentException if latitude scale or precision
+     * exceeds the bounds specified in AppConstants
+     */
     public void setLatitude(BigDecimal latitude)
     {
         if
@@ -195,6 +245,12 @@ public class EventAddress
         this.latitude = latitude;
     }
 
+    /**
+     * Update the longitude coordinate of an address.
+     * @param longitude the longitude coordinate
+     * @throws IllegalArgumentException if latitude scale or precision
+     * exceeds the bounds specified in AppConstants
+     */
     public void setLongitude(BigDecimal longitude)
     {
         if
@@ -225,11 +281,17 @@ public class EventAddress
         }
         this.longitude = longitude;
     }
+    /**
+     * Check coordinate validity after loading address data from the database.
+     */
     @PostLoad
     private void validateCoordinatesOnLoad()
     {
         this.validateCoordinates();
     }
+    /**
+     * Check coordinate validity before saving address data to the database.
+     */
     @PrePersist
     @PreUpdate
     private void validateCoordinatesBeforeWrite()

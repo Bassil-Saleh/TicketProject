@@ -16,6 +16,16 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Objects;
 
+/**
+ * EventHost is an entity representing a record on an event host,
+ * who can do things such as create events and invite/block
+ * end users to/from events.
+ * 
+ * Event hosts are uniquely identified by their email address,
+ * since that is the primary method from which they verify their
+ * account when creating it for the first time, receive a link
+ * to reset their password, and so on.
+ */
 @Entity
 @Table
 (
@@ -28,10 +38,16 @@ import java.util.Objects;
 )
 public class EventHost
 {
+    /**
+     * The primary key.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * The event host's first name.
+     */
     @Column
     (
         name = AppConstants.Database.EventHosts.TableNames.COLUMN_FIRST_NAME,
@@ -40,6 +56,9 @@ public class EventHost
     )
     private String firstName;
 
+    /**
+     * The event host's middle name (optional).
+     */
     @Column
     (
         name = AppConstants.Database.EventHosts.TableNames.COLUMN_MIDDLE_NAME,
@@ -47,6 +66,9 @@ public class EventHost
     )
     private String middleName;
 
+    /**
+     * The event host's last name.
+     */
     @Column
     (
         name = AppConstants.Database.EventHosts.TableNames.COLUMN_LAST_NAME,
@@ -55,6 +77,9 @@ public class EventHost
     )
     private String lastName;
 
+    /**
+     * Used to check that an event host is at least 18 years old when creating a new account.
+     */
     @Convert(converter = EncryptedLocalDateConverter.class)
     @Column
     (
@@ -64,6 +89,10 @@ public class EventHost
     )
     private LocalDate dateOfBirth;
 
+    /**
+     * Used by the event host to log in to the application, and also receive
+     * important communications (account verification, password reset link, etc.).
+     */
     @Convert(converter = EncryptedStringConverter.class)
     @Column
     (
@@ -73,6 +102,11 @@ public class EventHost
     )
     private String email;
 
+    /**
+     * Used to query the event host database table based on the email field,
+     * such as preventing an event host record with an email address that
+     * already exists in the table from getting inserted into the table.
+     */
     @Column
     (
         name = AppConstants.Database.EventHosts.TableNames.COLUMN_EMAIL_BLIND_INDEX,
@@ -81,6 +115,9 @@ public class EventHost
     )
     private byte[] emailBlindIndex;
 
+    /**
+     * Stores the hashed password of the event host's account.
+     */
     @Column
     (
         name = AppConstants.Database.EventHosts.TableNames.COLUMN_PASSWORD_HASH,
@@ -89,13 +126,21 @@ public class EventHost
     )
     private String passwordHash;
 
+    /**
+     * When the record was first created. Should not be changed.
+     */
     @Column
     (
         name = AppConstants.Database.EventHosts.TableNames.COLUMN_CREATED,
+        updatable = false,
         nullable = false
     )
     private LocalDateTime created;
 
+    /**
+     * When the event host last logged in. Technically, they log in when
+     * they create an account for the very first time, hence this field being non-null.
+     */
     @Column
     (
         name = AppConstants.Database.EventHosts.TableNames.COLUMN_LAST_LOGIN,
@@ -103,6 +148,9 @@ public class EventHost
     )
     private LocalDateTime lastLogin;
 
+    /**
+     * When this record was last updated.
+     */
     @Column
     (
         name = AppConstants.Database.EventHosts.TableNames.COLUMN_LAST_UPDATED,
@@ -110,6 +158,9 @@ public class EventHost
     )
     private LocalDateTime lastUpdated;
 
+    /**
+     * Whether or not the event host's account is still active.
+     */
     @Column
     (
         name = AppConstants.Database.EventHosts.TableNames.COLUMN_ACTIVE,
@@ -117,6 +168,9 @@ public class EventHost
     )
     private boolean active;
 
+    /**
+     * Whether or not the event host's account has been successfully verified.
+     */
     @Column
     (
         name = AppConstants.Database.EventHosts.TableNames.COLUMN_VERIFIED,
@@ -124,6 +178,10 @@ public class EventHost
     )
     private boolean verified;
 
+    /**
+     * Stores a hash of the account verification key sent to the event host's
+     * email address when they create an account for the first time.
+     */
     @Column
     (
         name = AppConstants.Database.EventHosts.TableNames.COLUMN_VERIFICATION_KEY_HASH,
@@ -132,6 +190,9 @@ public class EventHost
     )
     private byte[] verificationKeyHash;
 
+    /**
+     * When the account verification key for an event host's account expires.
+     */
     @Column
     (
         name = AppConstants.Database.EventHosts.TableNames.COLUMN_VERIFICATION_EXPIRES,
@@ -139,18 +200,36 @@ public class EventHost
     )
     private LocalDateTime verificationExpires;
 
+    /**
+     * An event host can create many events, but each event can only be authored by a single event host.
+     */
     @OneToMany(mappedBy = AppConstants.Database.EventHosts.MappedByNames.MAPPED_BY_EVENT_HOST)
     private Set<Event> events = new HashSet<>();
 
+    /**
+     * An event host's address book can have several records, but each address book record
+     * can only belong to a single event host.
+     */
     @OneToMany(mappedBy = AppConstants.Database.EventHosts.MappedByNames.MAPPED_BY_EVENT_HOST)
     private Set<AddressBookContact> addressBookContacts = new HashSet<>();
 
+    /**
+     * An event host can have multiple password reset tokens, but each password reset token
+     * can only belong to a single event host.
+     */
     @OneToMany(mappedBy = AppConstants.Database.EventHosts.MappedByNames.MAPPED_BY_EVENT_HOST)
     private Set<PasswordResetToken> passwordResetTokens = new HashSet<>();
 
+    /**
+     * An event host can block multiple registrations, but each block can only
+     * be authored by a single event host.
+     */
     @OneToMany(mappedBy = AppConstants.Database.EventHosts.MappedByNames.MAPPED_BY_BLOCKED_BY)
     private Set<BlockedRegistration> blockedRegistrations = new HashSet<>();
 
+    /**
+     * An event host can scan multiple tickets, but each ticket can only be scanned by a single event host.
+     */
     @OneToMany(mappedBy = AppConstants.Database.EventHosts.MappedByNames.MAPPED_BY_SCANNED_BY)
     private Set<TicketScan> ticketScans = new HashSet<>();
 

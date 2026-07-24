@@ -7,6 +7,11 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * EventSigningKey is an entity representing a record that stores a key pair
+ * (a public key and a private key) for each event, used to authenticate
+ * and verify scanned tickets.
+ */
 @Entity
 @Table
 (
@@ -19,10 +24,17 @@ import java.util.Objects;
 )
 public class EventSigningKey
 {
+    /**
+     * The primary key.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Every event must have an event signing key pair, and
+     * every key pair must be associated with a single event.
+     */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn
     (
@@ -31,6 +43,10 @@ public class EventSigningKey
     )
     private Event event;
 
+    /**
+     * The event key pair's private key. Used to generate digital signatures to validate
+     * whether a scanned ticket actually originated from the server.
+     */
     @Convert(converter = EncryptedPrivateKeyConverter.class)
     @Column
     (
@@ -40,6 +56,16 @@ public class EventSigningKey
     )
     private byte[] privateKey;
 
+    /**
+     * The event key pair's public key. When an event host logs into the Android app
+     * (which is used to scan tickets and communicate with the back-end of the web application)
+     * and pulls up an event they've created, the event's public key gets sent to their device.
+     * 
+     * That way, the event host can quickly validate scanned tickets (as opposed to having each
+     * individual scanned ticket take an entire round-trip from their device to the back-end),
+     * and then the app can send a queue of those scanned tickets back to the back-end later
+     * for further validation.
+     */
     @Column
     (
         name = AppConstants.Database.EventSigningKeys.TableNames.COLUMN_PUBLIC_KEY,
@@ -48,9 +74,13 @@ public class EventSigningKey
     )
     private byte[] publicKey;
 
+    /**
+     * When the record was created. Should not be changed.
+     */
     @Column
     (
         name = AppConstants.Database.EventSigningKeys.TableNames.COLUMN_CREATED,
+        updatable = false,
         nullable = false
     )
     private LocalDateTime created;

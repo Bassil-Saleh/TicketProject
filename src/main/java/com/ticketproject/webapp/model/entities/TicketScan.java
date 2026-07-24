@@ -6,6 +6,10 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * TicketScan is an entity representing a record that stores info on a scanned ticket,
+ * such as when the ticket was scanned and by whom it was scanned.
+ */
 @Entity
 @Table
 (
@@ -18,10 +22,17 @@ import java.util.Objects;
 )
 public class TicketScan
 {
+    /**
+     * The primary key.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * When a ticket gets scanned, it can only be associated with a single ticket scan record.
+     * Also, every single ticket scan record can only be associated with a single ticket.
+     */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn
     (
@@ -30,6 +41,9 @@ public class TicketScan
     )
     private Ticket ticket;
 
+    /**
+     * Who scanned the ticket.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     (
@@ -38,6 +52,9 @@ public class TicketScan
     )
     private EventHost scannedBy;
 
+    /**
+     * When the ticket was scanned.
+     */
     @Column
     (
         name = AppConstants.Database.TicketScans.TableNames.COLUMN_SCANNED_AT,
@@ -45,6 +62,9 @@ public class TicketScan
     )
     private LocalDateTime scannedAt;
 
+    /**
+     * Info about the device which scanned the ticket.
+     */
     @Column
     (
         name = AppConstants.Database.TicketScans.TableNames.COLUMN_DEVICE_INFO,

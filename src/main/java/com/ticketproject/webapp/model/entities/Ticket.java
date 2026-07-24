@@ -7,6 +7,13 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * Ticket is an entity representing a record that stores info
+ * on a digital ticket for use by an attendee.
+ * 
+ * The ticket can either be for a public event which the attendee registered for,
+ * or a private event which the attendee was invited to.
+ */
 @Entity
 @Table
 (
@@ -29,10 +36,17 @@ import java.util.Objects;
 )
 public class Ticket
 {
+    /**
+     * The primary key.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * A value which gets encoded into a QR code for the attendee's ticket.
+     * This gets scanned by the Android app and is used to check in the attendee.
+     */
     @Column
     (
         name = AppConstants.Database.Tickets.TableNames.COLUMN_PUBLIC_TOKEN,
@@ -41,6 +55,10 @@ public class Ticket
     )
     private String publicToken;
 
+    /**
+     * When the application's back-end receives the public token scanned from a QR code,
+     * it extracts an identifier from the payload and compares it to the identifier in the database.
+     */
     @Column
     (
         name = AppConstants.Database.Tickets.TableNames.COLUMN_TOKEN_IDENTIFIER,
@@ -49,6 +67,9 @@ public class Ticket
     )
     private String tokenIdentifier;
 
+    /**
+     * An attendee can have many tickets, but each ticket can only belong to a single attendee.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     (
@@ -57,6 +78,9 @@ public class Ticket
     )
     private Attendee attendee;
 
+    /**
+     * An event can have many tickets, but each ticket can only belong to a single event.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     (
@@ -65,6 +89,10 @@ public class Ticket
     )
     private Event event;
 
+    /**
+     * Whether or not the scanned ticket has been successfully validated
+     * (in other words, whether the attendee is present).
+     */
     @Column
     (
         name = AppConstants.Database.Tickets.TableNames.COLUMN_PRESENT,
@@ -72,6 +100,10 @@ public class Ticket
     )
     private boolean present;
 
+    /**
+     * The attendee's response to their invitation for a private event
+     * (pending, accepted, rejected).
+     */
     @Enumerated(EnumType.STRING)
     @Column
     (
@@ -80,13 +112,20 @@ public class Ticket
     )
     private InvitationStatus invitationStatus;
 
+    /**
+     * When the record was first created. Should not be changed.
+     */
     @Column
     (
         name = AppConstants.Database.Tickets.TableNames.COLUMN_CREATED,
+        updatable = false,
         nullable = false
     )
     private LocalDateTime created;
 
+    /**
+     * When the record was last updated.
+     */
     @Column
     (
         name = AppConstants.Database.Tickets.TableNames.COLUMN_LAST_UPDATED,
@@ -94,9 +133,17 @@ public class Ticket
     )
     private LocalDateTime lastUpdated;
 
+    /**
+     * When the ticket was soft-deleted (meaning the ticket is no longer active
+     * or usable, but its information remains in the database to allow for bookkeeping).
+     */
     @Column(name = AppConstants.Database.Tickets.TableNames.COLUMN_DELETED_AT)
     private LocalDateTime deletedAt;
 
+    /**
+     * When a ticket gets scanned, it can only be associated with a single ticket scan record.
+     * Also, every single ticket scan record can only be associated with a single ticket.
+     */
     @OneToOne(mappedBy = AppConstants.Database.Tickets.MappedByNames.MAPPED_BY_TICKET)
     private TicketScan ticketScan;
     // ************************************************

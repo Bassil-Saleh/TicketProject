@@ -11,6 +11,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Objects;
 
+/**
+ * Event is an entity representing a record on either a public event
+ * (where end users register through a public page for the event) or
+ * a private event (where the event host manually invites people of
+ * their choice).
+ */
 @Entity
 @Table
 (
@@ -23,10 +29,19 @@ import java.util.Objects;
 )
 public class Event
 {
+    /**
+     * The primary key.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Used for constructing a URL to a page where attendees can view
+     * info about the event. Note that before an event is published by
+     * the event host, it is possible for the event host to change
+     * a public event to a private event (or vice versa).
+     */
     @Column
     (
         name = AppConstants.Database.Events.TableNames.COLUMN_PUBLIC_ID,
@@ -35,6 +50,10 @@ public class Event
     )
     private String publicId;
 
+    /**
+     * A single event host can create many events, but each event can
+     * only be authored by a single event host.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     (
@@ -43,13 +62,20 @@ public class Event
     )
     private EventHost eventHost;
 
+    /**
+     * When the record was first created. Should not be changed.
+     */
     @Column
     (
         name = AppConstants.Database.Events.TableNames.COLUMN_CREATED,
+        updatable = false,
         nullable = false
     )
     private LocalDateTime created;
 
+    /**
+     * When the record was last updated.
+     */
     @Column
     (
         name = AppConstants.Database.Events.TableNames.COLUMN_LAST_UPDATED,
@@ -57,6 +83,9 @@ public class Event
     )
     private LocalDateTime lastUpdated;
 
+    /**
+     * The event's name.
+     */
     @Column
     (
         name = AppConstants.Database.Events.TableNames.COLUMN_NAME,
@@ -65,6 +94,9 @@ public class Event
     )
     private String name;
 
+    /**
+     * The event's description.
+     */
     @Column
     (
         name = AppConstants.Database.Events.TableNames.COLUMN_DESCRIPTION,
@@ -73,6 +105,9 @@ public class Event
     )
     private String description;
 
+    /**
+     * The event's address.
+     */
     @OneToOne
     (
         cascade = CascadeType.ALL,
@@ -85,6 +120,9 @@ public class Event
     )
     private EventAddress eventAddress;
 
+    /**
+     * When the event begins.
+     */
     @Column
     (
         name = AppConstants.Database.Events.TableNames.COLUMN_START_DATE_TIME,
@@ -93,6 +131,9 @@ public class Event
     private LocalDateTime startDateTime;
 
 
+    /**
+     * When the event ends.
+     */
     @Column
     (
         name = AppConstants.Database.Events.TableNames.COLUMN_END_DATE_TIME,
@@ -100,6 +141,9 @@ public class Event
     )
     private LocalDateTime endDateTime;
 
+    /**
+     * The event's type (i.e. public or private).
+     */
     @Enumerated(EnumType.STRING)
     @Column
     (
@@ -108,9 +152,17 @@ public class Event
     )
     private EventType eventType;
 
+    /**
+     * The maximum number of attendees which can register for a public event.
+     * Note that this can be null since the number of attendees for
+     * a private event are determined by how many people the event host invites.
+     */
     @Column(name = AppConstants.Database.Events.TableNames.COLUMN_MAX_ATTENDEES)
     private Integer maxAttendees;
 
+    /**
+     * Whether or not people can still register for the event.
+     */
     @Enumerated(EnumType.STRING)
     @Column
     (
@@ -119,6 +171,18 @@ public class Event
     )
     private RegistrationStatus registrationStatus;
 
+    /**
+     * The event's status (draft, published, canceled).
+     * 
+     * When an event is in the draft status, it is still possible to change all of its details,
+     * including whether it is a public or private event.
+     * 
+     * When an event is in the published status, it cannot be changed from public to private
+     * (or vice versa), but it is still possible to edit other details about the event.
+     * 
+     * When an event is in the canceled status, all tickets/invitations for said event
+     * should no longer work, and the event should not be changeable either.
+     */
     @Enumerated(EnumType.STRING)
     @Column
     (
@@ -127,12 +191,27 @@ public class Event
     )
     private EventStatus eventStatus;
 
+    /**
+     * There can be many tickets for a single event, but each ticket
+     * can only be used for a single event.
+     */
     @OneToMany(mappedBy = AppConstants.Database.Events.MappedByNames.MAPPED_BY_EVENT)
     private Set<Ticket> tickets = new HashSet<>();
 
+    /**
+     * A single event can have many registration blocks, but each block
+     * can only be associated with a single event.
+     */
     @OneToMany(mappedBy = AppConstants.Database.Events.MappedByNames.MAPPED_BY_EVENT)
     private Set<BlockedRegistration> blockedRegistrations = new HashSet<>();
 
+    /**
+     * Consists of a key pair (a public key and a private key) used to
+     * authenticate tickets for an event.
+     * 
+     * Each event must have a single key pair, and each key pair
+     * must belong to only a single event.
+     */
     @OneToOne
     (
         mappedBy = AppConstants.Database.Events.MappedByNames.MAPPED_BY_EVENT,

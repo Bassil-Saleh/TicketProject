@@ -13,6 +13,13 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Objects;
 
+/**
+ * Attendee is an entity representing a record on someone who has either
+ * registered for a public event, or who has been invited to a private event.
+ * 
+ * Since attendees receive all communications on events (tickets, invitations, etc.)
+ * via email, each attendee record should have a unique email address.
+ */
 @Entity
 @Table
 (
@@ -25,10 +32,16 @@ import java.util.Objects;
 )
 public class Attendee
 {
+    /**
+     * The primary key.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * The attendee's first name.
+     */
     @Column
     (
         name = AppConstants.Database.Attendees.TableNames.COLUMN_FIRST_NAME,
@@ -37,6 +50,9 @@ public class Attendee
     )
     private String firstName;
 
+    /**
+     * The attendee's middle name (optional).
+     */
     @Column
     (
         name = AppConstants.Database.Attendees.TableNames.COLUMN_MIDDLE_NAME,
@@ -44,6 +60,9 @@ public class Attendee
     )
     private String middleName;
 
+    /**
+     * The attendee's last name.
+     */
     @Column
     (
         name = AppConstants.Database.Attendees.TableNames.COLUMN_LAST_NAME,
@@ -52,6 +71,9 @@ public class Attendee
     )
     private String lastName;
 
+    /**
+     * The attendee's email address.
+     */
     @Convert(converter = EncryptedStringConverter.class)
     @Column
     (
@@ -61,6 +83,9 @@ public class Attendee
     )
     private String email;
 
+    /**
+     * Used to query for attendee records based on the email address field.
+     */
     @Column
     (
         name = AppConstants.Database.Attendees.TableNames.COLUMN_EMAIL_BLIND_INDEX,
@@ -69,19 +94,36 @@ public class Attendee
     )
     private byte[] emailBlindIndex;
 
+    /**
+     * When the attendee record was first created. Should not be changed.
+     */
     @Column
     (
         name = AppConstants.Database.Attendees.TableNames.COLUMN_CREATED,
+        updatable = false,
         nullable = false
     )
     private LocalDateTime created;
 
+    /**
+     * It is possible for an attendee to have many different tickets and invitations,
+     * but each ticket/invitation should only belong to a single attendee.
+     */
     @OneToMany(mappedBy = AppConstants.Database.Attendees.MappedByNames.MAPPED_BY_ATTENDEE)
     private Set<Ticket> tickets = new HashSet<>();
 
+    /**
+     * It is possible for an attendee to be associated with many different address book records
+     * (i.e. if multiple different hosts invite the same person to their own private events),
+     * but every address book record should only be associated with a single attendee.
+     */
     @OneToMany(mappedBy = AppConstants.Database.Attendees.MappedByNames.MAPPED_BY_ATTENDEE)
     private Set<AddressBookContact> addressBookContacts = new HashSet<>();
 
+    /**
+     * Multiple of an attendee's event registrations can be blocked, but each
+     * registration block can only be associated with a single attendee.
+     */
     @OneToMany(mappedBy = AppConstants.Database.Attendees.MappedByNames.MAPPED_BY_ATTENDEE)
     private Set<BlockedRegistration> blockedRegistrations = new HashSet<>();
 
@@ -125,6 +167,12 @@ public class Attendee
     public void setFirstName(String firstName)                                         { this.firstName = firstName; }
     public void setMiddleName(String middleName)                                       { this.middleName = middleName; }
     public void setLastName(String lastName)                                           { this.lastName = lastName; }
+    /**
+     * Given a plaintext email, use a converter to encrypt it,
+     * and use a service to compute a blind index for it,
+     * and save the ciphertext email and blind index.
+     * @param email a plaintext email
+     */
     public void setEmail(String email)
     {
         this.email = email;
