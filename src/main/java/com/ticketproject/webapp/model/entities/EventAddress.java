@@ -112,8 +112,6 @@ public class EventAddress
 
     public EventAddress
     (
-        LocalDateTime created,
-        LocalDateTime lastUpdated,
         String addressLine1,
         String addressLine2,
         String city,
@@ -124,8 +122,8 @@ public class EventAddress
         BigDecimal longitude
     )
     {
-        this.created = created;
-        this.lastUpdated = lastUpdated;
+        this.created = LocalDateTime.now();
+        this.lastUpdated = LocalDateTime.now();
         this.addressLine1 = addressLine1;
         this.addressLine2 = addressLine2;
         this.city = city;
@@ -154,7 +152,6 @@ public class EventAddress
     // ************************************************
     // Setters
     // ************************************************
-    public void setCreated(LocalDateTime created)         { this.created = created; }
     public void setLastUpdated(LocalDateTime lastUpdated) { this.lastUpdated = lastUpdated; }
     public void setAddressLine1(String addressLine1)      { this.addressLine1 = addressLine1; }
     public void setAddressLine2(String addressLine2)      { this.addressLine2 = addressLine2; }
@@ -300,8 +297,6 @@ public class EventAddress
     // ************************************************
     public static class Builder
     {
-        private LocalDateTime created;
-        private LocalDateTime lastUpdated;
         private String addressLine1;
         private String addressLine2;
         private String city;
@@ -310,18 +305,6 @@ public class EventAddress
         private String country;
         private BigDecimal latitude;
         private BigDecimal longitude;
-
-        public Builder created(LocalDateTime created)
-        {
-            this.created = created;
-            return this;
-        }
-
-        public Builder lastUpdated(LocalDateTime lastUpdated)
-        {
-            this.lastUpdated = lastUpdated;
-            return this;
-        }
 
         public Builder addressLine1(String addressLine1)
         {
@@ -375,8 +358,6 @@ public class EventAddress
         {
             return new EventAddress
             (
-                created,
-                lastUpdated,
                 addressLine1,
                 addressLine2,
                 city,
