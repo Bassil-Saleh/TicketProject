@@ -166,6 +166,8 @@ public class Event
         this.endDateTime = endDateTime;
         this.eventType = eventType;
         this.maxAttendees = maxAttendees;
+        this.created = LocalDateTime.now();
+        this.lastUpdated = LocalDateTime.now();
     }
 
     // ************************************************
@@ -194,7 +196,6 @@ public class Event
     // ************************************************
     public void setPublicId(String publicId)                                           { this.publicId = publicId; }
     public void setEventHost(EventHost eventHost)                                      { this.eventHost = eventHost; }
-    public void setCreated(LocalDateTime created)                                      { this.created = created; }
     public void setLastUpdated(LocalDateTime lastUpdated)                              { this.lastUpdated = lastUpdated; }
     public void setName(String name)                                                   { this.name = name; }
     public void setDescription(String description)                                     { this.description = description; }

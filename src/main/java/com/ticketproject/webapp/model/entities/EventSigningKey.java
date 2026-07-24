@@ -64,14 +64,13 @@ public class EventSigningKey
     (
         Event event,
         byte[] privateKey,
-        byte[] publicKey,
-        LocalDateTime created
+        byte[] publicKey
     )
     {
         this.event = event;
         this.privateKey = privateKey;
         this.publicKey = publicKey;
-        this.created = created;
+        this.created = LocalDateTime.now();
     }
 
     // ************************************************
@@ -89,7 +88,6 @@ public class EventSigningKey
     public void setEvent(Event event)             { this.event = event; }
     public void setPrivateKey(byte[] privateKey)  { this.privateKey = privateKey; }
     public void setPublicKey(byte[] publicKey)    { this.publicKey = publicKey; }
-    public void setCreated(LocalDateTime created) { this.created = created; }
 
     // ************************************************
     // equals(), hashCode(), toString()
@@ -125,7 +123,6 @@ public class EventSigningKey
         private Event event;
         private byte[] privateKey;
         private byte[] publicKey;
-        private LocalDateTime created;
 
         public Builder event(Event event)
         {
@@ -145,15 +142,9 @@ public class EventSigningKey
             return this;
         }
 
-        public Builder created(LocalDateTime created)
-        {
-            this.created = created;
-            return this;
-        }
-
         public EventSigningKey build()
         {
-            return new EventSigningKey(event, privateKey, publicKey, created);
+            return new EventSigningKey(event, privateKey, publicKey);
         }
     }
 }

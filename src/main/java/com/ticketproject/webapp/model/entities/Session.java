@@ -2,6 +2,8 @@ package com.ticketproject.webapp.model.entities;
 
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.model.enums.ClientType;
+import com.ticketproject.webapp.services.HashingService;
+import com.ticketproject.webapp.bridges.SpringContextBridge;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -85,21 +87,16 @@ public class Session
     public Session
     (
         EventHost eventHost,
-        byte[] tokenHash,
         ClientType clientType,
         String ipAddress,
-        String userAgent,
-        LocalDateTime created,
-        LocalDateTime expires
+        String userAgent
     )
     {
         this.eventHost = eventHost;
-        this.tokenHash = tokenHash;
         this.clientType = clientType;
         this.ipAddress = ipAddress;
         this.userAgent = userAgent;
-        this.created = created;
-        this.expires = expires;
+        this.created = LocalDateTime.now();
     }
 
     // ************************************************
@@ -119,12 +116,28 @@ public class Session
     // Setters
     // ************************************************
     public void setEventHost(EventHost eventHost)    { this.eventHost = eventHost; }
-    public void setTokenHash(byte[] tokenHash)       { this.tokenHash = tokenHash; }
+    /**
+     * Generate a user session token, store its hash, then return the raw token
+     * (i.e. to be maintained by the user's web browser).
+     * 
+     * Since the server only stores the hash of this token when constructing
+     * a new Session object, this method should be used right after creating
+     * a new user session token, so that the user can still get the raw token.
+     * @return the raw user session token
+     */
+    public String generateToken()
+    {
+        HashingService hasher = SpringContextBridge.getBean(HashingService.class);
+        HashingService.GeneratedToken token = hasher.generateVerificationToken();
+        this.tokenHash = token.tokenHash();
+        this.expires = LocalDateTime
+            .now()
+            .plusHours(AppConstants.Database.Sessions.Sizes.LOGIN_SESSION_DURATION_HOURS);
+        return token.rawToken();
+    }
     public void setClientType(ClientType clientType) { this.clientType = clientType; }
     public void setIpAddress(String ipAddress)       { this.ipAddress = ipAddress; }
     public void setUserAgent(String userAgent)       { this.userAgent = userAgent; }
-    public void setCreated(LocalDateTime created)    { this.created = created; }
-    public void setExpires(LocalDateTime expires)    { this.expires = expires; }
     public void setRevoked(LocalDateTime revoked)    { this.revoked = revoked; }
 
     // ************************************************
@@ -169,22 +182,13 @@ public class Session
     public static class Builder
     {
         private EventHost eventHost;
-        private byte[] tokenHash;
         private ClientType clientType;
         private String ipAddress;
         private String userAgent;
-        private LocalDateTime created;
-        private LocalDateTime expires;
 
         public Builder eventHost(EventHost eventHost)
         {
             this.eventHost = eventHost;
-            return this;
-        }
-
-        public Builder tokenHash(byte[] tokenHash)
-        {
-            this.tokenHash = tokenHash;
             return this;
         }
 
@@ -206,29 +210,14 @@ public class Session
             return this;
         }
 
-        public Builder created(LocalDateTime created)
-        {
-            this.created = created;
-            return this;
-        }
-
-        public Builder expires(LocalDateTime expires)
-        {
-            this.expires = expires;
-            return this;
-        }
-
         public Session build()
         {
             return new Session
             (
                 eventHost,
-                tokenHash,
                 clientType,
                 ipAddress,
-                userAgent,
-                created,
-                expires
+                userAgent
             );
         }
     }

@@ -75,15 +75,14 @@ public class BlockedRegistration
         Attendee attendee,
         Event event,
         EventHost blockedBy,
-        String reason,
-        LocalDateTime created
+        String reason
     )
     {
         this.attendee = attendee;
         this.event = event;
         this.blockedBy = blockedBy;
         this.reason = reason;
-        this.created = created;
+        this.created = LocalDateTime.now();
     }
 
     // ************************************************
@@ -104,7 +103,6 @@ public class BlockedRegistration
     public void setEvent(Event event)             { this.event = event; }
     public void setBlockedBy(EventHost blockedBy) { this.blockedBy = blockedBy; }
     public void setReason(String reason)          { this.reason = reason; }
-    public void setCreated(LocalDateTime created) { this.created = created; }
     public void setRevoked(LocalDateTime revoked) { this.revoked = revoked; }
 
     // ************************************************
@@ -149,7 +147,6 @@ public class BlockedRegistration
         private Event event;
         private EventHost blockedBy;
         private String reason;
-        private LocalDateTime created;
 
         public Builder attendee(Attendee attendee)
         {
@@ -175,15 +172,9 @@ public class BlockedRegistration
             return this;
         }
 
-        public Builder created(LocalDateTime created)
-        {
-            this.created = created;
-            return this;
-        }
-
         public BlockedRegistration build()
         {
-            return new BlockedRegistration(attendee, event, blockedBy, reason, created);
+            return new BlockedRegistration(attendee, event, blockedBy, reason);
         }
     }
 }

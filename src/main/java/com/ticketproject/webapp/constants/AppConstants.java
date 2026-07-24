@@ -104,6 +104,7 @@ public final class AppConstants
                 }
 
                 public static final int TOKEN_LENGTH = 36;
+                public static final int TOKEN_DURATION_HOURS = 1;
             }
 
             public static final class Definitions
@@ -668,6 +669,7 @@ public final class AppConstants
                 public static final int TOKEN_HASH_LENGTH = 64;
                 public static final int IP_ADDRESS_LENGTH = 45;
                 public static final int USER_AGENT_LENGTH = 512;
+                public static final int LOGIN_SESSION_DURATION_HOURS = 6;
             }
 
             public static final class Definitions

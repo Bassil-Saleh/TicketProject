@@ -1,6 +1,8 @@
 package com.ticketproject.webapp.model.entities;
 
 import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.services.HashingService;
+import com.ticketproject.webapp.bridges.SpringContextBridge;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -59,16 +61,21 @@ public class PasswordResetToken
     public PasswordResetToken
     (
         EventHost eventHost,
-        byte[] tokenHash,
-        LocalDateTime created,
-        LocalDateTime expires
+        byte[] tokenHash
     )
     {
         this.eventHost = eventHost;
         this.tokenHash = tokenHash;
-        this.created = created;
-        this.expires = expires;
+        this.created = LocalDateTime.now();
         this.used = false;
+        // Since the database only stores the hashed token, the token
+        // should be generated outside of this constructor. That way:
+        // - The raw token can still be sent to the user
+        //   (i.e. as part of a URL for a password reset form).
+        // - If for whatever reason the application fails to send the
+        //   raw token to the user, then the application can avoid
+        //   creating a database record for a password reset token
+        //   which the user cannot obtain.
     }
 
     // ************************************************
@@ -86,8 +93,26 @@ public class PasswordResetToken
     // ************************************************
     public void setEventHost(EventHost eventHost) { this.eventHost = eventHost; }
     public void setTokenHash(byte[] tokenHash)    { this.tokenHash = tokenHash; }
-    public void setCreated(LocalDateTime created) { this.created = created; }
     public void setUsed(boolean used)             { this.used = used; }
+    /**
+     * Generate a password reset token, store its hash, then return the raw token
+     * (i.e. to use in a URL to a password reset page).
+     * 
+     * Since the server only stores the hash of this token when constructing
+     * a new PasswordResetToken object, this method should be used right after creating
+     * a new password reset token, so that the user can still get the raw token.
+     * @return the raw password reset token
+     */
+    public String generateToken()
+    {
+        HashingService hasher = SpringContextBridge.getBean(HashingService.class);
+        HashingService.GeneratedToken token = hasher.generateVerificationToken();
+        this.tokenHash = token.tokenHash();
+        this.expires = LocalDateTime
+            .now()
+            .plusHours(AppConstants.Database.PasswordResetTokens.Sizes.TOKEN_DURATION_HOURS);
+        return token.rawToken();
+    }
     public void setExpires(LocalDateTime expires) { this.expires = expires; }
 
     // ************************************************
@@ -137,8 +162,6 @@ public class PasswordResetToken
     {
         private EventHost eventHost;
         private byte[] tokenHash;
-        private LocalDateTime created;
-        private LocalDateTime expires;
 
         public Builder eventHost(EventHost eventHost)
         {
@@ -152,21 +175,9 @@ public class PasswordResetToken
             return this;
         }
 
-        public Builder created(LocalDateTime created)
-        {
-            this.created = created;
-            return this;
-        }
-
-        public Builder expires(LocalDateTime expires)
-        {
-            this.expires = expires;
-            return this;
-        }
-
         public PasswordResetToken build()
         {
-            return new PasswordResetToken(eventHost, tokenHash, created, expires);
+            return new PasswordResetToken(eventHost, tokenHash);
         }
     }
 }

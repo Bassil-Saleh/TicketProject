@@ -119,6 +119,7 @@ public class Ticket
         this.event = event;
         this.invitationStatus = invitationStatus;
         this.present = false;
+        this.created = LocalDateTime.now();
     }
 
     // ************************************************
@@ -146,7 +147,6 @@ public class Ticket
     public void setEvent(Event event)                                  { this.event = event; }
     public void setPresent(boolean present)                            { this.present = present; }
     public void setInvitationStatus(InvitationStatus invitationStatus) { this.invitationStatus = invitationStatus; }
-    public void setCreated(LocalDateTime created)                      { this.created = created; }
     public void setLastUpdated(LocalDateTime lastUpdated)              { this.lastUpdated = lastUpdated; }
     public void setDeletedAt(LocalDateTime deletedAt)                  { this.deletedAt = deletedAt; }
 
