@@ -130,8 +130,13 @@ public class EventAddress
         this.state = state;
         this.postalCode = postalCode;
         this.country = country;
-        this.latitude = latitude;
-        this.longitude = longitude;
+        // If the user is going to supply latitude/longitude coordinates
+        // to the constructor, then I don't think it makes sense to have
+        // one of them null and the other non-null.
+        if ((latitude == null && longitude != null) || (latitude != null && longitude == null))
+            throw new IllegalArgumentException("If either latitude or longitude is supplied, then both of them must be non-null");
+        this.setLatitude(latitude);
+        this.setLongitude(longitude);
     }
 
     // ************************************************
