@@ -14,11 +14,19 @@ import com.ticketproject.webapp.services.CryptoService;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
+/**
+ * EncryptedPrivateKeyConverter is used to handle encryption and decryption of
+ * PrivateKey objects as they are stored into and retrieved from the database.
+ */
 @Converter
 public class EncryptedPrivateKeyConverter implements AttributeConverter<PrivateKey, byte[]>
 {
     private CryptoService cryptoService;
 
+    /**
+     * Retrieves the encryption service from Spring's application context.
+     * @return a reference to the encryption service
+     */
     private CryptoService getCryptoService()
     {
         if (cryptoService == null)

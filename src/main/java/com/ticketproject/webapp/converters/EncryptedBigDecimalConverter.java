@@ -11,11 +11,19 @@ import javax.crypto.AEADBadTagException;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
+/**
+ * EncryptedBigDecimalConverter is used to handle encryption and decryption of
+ * BigDecimal objects as they are stored into and retrieved from the database.
+ */
 @Converter
 public class EncryptedBigDecimalConverter implements AttributeConverter<BigDecimal, byte[]>
 {
     private CryptoService cryptoService;
 
+    /**
+     * Retrieves the encryption service from Spring's application context.
+     * @return a reference to the encryption service
+     */
     private CryptoService getCryptoService()
     {
         if (cryptoService == null)
