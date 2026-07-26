@@ -4,6 +4,9 @@ import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.converters.EncryptedPrivateKeyConverter;
 
 import jakarta.persistence.*;
+
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -54,7 +57,7 @@ public class EventSigningKey
         nullable = false,
         columnDefinition = AppConstants.Database.EventSigningKeys.Definitions.COLUMN_PRIVATE_KEY
     )
-    private byte[] privateKey;
+    private PrivateKey privateKey;
 
     /**
      * The event key pair's public key. When an event host logs into the Android app
@@ -72,7 +75,7 @@ public class EventSigningKey
         nullable = false,
         columnDefinition = AppConstants.Database.EventSigningKeys.Definitions.COLUMN_PUBLIC_KEY
     )
-    private byte[] publicKey;
+    private PublicKey publicKey;
 
     /**
      * When the record was created. Should not be changed.
@@ -93,8 +96,8 @@ public class EventSigningKey
     public EventSigningKey
     (
         Event event,
-        byte[] privateKey,
-        byte[] publicKey
+        PrivateKey privateKey,
+        PublicKey publicKey
     )
     {
         this.event = event;
@@ -108,16 +111,16 @@ public class EventSigningKey
     // ************************************************
     public Long getId()               { return this.id; }
     public Event getEvent()           { return this.event; }
-    public byte[] getPrivateKey()     { return this.privateKey; }
-    public byte[] getPublicKey()      { return this.publicKey; }
+    public PrivateKey getPrivateKey() { return this.privateKey; }
+    public PublicKey getPublicKey()   { return this.publicKey; }
     public LocalDateTime getCreated() { return this.created; }
 
     // ************************************************
     // Setters
     // ************************************************
-    public void setEvent(Event event)             { this.event = event; }
-    public void setPrivateKey(byte[] privateKey)  { this.privateKey = privateKey; }
-    public void setPublicKey(byte[] publicKey)    { this.publicKey = publicKey; }
+    public void setEvent(Event event)                { this.event = event; }
+    public void setPrivateKey(PrivateKey privateKey) { this.privateKey = privateKey; }
+    public void setPublicKey(PublicKey publicKey)    { this.publicKey = publicKey; }
 
     // ************************************************
     // equals(), hashCode(), toString()
@@ -151,8 +154,8 @@ public class EventSigningKey
     public static class Builder
     {
         private Event event;
-        private byte[] privateKey;
-        private byte[] publicKey;
+        private PrivateKey privateKey;
+        private PublicKey publicKey;
 
         public Builder event(Event event)
         {
@@ -160,13 +163,13 @@ public class EventSigningKey
             return this;
         }
 
-        public Builder privateKey(byte[] privateKey)
+        public Builder privateKey(PrivateKey privateKey)
         {
             this.privateKey = privateKey;
             return this;
         }
 
-        public Builder publicKey(byte[] publicKey)
+        public Builder publicKey(PublicKey publicKey)
         {
             this.publicKey = publicKey;
             return this;
