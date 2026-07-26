@@ -2,6 +2,7 @@ package com.ticketproject.webapp.model.entities;
 
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.converters.EncryptedPrivateKeyConverter;
+import com.ticketproject.webapp.converters.PublicKeyConverter;
 
 import jakarta.persistence.*;
 
@@ -69,6 +70,7 @@ public class EventSigningKey
      * and then the app can send a queue of those scanned tickets back to the back-end later
      * for further validation.
      */
+    @Convert(converter = PublicKeyConverter.class)
     @Column
     (
         name = AppConstants.Database.EventSigningKeys.TableNames.COLUMN_PUBLIC_KEY,
