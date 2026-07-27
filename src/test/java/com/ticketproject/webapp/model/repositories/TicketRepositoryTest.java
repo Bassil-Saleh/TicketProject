@@ -378,5 +378,31 @@ class TicketRepositoryTest
 
             assertThat(ticketRepository.findAll()).isEmpty();
         }
+
+        @Test
+        @DisplayName("Constraint violation rolls back prior save in same transaction")
+        void constraintViolationRollsBackPriorSave()
+        {
+            Ticket ticket1 = createTicket();
+            ticket1 = ticketRepository.saveAndFlush(ticket1);
+            assertThat(ticket1).isNotNull();
+            assertThat(ticket1.getId()).isNotNull();
+            assertThat(ticketRepository.findById(ticket1.getId())).isPresent();
+
+            // Attempt to save a ticket with the same composite key
+            Ticket ticket2 = createTicket();
+            ticket2.setPublicToken(UUID.randomUUID().toString());
+            ticket2.setTokenIdentifier(UUID.randomUUID().toString());
+
+            assertThatThrownBy(() -> ticketRepository.saveAndFlush(ticket2))
+                .isInstanceOf(DataIntegrityViolationException.class);
+
+            // End the poisoned transaction and start a new one.
+            TestTransaction.end();
+            TestTransaction.start();
+
+            // There should be no Ticket entities persisted in the database.
+            assertThat(ticketRepository.findAll()).isEmpty();
+        }
     }
 }
