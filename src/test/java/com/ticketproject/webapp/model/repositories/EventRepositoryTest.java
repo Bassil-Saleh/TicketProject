@@ -438,5 +438,27 @@ public class EventRepositoryTest
             assertThat(eventAddressRepository.findById(saved.getEventAddress().getId())).isPresent();
             assertThat(eventSigningKeyRepository.findById(signingKey.getId())).isPresent();
         }
+
+        @Test
+        @DisplayName("Successful transaction commits all changes")
+        void successfulTransactionCommitsAll()
+        {
+            Event event = createEvent(UUID.randomUUID().toString());
+            Event saved = eventRepository.saveAndFlush(event);
+
+            EventSigningKey signingKey = createSigningKey(saved);
+            saved.setSigningKey(signingKey);
+            saved = eventRepository.saveAndFlush(saved);
+            signingKey = saved.getSigningKey();
+
+            TestTransaction.flagForCommit();
+            TestTransaction.end();
+            TestTransaction.start();
+
+            // After commit, everything should be persisted
+            assertThat(eventRepository.findById(saved.getId())).isPresent();
+            assertThat(eventAddressRepository.findById(saved.getEventAddress().getId())).isPresent();
+            assertThat(eventSigningKeyRepository.findById(signingKey.getId())).isPresent();
+        }
     }
 }
