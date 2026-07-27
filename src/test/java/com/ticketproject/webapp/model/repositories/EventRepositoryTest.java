@@ -485,5 +485,25 @@ public class EventRepositoryTest
             // After rollback, the event should not be visible
             assertThat(eventRepository.findById(eventId)).isEmpty();
         }
+
+        @Test
+        @DisplayName("Committed changes are visible in subsequent transactions")
+        void committedChangesVisibleInSubsequentTransaction()
+        {
+            String publicId = UUID.randomUUID().toString();
+
+            // First transaction: save and commit
+            Event event = createEvent(publicId);
+            Event saved = eventRepository.saveAndFlush(event);
+            Long eventId = saved.getId();
+            TestTransaction.flagForCommit();
+            TestTransaction.end();
+
+            // Second transaction: should see the committed data
+            TestTransaction.start();
+            Optional<Event> loaded = eventRepository.findById(eventId);
+            assertThat(loaded).isPresent();
+            assertThat(loaded.get().getPublicId()).isEqualTo(publicId);
+        }
     }
 }
