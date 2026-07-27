@@ -339,5 +339,21 @@ class TicketRepositoryTest
             assertThatThrownBy(() -> ticketRepository.saveAndFlush(ticket2))
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
+
+        @Test
+        @DisplayName("Duplicate composite key (attendee_id, event_id) violates unique constraint")
+        void duplicateCompositeKeyThrowsException()
+        {
+            Ticket ticket1 = createTicket();
+            ticket1 = ticketRepository.saveAndFlush(ticket1);
+
+            Ticket ticket2 = createTicket();
+            // Same attendee and event, different tokens
+            ticket2.setPublicToken(UUID.randomUUID().toString());
+            ticket2.setTokenIdentifier(UUID.randomUUID().toString());
+
+            assertThatThrownBy(() -> ticketRepository.saveAndFlush(ticket2))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
     }
 }
