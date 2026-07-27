@@ -454,4 +454,47 @@ class TicketRepositoryTest
             assertThat(ticketRepository.findAll()).hasSize(2);
         }
     }
+
+    @Nested
+    @DisplayName("Isolation")
+    class Isolation
+    {
+        @Test
+        @DisplayName("Rolled back ticket is not visible in subsequent transaction")
+        void rolledBackTicketNotVisible()
+        {
+            Ticket ticket = createTicket();
+            Ticket saved = ticketRepository.saveAndFlush(ticket);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+            Long ticketId = saved.getId();
+
+            assertThat(ticketRepository.findById(ticketId)).isPresent();
+
+            TestTransaction.flagForRollback();
+            TestTransaction.end();
+
+            assertThat(ticketRepository.findById(ticketId)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Committed ticket is visible in subsequent transaction")
+        void committedTicketVisible()
+        {
+            Ticket ticket = createTicket();
+            Ticket saved = ticketRepository.saveAndFlush(ticket);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+            Long ticketId = saved.getId();
+            TestTransaction.flagForCommit();
+            TestTransaction.end();
+
+            TestTransaction.start();
+            Optional<Ticket> loaded = ticketRepository.findById(ticketId);
+            assertThat(loaded).isPresent();
+            assertThat(loaded.get().getPublicToken()).isEqualTo(ticket.getPublicToken());
+            TestTransaction.flagForCommit();
+            TestTransaction.end();
+        }
+    }
 }
