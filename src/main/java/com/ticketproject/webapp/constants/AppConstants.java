@@ -790,6 +790,7 @@ public final class AppConstants
         public static final String HASH_ALGORITHM = "SHA-256";
         public static final String PUBLIC_PRIVATE_KEY_ALGORITHM = "RSA";
         public static final int PUBLIC_PRIVATE_KEY_SIZE_PROD = 4096;
+        public static final int PUBLIC_PRIVATE_KEY_SIZE_TEST = 1024;
         public static final int GCM_IV_LENGTH_BYTES = 12;
         public static final int GCM_TAG_LENGTH_BITS = 128;
         public static final int HASH_LENGTH_BYTES = 32;

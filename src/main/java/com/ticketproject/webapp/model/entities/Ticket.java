@@ -167,6 +167,7 @@ public class Ticket
         this.invitationStatus = invitationStatus;
         this.present = false;
         this.created = LocalDateTime.now();
+        this.lastUpdated = LocalDateTime.now();
     }
 
     // ************************************************

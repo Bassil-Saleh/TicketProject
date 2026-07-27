@@ -125,7 +125,7 @@ public class EventRepositoryTest
         {
             KeyPairGenerator generator = KeyPairGenerator
                 .getInstance(AppConstants.Crypto.PUBLIC_PRIVATE_KEY_ALGORITHM);
-            generator.initialize(AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_PROD);
+            generator.initialize(AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
             return generator.generateKeyPair();
         }
         catch (NoSuchAlgorithmException e)
