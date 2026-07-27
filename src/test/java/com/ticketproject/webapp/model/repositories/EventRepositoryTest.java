@@ -461,4 +461,29 @@ public class EventRepositoryTest
             assertThat(eventSigningKeyRepository.findById(signingKey.getId())).isPresent();
         }
     }
+
+    @Nested
+    @DisplayName("Isolation")
+    class Isolation
+    {
+        @Test
+        @DisplayName("Uncommitted changes are not visible after rollback")
+        void uncommittedChangesNotVisibleAfterRollback()
+        {
+            Event event = createEvent(UUID.randomUUID().toString());
+            Event saved = eventRepository.saveAndFlush(event);
+            Long eventId = saved.getId();
+
+            // Within the transaction, check that the event is visible
+            assertThat(eventRepository.findById(eventId)).isPresent();
+
+            // Roll back and start a new transaction
+            TestTransaction.flagForRollback();
+            TestTransaction.end();
+            TestTransaction.start();
+
+            // After rollback, the event should not be visible
+            assertThat(eventRepository.findById(eventId)).isEmpty();
+        }
+    }
 }
