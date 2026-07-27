@@ -22,6 +22,12 @@ import java.util.Objects;
     name = AppConstants.Database.EventSigningKeys.TableNames.TABLE_NAME,
     uniqueConstraints =
     {
+        // Suppose the user creates an Event with an EventSigningKey,
+        // creates tickets with the EventSigningKey, then gives the
+        // Event a new EventSigningKey. Then the tickets made using
+        // the old EventSigningKey will no longer be usable.
+        //
+        // To avoid that, I put a uniqueness constraint for the Event ID column here.
         @UniqueConstraint
         (columnNames = AppConstants.Database.EventSigningKeys.TableNames.COLUMN_EVENT_ID)
     }

@@ -284,7 +284,8 @@ public class EventRepositoryTest
             // creates tickets with the EventSigningKey, then gives the
             // Event a new EventSigningKey, then the tickets made using
             // the old EventSigningKey will no longer be usable.
-            // That's why I put a unique constraint for EventSigningKey.
+            // That's why I put a uniqueness constraint for EventSigningKey.
+
             Event event = createEvent(UUID.randomUUID().toString());
             Event saved = eventRepository.saveAndFlush(event);
 
