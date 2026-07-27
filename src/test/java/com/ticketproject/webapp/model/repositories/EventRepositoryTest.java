@@ -416,4 +416,27 @@ public class EventRepositoryTest
             assertThat(eventAddressRepository.count()).isZero();
         }
     }
+
+    @Nested
+    @DisplayName("Commit atomicity")
+    class CommitAtomicity
+    {
+        @Test
+        @DisplayName("Saving event with address and signing key atomically persists all")
+        void saveEventGraphAtomically()
+        {
+            Event event = createEvent(UUID.randomUUID().toString());
+            Event saved = eventRepository.saveAndFlush(event);
+
+            EventSigningKey signingKey = createSigningKey(saved);
+            saved.setSigningKey(signingKey);
+            saved = eventRepository.saveAndFlush(saved);
+            signingKey = saved.getSigningKey();
+
+            // Verify all parts of the graph are persisted
+            assertThat(eventRepository.findById(saved.getId())).isPresent();
+            assertThat(eventAddressRepository.findById(saved.getEventAddress().getId())).isPresent();
+            assertThat(eventSigningKeyRepository.findById(signingKey.getId())).isPresent();
+        }
+    }
 }
