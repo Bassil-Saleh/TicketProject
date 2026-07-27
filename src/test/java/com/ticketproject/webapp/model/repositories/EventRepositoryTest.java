@@ -341,5 +341,27 @@ public class EventRepositoryTest
             Optional<EventSigningKey> loaded = eventSigningKeyRepository.findById(signingKey.getId());
             assertThat(loaded).isPresent();
         }
+
+        @Test
+        @DisplayName("Deleting event cascades to EventAddress and EventSigningKey")
+        void deleteEventCascadesToChildren()
+        {
+            Event event = createEvent(UUID.randomUUID().toString());
+            Event saved = eventRepository.saveAndFlush(event);
+
+            EventSigningKey signingKey = createSigningKey(saved);
+            saved.setSigningKey(signingKey);
+            saved = eventRepository.saveAndFlush(saved);
+            signingKey = saved.getSigningKey();
+
+            Long addressId = saved.getEventAddress().getId();
+            Long keyId = signingKey.getId();
+
+            eventRepository.delete(saved);
+            eventRepository.flush();
+
+            assertThat(eventAddressRepository.findById(addressId)).isEmpty();
+            assertThat(eventSigningKeyRepository.findById(keyId)).isEmpty();
+        }
     }
 }
