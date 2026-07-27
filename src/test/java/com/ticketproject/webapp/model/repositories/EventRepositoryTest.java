@@ -364,4 +364,32 @@ public class EventRepositoryTest
             assertThat(eventSigningKeyRepository.findById(keyId)).isEmpty();
         }
     }
+
+    @Nested
+    @DisplayName("Rollback on failure")
+    class RollbackOnFailure
+    {
+        @Test
+        @DisplayName("Failed save does not persist partial data")
+        void failedSaveDoesNotPersistPartialData()
+        {
+            Event event = createEvent(UUID.randomUUID().toString());
+            // Make the event invalid after setting up the address
+            event.setPublicId(null);
+
+            assertThatThrownBy(() -> eventRepository.saveAndFlush(event))
+                .isInstanceOf(DataIntegrityViolationException.class);
+            
+            // Since a failed transaction should automatically be flagged
+            // by Spring as rollback-only, end the poisoned transaction
+            // and start a clean one.
+            TestTransaction.end();
+            TestTransaction.start();
+
+            // The event should not have been persisted
+            assertThat(eventRepository.findAll()).isEmpty();
+            // The address should not have been persisted either
+            assertThat(eventAddressRepository.findAll()).isEmpty();
+        }
+    }
 }
