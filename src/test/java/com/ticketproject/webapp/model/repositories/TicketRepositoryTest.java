@@ -21,13 +21,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.transaction.TestTransaction;
 
 import com.ticketproject.webapp.bridges.SpringContextBridge;
+import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.model.entities.Attendee;
 import com.ticketproject.webapp.model.entities.Event;
 import com.ticketproject.webapp.model.entities.EventAddress;
 import com.ticketproject.webapp.model.entities.EventHost;
-import com.ticketproject.webapp.model.entities.Ticket;
-import com.ticketproject.webapp.model.entities.TicketScan;
 import com.ticketproject.webapp.model.entities.EventSigningKey;
+import com.ticketproject.webapp.model.entities.Ticket;
 import com.ticketproject.webapp.model.enums.EventStatus;
 import com.ticketproject.webapp.model.enums.EventType;
 import com.ticketproject.webapp.model.enums.InvitationStatus;
@@ -35,24 +35,20 @@ import com.ticketproject.webapp.model.enums.RegistrationStatus;
 import com.ticketproject.webapp.services.BlindIndexService;
 import com.ticketproject.webapp.services.CryptoService;
 import com.ticketproject.webapp.services.HashingService;
-import com.ticketproject.webapp.constants.AppConstants;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * TicketScanRepositoryTest contains integration tests for the TicketScan entity
- * and TicketScanRepository, covering rollback on failure, data constraints,
+ * TicketRepositoryTest contains integration tests for the Ticket entity
+ * and TicketRepository, covering rollback on failure, data constraints,
  * data integrity, and commit atomicity.
  */
 @DataJpaTest
 @Import({SpringContextBridge.class, CryptoService.class, BlindIndexService.class, HashingService.class})
 @ActiveProfiles("test")
-public class TicketRepositoryTest
+class TicketRepositoryTest
 {
-    @Autowired
-    private TicketScanRepository ticketScanRepository;
-
     @Autowired
     private TicketRepository ticketRepository;
 
@@ -65,78 +61,55 @@ public class TicketRepositoryTest
     @Autowired
     private EventHostRepository eventHostRepository;
 
-    private Ticket savedTicket;
-    private EventHost savedScanner;
+    private Attendee savedAttendee;
+    private Event savedEvent;
 
-    /**
-     * Creates and persists shared entities used across tests.
-     */
     @BeforeEach
     void setUp()
     {
         Attendee attendee = new Attendee.Builder()
-            .firstName("Scan")
-            .lastName("Attendee")
-            .email("scan-" + UUID.randomUUID() + "@example.com")
+            .firstName("Jane")
+            .lastName("Doe")
+            .email("attendee-" + UUID.randomUUID() + "@example.com")
             .build();
-        Attendee savedAttendee = attendeeRepository.saveAndFlush(attendee);
+        savedAttendee = attendeeRepository.saveAndFlush(attendee);
 
         EventHost host = new EventHost.Builder()
-            .firstName("Scan")
-            .lastName("Host")
-            .dateOfBirth(LocalDate.of(1987, 8, 8))
-            .email("scanhost-" + UUID.randomUUID() + "@example.com")
+            .firstName("Host")
+            .lastName("User")
+            .dateOfBirth(LocalDate.of(1985, 6, 15))
+            .email("host-" + UUID.randomUUID() + "@example.com")
             .plaintextPassword("password123")
             .build();
         host.generateVerificationToken();
         EventHost savedHost = eventHostRepository.saveAndFlush(host);
 
         EventAddress address = new EventAddress.Builder()
-            .addressLine1("300 Scan Ave")
-            .city("Scantown")
-            .state("FL")
-            .postalCode("33101")
+            .addressLine1("789 Elm St")
+            .city("Capital City")
+            .state("NY")
+            .postalCode("10001")
             .country("USA")
             .build();
 
         Event event = new Event.Builder()
             .publicId(UUID.randomUUID().toString())
             .eventHost(savedHost)
-            .name("Scan Event")
-            .description("An event for ticket scan tests")
-            .startDateTime(LocalDateTime.now().plusDays(5))
-            .endDateTime(LocalDateTime.now().plusDays(5).plusHours(3))
+            .name("Concert")
+            .description("A live concert event")
+            .startDateTime(LocalDateTime.now().plusDays(14))
+            .endDateTime(LocalDateTime.now().plusDays(14).plusHours(4))
             .eventType(EventType.PUBLIC)
-            .maxAttendees(300)
+            .maxAttendees(500)
             .build();
-        
+
         EventSigningKey signingKey = createSigningKey(event);
 
+        event.setSigningKey(signingKey);
         event.setEventAddress(address);
         event.setRegistrationStatus(RegistrationStatus.OPEN);
         event.setEventStatus(EventStatus.PUBLISHED);
-        event.setSigningKey(signingKey);
-        Event savedEvent = eventRepository.saveAndFlush(event);
-
-        Ticket ticket = new Ticket.Builder()
-            .publicToken(UUID.randomUUID().toString())
-            .tokenIdentifier(UUID.randomUUID().toString())
-            .attendee(savedAttendee)
-            .event(savedEvent)
-            .invitationStatus(InvitationStatus.ACCEPTED)
-            .build();
-        savedTicket = ticketRepository.saveAndFlush(ticket);
-
-        // Create a separate EventHost who will act as the scanner
-        EventHost scanner = new EventHost.Builder()
-            .firstName("Scanner")
-            .lastName("Person")
-            .dateOfBirth(LocalDate.of(1990, 2, 2))
-            .email("scanner-" + UUID.randomUUID() + "@example.com")
-            .plaintextPassword("password123")
-            .build();
-        scanner.generateVerificationToken();
-        savedScanner = eventHostRepository.saveAndFlush(scanner);
+        savedEvent = eventRepository.saveAndFlush(event);
     }
 
     /**
@@ -178,16 +151,17 @@ public class TicketRepositoryTest
     }
 
     /**
-     * Helper method to create a valid TicketScan entity.
-     * @return a new TicketScan entity (not yet persisted)
+     * Helper method to create a valid Ticket entity.
+     * @return a new Ticket entity (not yet persisted)
      */
-    private TicketScan createScan()
+    private Ticket createTicket()
     {
-        return new TicketScan.Builder()
-            .ticket(savedTicket)
-            .scannedBy(savedScanner)
-            .scannedAt(LocalDateTime.now())
-            .deviceInfo("Pixel 7, Android 14")
+        return new Ticket.Builder()
+            .publicToken(UUID.randomUUID().toString())
+            .tokenIdentifier(UUID.randomUUID().toString())
+            .attendee(savedAttendee)
+            .event(savedEvent)
+            .invitationStatus(InvitationStatus.ACCEPTED)
             .build();
     }
 
@@ -196,13 +170,57 @@ public class TicketRepositoryTest
     class DataConstraints
     {
         @Test
-        @DisplayName("Saving scan with null ticket violates NOT NULL constraint")
-        void nullTicketThrowsException()
+        @DisplayName("Saving ticket with null publicToken violates NOT NULL constraint")
+        void nullPublicTokenThrowsException()
         {
-            TicketScan scan = createScan();
-            scan.setTicket(null);
+            Ticket ticket = createTicket();
+            ticket.setPublicToken(null);
 
-            assertThatThrownBy(() -> ticketScanRepository.saveAndFlush(scan))
+            assertThatThrownBy(() -> ticketRepository.saveAndFlush(ticket))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Saving ticket with null tokenIdentifier violates NOT NULL constraint")
+        void nullTokenIdentifierThrowsException()
+        {
+            Ticket ticket = createTicket();
+            ticket.setTokenIdentifier(null);
+
+            assertThatThrownBy(() -> ticketRepository.saveAndFlush(ticket))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Saving ticket with null attendee violates NOT NULL constraint")
+        void nullAttendeeThrowsException()
+        {
+            Ticket ticket = createTicket();
+            ticket.setAttendee(null);
+
+            assertThatThrownBy(() -> ticketRepository.saveAndFlush(ticket))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Saving ticket with null event violates NOT NULL constraint")
+        void nullEventThrowsException()
+        {
+            Ticket ticket = createTicket();
+            ticket.setEvent(null);
+
+            assertThatThrownBy(() -> ticketRepository.saveAndFlush(ticket))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Saving ticket with null invitationStatus violates NOT NULL constraint")
+        void nullInvitationStatusThrowsException()
+        {
+            Ticket ticket = createTicket();
+            ticket.setInvitationStatus(null);
+
+            assertThatThrownBy(() -> ticketRepository.saveAndFlush(ticket))
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
     }
