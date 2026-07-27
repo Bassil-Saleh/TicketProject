@@ -162,5 +162,118 @@ public class EventRepositoryTest
             assertThatThrownBy(() -> eventRepository.saveAndFlush(event))
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
+
+        @Test
+        @DisplayName("Saving event with null name violates NOT NULL constraint")
+        void nullNameThrowsException()
+        {
+            Event event = createEvent(UUID.randomUUID().toString());
+            event.setName(null);
+
+            assertThatThrownBy(() -> eventRepository.saveAndFlush(event))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Saving event with null description violates NOT NULL constraint")
+        void nullDescriptionThrowsException()
+        {
+            Event event = createEvent(UUID.randomUUID().toString());
+            event.setDescription(null);
+
+            assertThatThrownBy(() -> eventRepository.saveAndFlush(event))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Saving event with null eventHost violates NOT NULL constraint")
+        void nullEventHostThrowsException()
+        {
+            Event event = createEvent(UUID.randomUUID().toString());
+            event.setEventHost(null);
+
+            assertThatThrownBy(() -> eventRepository.saveAndFlush(event))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Saving event with null eventAddress violates NOT NULL constraint")
+        void nullEventAddressThrowsException()
+        {
+            Event event = createEvent(UUID.randomUUID().toString());
+            event.setEventAddress(null);
+
+            assertThatThrownBy(() -> eventRepository.saveAndFlush(event))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Saving event with null startDateTime violates NOT NULL constraint")
+        void nullStartDateTimeThrowsException()
+        {
+            Event event = createEvent(UUID.randomUUID().toString());
+            event.setStartDateTime(null);
+
+            assertThatThrownBy(() -> eventRepository.saveAndFlush(event))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Saving event with null endDateTime violates NOT NULL constraint")
+        void nullEndDateTimeThrowsException()
+        {
+            Event event = createEvent(UUID.randomUUID().toString());
+            event.setEndDateTime(null);
+
+            assertThatThrownBy(() -> eventRepository.saveAndFlush(event))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Saving event with null eventType violates NOT NULL constraint")
+        void nullEventTypeThrowsException()
+        {
+            Event event = createEvent(UUID.randomUUID().toString());
+            event.setEventType(null);
+
+            assertThatThrownBy(() -> eventRepository.saveAndFlush(event))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Saving event with null registrationStatus violates NOT NULL constraint")
+        void nullRegistrationStatusThrowsException()
+        {
+            Event event = createEvent(UUID.randomUUID().toString());
+            event.setRegistrationStatus(null);
+
+            assertThatThrownBy(() -> eventRepository.saveAndFlush(event))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Saving event with null eventStatus violates NOT NULL constraint")
+        void nullEventStatusThrowsException()
+        {
+            Event event = createEvent(UUID.randomUUID().toString());
+            event.setEventStatus(null);
+
+            assertThatThrownBy(() -> eventRepository.saveAndFlush(event))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Duplicate publicId violates unique constraint")
+        void duplicatePublicIdThrowsException()
+        {
+            String publicId = UUID.randomUUID().toString();
+            Event event1 = createEvent(publicId);
+            eventRepository.saveAndFlush(event1);
+
+            Event event2 = createEvent(publicId);
+
+            assertThatThrownBy(() -> eventRepository.saveAndFlush(event2))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
     }
 }
