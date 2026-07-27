@@ -85,6 +85,7 @@ public class AddressBookContact
     {
         this.attendee = attendee;
         this.eventHost = eventHost;
+        this.created = LocalDateTime.now();
     }
 
     // ************************************************

@@ -109,5 +109,31 @@ class AddressBookContactRepositoryTest
             assertThatThrownBy(() -> addressBookContactRepository.saveAndFlush(contact))
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
+
+        @Test
+        @DisplayName("Updating contact with null attendee violates NOT NULL constraint")
+        void updateNullAttendeeThrowsException()
+        {
+            AddressBookContact contact = createContact();
+            AddressBookContact saved = addressBookContactRepository.saveAndFlush(contact);
+            assertThat(saved).isNotNull();
+            saved.setAttendee(null);
+
+            assertThatThrownBy(() -> addressBookContactRepository.saveAndFlush(saved))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Updating contact with null eventHost violates NOT NULL constraint")
+        void updateNullEventHostThrowsException()
+        {
+            AddressBookContact contact = createContact();
+            AddressBookContact saved = addressBookContactRepository.saveAndFlush(contact);
+            assertThat(saved).isNotNull();
+            saved.setEventHost(null);
+
+            assertThatThrownBy(() -> addressBookContactRepository.saveAndFlush(saved))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
     }
 }
