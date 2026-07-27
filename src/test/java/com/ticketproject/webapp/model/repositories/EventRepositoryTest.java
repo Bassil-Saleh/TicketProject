@@ -276,4 +276,26 @@ public class EventRepositoryTest
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
     }
+
+    @Nested
+    @DisplayName("Data integrity: cascade and orphan removal")
+    class DataIntegrity
+    {
+        @Test
+        @DisplayName("Cascade ALL: saving event also persists its EventAddress")
+        void cascadeAllPersistsEventAddress()
+        {
+            Event event = createEvent(UUID.randomUUID().toString());
+            EventAddress address = event.getEventAddress();
+
+            Event saved = eventRepository.saveAndFlush(event);
+            address = saved.getEventAddress();
+
+            assertThat(saved.getId()).isNotNull();
+            assertThat(address.getId()).isNotNull();
+
+            Optional<EventAddress> loaded = eventAddressRepository.findById(address.getId());
+            assertThat(loaded).isPresent();
+        }
+    }
 }
