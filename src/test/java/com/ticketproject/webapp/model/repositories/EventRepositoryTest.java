@@ -323,5 +323,23 @@ public class EventRepositoryTest
 
             assertThat(newAddress.getId()).isNotNull();
         }
+
+        @Test
+        @DisplayName("Cascade ALL: saving event also persists its EventSigningKey")
+        void cascadeAllPersistsSigningKey()
+        {
+            Event event = createEvent(UUID.randomUUID().toString());
+            Event saved = eventRepository.saveAndFlush(event);
+
+            EventSigningKey signingKey = createSigningKey(saved);
+            saved.setSigningKey(signingKey);
+            saved = eventRepository.saveAndFlush(saved);
+            signingKey = saved.getSigningKey();
+
+            assertThat(signingKey.getId()).isNotNull();
+
+            Optional<EventSigningKey> loaded = eventSigningKeyRepository.findById(signingKey.getId());
+            assertThat(loaded).isPresent();
+        }
     }
 }
