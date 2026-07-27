@@ -297,5 +297,31 @@ public class EventRepositoryTest
             Optional<EventAddress> loaded = eventAddressRepository.findById(address.getId());
             assertThat(loaded).isPresent();
         }
+
+        @Test
+        @DisplayName("Orphan removal: replacing EventAddress deletes the old one")
+        void orphanRemovalDeletesOldAddress()
+        {
+            Event event = createEvent(UUID.randomUUID().toString());
+            Event saved = eventRepository.saveAndFlush(event);
+            Long oldAddressId = saved.getEventAddress().getId();
+
+            EventAddress newAddress = new EventAddress.Builder()
+                .addressLine1("456 Oak Ave")
+                .city("Shelbyville")
+                .state("IL")
+                .postalCode("62565")
+                .country("USA")
+                .build();
+
+            saved.setEventAddress(newAddress);
+            saved = eventRepository.saveAndFlush(saved);
+            newAddress = saved.getEventAddress();
+
+            Optional<EventAddress> oldLoaded = eventAddressRepository.findById(oldAddressId);
+            assertThat(oldLoaded).isEmpty();
+
+            assertThat(newAddress.getId()).isNotNull();
+        }
     }
 }
