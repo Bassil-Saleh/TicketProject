@@ -289,6 +289,20 @@ public class Event
     public void setTickets(Set<Ticket> tickets)                                        { this.tickets = tickets; }
     public void setBlockedRegistrations(Set<BlockedRegistration> blockedRegistrations) { this.blockedRegistrations = blockedRegistrations; }
     public void setSigningKey(EventSigningKey signingKey)                              { this.signingKey = signingKey; }
+    /**
+     * I don't think it makes sense for an Event to have no EventAddress
+     * or no EventSigningKey. Also, if the user wants to edit an Event's
+     * EventAddress, it shouldn't be set to null either.
+     */
+    @PrePersist
+    @PreUpdate
+    private void validateMandatoryAssociations()
+    {
+        if (this.eventAddress == null)
+            throw new IllegalStateException("EventAddress must not be null before persisting Event");
+        if (this.signingKey == null)
+            throw new IllegalStateException("EventSigningKey must not be null before persisting Event");
+    }
 
     // ************************************************
     // equals(), hashCode(), toString()

@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.transaction.TestTransaction;
 
@@ -103,9 +104,12 @@ public class EventRepositoryTest
             .maxAttendees(100)
             .build();
         
+        EventSigningKey signingKey = createSigningKey(event);
+        
         event.setEventAddress(address);
         event.setRegistrationStatus(RegistrationStatus.OPEN);
         event.setEventStatus(EventStatus.DRAFT);
+        event.setSigningKey(signingKey);
 
         return event;
     }
@@ -204,7 +208,7 @@ public class EventRepositoryTest
             event.setEventAddress(null);
 
             assertThatThrownBy(() -> eventRepository.saveAndFlush(event))
-                .isInstanceOf(DataIntegrityViolationException.class);
+                .isInstanceOf(InvalidDataAccessApiUsageException.class);
         }
 
         @Test
@@ -289,13 +293,8 @@ public class EventRepositoryTest
             Event event = createEvent(UUID.randomUUID().toString());
             Event saved = eventRepository.saveAndFlush(event);
 
-            EventSigningKey key1 = createSigningKey(saved);
-            saved.setSigningKey(key1);
-            saved = eventRepository.saveAndFlush(saved);
-            key1 = saved.getSigningKey();
-
-            EventSigningKey key2 = createSigningKey(saved);
-            saved.setSigningKey(key2);
+            EventSigningKey newKey = createSigningKey(saved);
+            saved.setSigningKey(newKey);
 
             // Since saved is not a final variable, I can't use it in a lambda,
             // so I have to check that it throws an exception a different way.
@@ -326,7 +325,9 @@ public class EventRepositoryTest
             Event saved = eventRepository.saveAndFlush(event);
             address = saved.getEventAddress();
 
+            assertThat(saved).isNotNull();
             assertThat(saved.getId()).isNotNull();
+            assertThat(address).isNotNull();
             assertThat(address.getId()).isNotNull();
 
             Optional<EventAddress> loaded = eventAddressRepository.findById(address.getId());
@@ -366,11 +367,8 @@ public class EventRepositoryTest
             Event event = createEvent(UUID.randomUUID().toString());
             Event saved = eventRepository.saveAndFlush(event);
 
-            EventSigningKey signingKey = createSigningKey(saved);
-            saved.setSigningKey(signingKey);
-            saved = eventRepository.saveAndFlush(saved);
-            signingKey = saved.getSigningKey();
-
+            EventSigningKey signingKey = saved.getSigningKey();
+            assertThat(signingKey).isNotNull();
             assertThat(signingKey.getId()).isNotNull();
 
             Optional<EventSigningKey> loaded = eventSigningKeyRepository.findById(signingKey.getId());
@@ -384,19 +382,18 @@ public class EventRepositoryTest
             Event event = createEvent(UUID.randomUUID().toString());
             Event saved = eventRepository.saveAndFlush(event);
 
-            EventSigningKey signingKey = createSigningKey(saved);
-            saved.setSigningKey(signingKey);
-            saved = eventRepository.saveAndFlush(saved);
-            signingKey = saved.getSigningKey();
-
-            Long addressId = saved.getEventAddress().getId();
-            Long keyId = signingKey.getId();
+            EventSigningKey signingKey = saved.getSigningKey();
+            EventAddress address = saved.getEventAddress();
+            assertThat(signingKey).isNotNull();
+            assertThat(signingKey.getId()).isNotNull();
+            assertThat(address).isNotNull();
+            assertThat(address.getId()).isNotNull();
 
             eventRepository.delete(saved);
             eventRepository.flush();
 
-            assertThat(eventAddressRepository.findById(addressId)).isEmpty();
-            assertThat(eventSigningKeyRepository.findById(keyId)).isEmpty();
+            assertThat(eventAddressRepository.findById(address.getId())).isEmpty();
+            assertThat(eventSigningKeyRepository.findById(signingKey.getId())).isEmpty();
         }
     }
 
@@ -425,6 +422,8 @@ public class EventRepositoryTest
             assertThat(eventRepository.findAll()).isEmpty();
             // The address should not have been persisted either
             assertThat(eventAddressRepository.findAll()).isEmpty();
+            // The signing key should not have been persisted either
+            assertThat(eventSigningKeyRepository.findAll()).isEmpty();
         }
 
         @Test
@@ -434,6 +433,9 @@ public class EventRepositoryTest
             Event event1 = createEvent(UUID.randomUUID().toString());
             event1 = eventRepository.saveAndFlush(event1);
             // Verify event1 was saved
+            assertThat(event1).isNotNull();
+            assertThat(event1.getId()).isNotNull();
+            assertThat(event1.getPublicId()).isNotNull();
             assertThat(eventRepository.findById(event1.getId())).isPresent();
 
             // Now attempt to save event2 with a duplicate publicId
@@ -446,9 +448,10 @@ public class EventRepositoryTest
             TestTransaction.end();
             TestTransaction.start();
 
-            // There should be no Event or EventAddress entities at this point
+            // There should be no Event, EventAddress, or EventSigningKey entities at this point
             assertThat(eventRepository.count()).isZero();
             assertThat(eventAddressRepository.count()).isZero();
+            assertThat(eventSigningKeyRepository.count()).isZero();
         }
     }
 
@@ -462,15 +465,19 @@ public class EventRepositoryTest
         {
             Event event = createEvent(UUID.randomUUID().toString());
             Event saved = eventRepository.saveAndFlush(event);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
 
-            EventSigningKey signingKey = createSigningKey(saved);
-            saved.setSigningKey(signingKey);
-            saved = eventRepository.saveAndFlush(saved);
-            signingKey = saved.getSigningKey();
+            EventSigningKey signingKey = saved.getSigningKey();
+            EventAddress address = saved.getEventAddress();
+            assertThat(signingKey).isNotNull();
+            assertThat(signingKey.getId()).isNotNull();
+            assertThat(address).isNotNull();
+            assertThat(address.getId()).isNotNull();
 
             // Verify all parts of the graph are persisted
             assertThat(eventRepository.findById(saved.getId())).isPresent();
-            assertThat(eventAddressRepository.findById(saved.getEventAddress().getId())).isPresent();
+            assertThat(eventAddressRepository.findById(address.getId())).isPresent();
             assertThat(eventSigningKeyRepository.findById(signingKey.getId())).isPresent();
         }
 
@@ -480,11 +487,15 @@ public class EventRepositoryTest
         {
             Event event = createEvent(UUID.randomUUID().toString());
             Event saved = eventRepository.saveAndFlush(event);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
 
-            EventSigningKey signingKey = createSigningKey(saved);
-            saved.setSigningKey(signingKey);
-            saved = eventRepository.saveAndFlush(saved);
-            signingKey = saved.getSigningKey();
+            EventSigningKey signingKey = saved.getSigningKey();
+            EventAddress address = saved.getEventAddress();
+            assertThat(signingKey).isNotNull();
+            assertThat(signingKey.getId()).isNotNull();
+            assertThat(address).isNotNull();
+            assertThat(address.getId()).isNotNull();
 
             TestTransaction.flagForCommit();
             TestTransaction.end();
@@ -492,7 +503,7 @@ public class EventRepositoryTest
 
             // After commit, everything should be persisted
             assertThat(eventRepository.findById(saved.getId())).isPresent();
-            assertThat(eventAddressRepository.findById(saved.getEventAddress().getId())).isPresent();
+            assertThat(eventAddressRepository.findById(address.getId())).isPresent();
             assertThat(eventSigningKeyRepository.findById(signingKey.getId())).isPresent();
         }
     }
@@ -507,6 +518,9 @@ public class EventRepositoryTest
         {
             Event event = createEvent(UUID.randomUUID().toString());
             Event saved = eventRepository.saveAndFlush(event);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+
             Long eventId = saved.getId();
 
             // Within the transaction, check that the event is visible
@@ -530,6 +544,9 @@ public class EventRepositoryTest
             // First transaction: save and commit
             Event event = createEvent(publicId);
             Event saved = eventRepository.saveAndFlush(event);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+
             Long eventId = saved.getId();
             TestTransaction.flagForCommit();
             TestTransaction.end();
