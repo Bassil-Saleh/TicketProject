@@ -223,5 +223,70 @@ class TicketRepositoryTest
             assertThatThrownBy(() -> ticketRepository.saveAndFlush(ticket))
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
+
+        @Test
+        @DisplayName("Updating ticket with null publicToken violates NOT NULL constraint")
+        void updateNullPublicTokenThrowsException()
+        {
+            Ticket ticket = createTicket();
+            Ticket saved = ticketRepository.saveAndFlush(ticket);
+            assertThat(saved).isNotNull();
+            saved.setPublicToken(null);
+
+            assertThatThrownBy(() -> ticketRepository.saveAndFlush(saved))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Updating ticket with null tokenIdentifier violates NOT NULL constraint")
+        void updateNullTokenIdentifierThrowsException()
+        {
+            Ticket ticket = createTicket();
+            Ticket saved = ticketRepository.saveAndFlush(ticket);
+            assertThat(saved).isNotNull();
+            saved.setTokenIdentifier(null);
+
+            assertThatThrownBy(() -> ticketRepository.saveAndFlush(saved))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Updating ticket with null attendee violates NOT NULL constraint")
+        void updateNullAttendeeThrowsException()
+        {
+            Ticket ticket = createTicket();
+            Ticket saved = ticketRepository.saveAndFlush(ticket);
+            assertThat(saved).isNotNull();
+            saved.setAttendee(null);
+
+            assertThatThrownBy(() -> ticketRepository.saveAndFlush(saved))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Updating ticket with null event violates NOT NULL constraint")
+        void updateNullEventThrowsException()
+        {
+            Ticket ticket = createTicket();
+            Ticket saved = ticketRepository.saveAndFlush(ticket);
+            assertThat(saved).isNotNull();
+            saved.setEvent(null);
+
+            assertThatThrownBy(() -> ticketRepository.saveAndFlush(saved))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Updating ticket with null invitationStatus violates NOT NULL constraint")
+        void updateNullInvitationStatusThrowsException()
+        {
+            Ticket ticket = createTicket();
+            Ticket saved = ticketRepository.saveAndFlush(ticket);
+            assertThat(saved).isNotNull();
+            saved.setInvitationStatus(null);
+
+            assertThatThrownBy(() -> ticketRepository.saveAndFlush(saved))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
     }
 }
