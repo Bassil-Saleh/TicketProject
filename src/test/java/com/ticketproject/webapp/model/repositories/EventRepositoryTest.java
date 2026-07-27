@@ -391,5 +391,29 @@ public class EventRepositoryTest
             // The address should not have been persisted either
             assertThat(eventAddressRepository.findAll()).isEmpty();
         }
+
+        @Test
+        @DisplayName("Constraint violation on second save rolls back the first save in same transaction")
+        void constraintViolationRollsBackPriorSave()
+        {
+            Event event1 = createEvent(UUID.randomUUID().toString());
+            event1 = eventRepository.saveAndFlush(event1);
+            // Verify event1 was saved
+            assertThat(eventRepository.findById(event1.getId())).isPresent();
+
+            // Now attempt to save event2 with a duplicate publicId
+            Event event2 = createEvent(event1.getPublicId());
+            assertThatThrownBy(() -> eventRepository.saveAndFlush(event2))
+                .isInstanceOf(DataIntegrityViolationException.class);
+            
+            // End the poisoned transaction (Spring should automatically
+            // mark it as rollback-only) and start a fresh one
+            TestTransaction.end();
+            TestTransaction.start();
+
+            // There should be no Event or EventAddress entities at this point
+            assertThat(eventRepository.count()).isZero();
+            assertThat(eventAddressRepository.count()).isZero();
+        }
     }
 }
