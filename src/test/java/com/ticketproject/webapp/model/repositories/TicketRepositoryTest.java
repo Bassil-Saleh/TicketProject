@@ -405,4 +405,53 @@ class TicketRepositoryTest
             assertThat(ticketRepository.findAll()).isEmpty();
         }
     }
+
+    @Nested
+    @DisplayName("Commit atomicity")
+    class CommitAtomicity
+    {
+        @Test
+        @DisplayName("Successful ticket save commits atomically")
+        void successfulSaveCommitsAtomically()
+        {
+            Ticket ticket = createTicket();
+            Ticket saved = ticketRepository.saveAndFlush(ticket);
+
+            TestTransaction.flagForCommit();
+            TestTransaction.end();
+            TestTransaction.start();
+
+            assertThat(ticketRepository.findById(saved.getId())).isPresent();
+        }
+
+        @Test
+        @DisplayName("Multiple ticket saves in one transaction all commit")
+        void multipleSavesCommitAtomic()
+        {
+            Attendee attendee2 = new Attendee.Builder()
+                .firstName("Multi")
+                .lastName("Test")
+                .email("multi-" + UUID.randomUUID() + "@example.com")
+                .build();
+            Attendee savedAttendee2 = attendeeRepository.saveAndFlush(attendee2);
+
+            Ticket ticket1 = createTicket();
+            ticket1 = ticketRepository.saveAndFlush(ticket1);
+
+            Ticket ticket2 = new Ticket.Builder()
+                .publicToken(UUID.randomUUID().toString())
+                .tokenIdentifier(UUID.randomUUID().toString())
+                .attendee(savedAttendee2)
+                .event(savedEvent)
+                .invitationStatus(InvitationStatus.PENDING)
+                .build();
+            ticket2 = ticketRepository.saveAndFlush(ticket2);
+
+            TestTransaction.flagForCommit();
+            TestTransaction.end();
+            TestTransaction.start();
+
+            assertThat(ticketRepository.findAll()).hasSize(2);
+        }
+    }
 }
