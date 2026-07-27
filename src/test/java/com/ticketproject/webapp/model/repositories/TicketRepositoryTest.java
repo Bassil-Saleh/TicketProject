@@ -314,5 +314,30 @@ class TicketRepositoryTest
             assertThatThrownBy(() -> ticketRepository.saveAndFlush(ticket2))
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
+
+        @Test
+        @DisplayName("Duplicate tokenIdentifier violates unique constraint")
+        void duplicateTokenIdentifierThrowsException()
+        {
+            String identifier = UUID.randomUUID().toString();
+            Ticket ticket1 = createTicket();
+            ticket1.setTokenIdentifier(identifier);
+            ticket1 = ticketRepository.saveAndFlush(ticket1);
+
+            Attendee attendee2 = new Attendee.Builder()
+                .firstName("Carol")
+                .lastName("Jones")
+                .email("carol-" + UUID.randomUUID() + "@example.com")
+                .build();
+            Attendee savedAttendee2 = attendeeRepository.saveAndFlush(attendee2);
+
+            Ticket ticket2 = createTicket();
+            ticket2.setTokenIdentifier(identifier);
+            ticket2.setAttendee(savedAttendee2);
+            ticket2.setPublicToken(UUID.randomUUID().toString());
+
+            assertThatThrownBy(() -> ticketRepository.saveAndFlush(ticket2))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
     }
 }
