@@ -275,6 +275,40 @@ public class EventRepositoryTest
             assertThatThrownBy(() -> eventRepository.saveAndFlush(event2))
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
+
+        @Test
+        @DisplayName("Duplicate EventSigningKey violates unique constraint")
+        void duplicateEventSigningKeyThrowsException()
+        {
+            // If the user creates an Event with an EventSigningKey,
+            // creates tickets with the EventSigningKey, then gives the
+            // Event a new EventSigningKey, then the tickets made using
+            // the old EventSigningKey will no longer be usable.
+            // That's why I put a unique constraint for EventSigningKey.
+            Event event = createEvent(UUID.randomUUID().toString());
+            Event saved = eventRepository.saveAndFlush(event);
+
+            EventSigningKey key1 = createSigningKey(saved);
+            saved.setSigningKey(key1);
+            saved = eventRepository.saveAndFlush(saved);
+            key1 = saved.getSigningKey();
+
+            EventSigningKey key2 = createSigningKey(saved);
+            saved.setSigningKey(key2);
+
+            // Since saved is not a final variable, I can't use it in a lambda,
+            // so I have to check that it throws an exception a different way.
+            boolean violated = false;
+            try
+            {
+                eventRepository.saveAndFlush(saved);
+            }
+            catch (DataIntegrityViolationException e)
+            {
+                violated = true;
+            }
+            assertThat(violated).isTrue();
+        }
     }
 
     @Nested
