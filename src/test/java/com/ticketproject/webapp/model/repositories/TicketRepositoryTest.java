@@ -356,4 +356,27 @@ class TicketRepositoryTest
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
     }
+
+    @Nested
+    @DisplayName("Rollback on failure")
+    class RollbackOnFailure
+    {
+        @Test
+        @DisplayName("Failed ticket save does not persist the ticket")
+        void failedSaveDoesNotPersist()
+        {
+            Ticket ticket = createTicket();
+            ticket.setPublicToken(null);
+
+            assertThatThrownBy(() -> ticketRepository.saveAndFlush(ticket))
+                .isInstanceOf(DataIntegrityViolationException.class);
+            
+            // Spring should automatically flag the poisoned transaction
+            // as rollback-only, so end the transaction and start a new one.
+            TestTransaction.end();
+            TestTransaction.start();
+
+            assertThat(ticketRepository.findAll()).isEmpty();
+        }
+    }
 }
