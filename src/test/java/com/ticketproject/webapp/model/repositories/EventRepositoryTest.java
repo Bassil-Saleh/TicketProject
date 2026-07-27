@@ -212,6 +212,17 @@ public class EventRepositoryTest
         }
 
         @Test
+        @DisplayName("Saving event with null eventSigningKey violates NOT NULL constraint")
+        void nullEventSigningKeyThrowsException()
+        {
+            Event event = createEvent(UUID.randomUUID().toString());
+            event.setSigningKey(null);
+
+            assertThatThrownBy(() -> eventRepository.saveAndFlush(event))
+                .isInstanceOf(InvalidDataAccessApiUsageException.class);
+        }
+
+        @Test
         @DisplayName("Saving event with null startDateTime violates NOT NULL constraint")
         void nullStartDateTimeThrowsException()
         {
