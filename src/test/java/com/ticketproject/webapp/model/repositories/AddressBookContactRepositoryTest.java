@@ -273,5 +273,25 @@ class AddressBookContactRepositoryTest
 
             assertThat(addressBookContactRepository.findById(contactId)).isEmpty();
         }
+
+        @Test
+        @DisplayName("Deleting event host removes associated address book contacts via FK cascade")
+        void deletingEventHostRemovesContacts()
+        {
+            AddressBookContact contact = createContact();
+            AddressBookContact saved = addressBookContactRepository.saveAndFlush(contact);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+            Long contactId = saved.getId();
+
+            entityManager.clear();
+
+            // Re-fetch a fresh managed copy of the event host
+            EventHost hostToDelete = eventHostRepository.findById(savedHost.getId()).orElseThrow();
+            eventHostRepository.delete(hostToDelete);
+            eventHostRepository.flush();
+
+            assertThat(addressBookContactRepository.findById(contactId)).isEmpty();
+        }
     }
 }
