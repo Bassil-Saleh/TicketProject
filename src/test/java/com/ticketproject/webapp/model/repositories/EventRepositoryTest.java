@@ -4,10 +4,13 @@ import java.security.InvalidParameterException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import javax.sql.DataSource;
+import java.sql.Connection;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -15,11 +18,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.transaction.TestTransaction;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.ticketproject.webapp.bridges.SpringContextBridge;
 import com.ticketproject.webapp.constants.AppConstants;
@@ -43,6 +51,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * data integrity, cascade operations, and commit atomicity.
  */
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import({SpringContextBridge.class, CryptoService.class, BlindIndexService.class, HashingService.class})
 @ActiveProfiles("test")
 public class EventRepositoryTest
@@ -58,6 +67,12 @@ public class EventRepositoryTest
 
     @Autowired
     private EventSigningKeyRepository eventSigningKeyRepository;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
+    @Autowired
+    private DataSource dataSource;
 
     private EventHost savedHost;
 
@@ -555,57 +570,124 @@ public class EventRepositoryTest
     @DisplayName("Rollback on failure")
     class RollbackOnFailure
     {
+        private TransactionTemplate txTemplate;
+
+        @BeforeEach
+        void setUpTransactionTemplate()
+        {
+            txTemplate = new TransactionTemplate(transactionManager);
+        }
+
+        @Test
+        @DisplayName("Diagnostic: Verify JDBC auto-commit is disabled")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        void verifyAutoCommitIsDisabled() throws SQLException 
+        {
+            try (Connection conn = dataSource.getConnection()) 
+            {
+                boolean isAutoCommit = conn.getAutoCommit();
+                System.out.println(">>> JDBC Auto-Commit is: " + isAutoCommit);
+                
+                // If this assertion fails, auto-commit is ON, which breaks rollback testing.
+                assertThat(isAutoCommit)
+                    .as("JDBC auto-commit must be false for transaction rollbacks to work")
+                    .isFalse();
+            }
+        }
+
         @Test
         @DisplayName("Failed save does not persist partial data")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED) // Disable test-managed transaction for this test
         void failedSaveDoesNotPersistPartialData()
         {
+            // Capture baseline counts before attempting the save
+            long eventCountBefore = eventRepository.count();
+            long addressCountBefore = eventAddressRepository.count();
+            long signingKeyCountBefore = eventSigningKeyRepository.count();
+
             Event event = createEvent(UUID.randomUUID().toString());
             // Make the event invalid after setting up the address
             event.setPublicId(null);
 
-            assertThatThrownBy(() -> eventRepository.saveAndFlush(event))
-                .isInstanceOf(DataIntegrityViolationException.class);
-            
-            // Since a failed transaction should automatically be flagged
-            // by Spring as rollback-only, end the poisoned transaction
-            // and start a clean one.
-            TestTransaction.end();
-            TestTransaction.start();
+            assertThatThrownBy
+            (
+                () -> txTemplate.execute
+                (
+                    status ->
+                    {
+                        eventRepository.saveAndFlush(event);
+                        return null;
+                    }
+                )
+            ).isInstanceOf(DataIntegrityViolationException.class);
 
-            // The event should not have been persisted
-            assertThat(eventRepository.findAll()).isEmpty();
-            // The address should not have been persisted either
-            assertThat(eventAddressRepository.findAll()).isEmpty();
-            // The signing key should not have been persisted either
-            assertThat(eventSigningKeyRepository.findAll()).isEmpty();
+            // Assert that the counts have NOT increased.
+            assertThat(eventRepository.count())
+                .as("Event count should not increase after rollback")
+                .isEqualTo(eventCountBefore);
+            assertThat(eventAddressRepository.count())
+                .as("Address count should not increase after rollback")
+                .isEqualTo(addressCountBefore);
+            assertThat(eventSigningKeyRepository.count())
+                .as("EventSigningKey count should not increase after rollback")
+                .isEqualTo(signingKeyCountBefore);
+            // // The event should not have been persisted
+            // assertThat(eventRepository.findAll()).isEmpty();
+            // // The address should not have been persisted either
+            // assertThat(eventAddressRepository.findAll()).isEmpty();
+            // // The signing key should not have been persisted either
+            // assertThat(eventSigningKeyRepository.findAll()).isEmpty();
         }
 
         @Test
         @DisplayName("Constraint violation on second save rolls back the first save in same transaction")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED) // Disable test-managed transaction for this test
         void constraintViolationRollsBackPriorSave()
         {
-            Event event1 = createEvent(UUID.randomUUID().toString());
-            event1 = eventRepository.saveAndFlush(event1);
-            // Verify event1 was saved
-            assertThat(event1).isNotNull();
-            assertThat(event1.getId()).isNotNull();
-            assertThat(event1.getPublicId()).isNotNull();
-            assertThat(eventRepository.findById(event1.getId())).isPresent();
+            // Capture baseline counts before attempting the save
+            long eventCountBefore = eventRepository.count();
+            long addressCountBefore = eventAddressRepository.count();
+            long signingKeyCountBefore = eventSigningKeyRepository.count();
 
-            // Now attempt to save event2 with a duplicate publicId
-            Event event2 = createEvent(event1.getPublicId());
-            assertThatThrownBy(() -> eventRepository.saveAndFlush(event2))
-                .isInstanceOf(DataIntegrityViolationException.class);
-            
-            // End the poisoned transaction (Spring should automatically
-            // mark it as rollback-only) and start a fresh one
-            TestTransaction.end();
-            TestTransaction.start();
+            assertThatThrownBy
+            (
+                () -> txTemplate.execute
+                (
+                    status ->
+                    {
+                        Event event1 = createEvent(UUID.randomUUID().toString());
+                        event1 = eventRepository.saveAndFlush(event1);
+                        // Verify event1 was saved
+                        assertThat(event1).isNotNull();
+                        assertThat(event1.getId()).isNotNull();
+                        assertThat(event1.getPublicId()).isNotNull();
+                        assertThat(eventRepository.findById(event1.getId())).isPresent();
 
-            // There should be no Event, EventAddress, or EventSigningKey entities at this point
-            assertThat(eventRepository.count()).isZero();
-            assertThat(eventAddressRepository.count()).isZero();
-            assertThat(eventSigningKeyRepository.count()).isZero();
+                        // Now attempt to save event2 with a duplicate publicId
+                        Event event2 = createEvent(event1.getPublicId());
+                        // This should throw an exception
+                        eventRepository.saveAndFlush(event2);
+
+                        return null;
+                    }
+                )
+            ).isInstanceOf(DataIntegrityViolationException.class);
+
+            // Assert that the counts have NOT increased.
+            assertThat(eventRepository.count())
+                .as("Event count should not increase after rollback")
+                .isEqualTo(eventCountBefore);
+            assertThat(eventAddressRepository.count())
+                .as("Address count should not increase after rollback")
+                .isEqualTo(addressCountBefore);
+            assertThat(eventSigningKeyRepository.count())
+                .as("EventSigningKey count should not increase after rollback")
+                .isEqualTo(signingKeyCountBefore);
+
+            // // There should be no Event, EventAddress, or EventSigningKey entities at this point
+            // assertThat(eventRepository.count()).isZero();
+            // assertThat(eventAddressRepository.count()).isZero();
+            // assertThat(eventSigningKeyRepository.count()).isZero();
         }
     }
 
