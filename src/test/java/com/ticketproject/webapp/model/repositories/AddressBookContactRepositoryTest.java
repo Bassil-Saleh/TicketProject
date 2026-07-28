@@ -23,6 +23,8 @@ import com.ticketproject.webapp.services.BlindIndexService;
 import com.ticketproject.webapp.services.CryptoService;
 import com.ticketproject.webapp.services.HashingService;
 
+import jakarta.persistence.EntityManager;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -46,6 +48,9 @@ class AddressBookContactRepositoryTest
 
     @Autowired
     private EventHostRepository eventHostRepository;
+
+    @Autowired
+    private EntityManager entityManager;
 
     private Attendee savedAttendee;
     private EventHost savedHost;
@@ -202,6 +207,71 @@ class AddressBookContactRepositoryTest
             assertThat(saved).isNotNull();
             assertThat(saved.getId()).isNotNull();
             assertThat(addressBookContactRepository.findAll()).hasSize(2);
+        }
+    }
+
+    @Nested
+    @DisplayName("Data integrity")
+    class DataIntegrity
+    {
+        @Test
+        @DisplayName("Contact references valid attendee and eventHost after save")
+        void contactReferencesValidEntities()
+        {
+            AddressBookContact contact = createContact();
+            AddressBookContact saved = addressBookContactRepository.saveAndFlush(contact);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+
+            AddressBookContact loaded = addressBookContactRepository.findById(saved.getId()).orElseThrow();
+            assertThat(loaded).isNotNull();
+            assertThat(loaded.getAttendee()).isNotNull();
+            assertThat(loaded.getEventHost()).isNotNull();
+            assertThat(loaded.getAttendee().getId()).isNotNull();
+            assertThat(loaded.getEventHost().getId()).isNotNull();
+            assertThat(loaded.getAttendee().getId()).isEqualTo(savedAttendee.getId());
+            assertThat(loaded.getEventHost().getId()).isEqualTo(savedHost.getId());
+        }
+
+        @Test
+        @DisplayName("Deleting attendee removes associated address book contacts via FK cascade")
+        void deletingAttendeeRemovesContacts()
+        {
+            AddressBookContact contact = createContact();
+            AddressBookContact saved = addressBookContactRepository.saveAndFlush(contact);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+            Long contactId = saved.getId();
+
+            // After saving the AddressBookContact, Hibernate's first-level cache
+            // (AKA persistence contex) holds an Attendee, EventHost, and
+            // AddressBookContact all in the MANAGED state.
+            //
+            // If this persistence context is not cleared before calling
+            // attendeeRepository.delete(), then Hibernate would mark the Attendee
+            // as removed (but not flushed yet), and the AddressBookContact
+            // (still in the MANAGED state) would still hold a reference to
+            // that Attendee. So when attendeeRepository.flush() gets called,
+            // Hibernate walks through every MANAGED entity in the persistence context
+            // to check for dirty state and validate foreign-key references.
+            //
+            // That means Hibernate would find the AddressBookContact pointing
+            // to an Attendee marked as REMOVED, treats the Attendee as
+            // "about to be transient", and will throw a
+            // TransientPropertyValueException.
+            //
+            // Clearing the persistence context detaches every entity from it,
+            // so that when the Attendee is re-fetched and deleted, there is
+            // no longer an AddressBookContact in the persistence context for
+            // Hibernate to inspect during the flush operation.
+            entityManager.clear();
+
+            // Re-fetch a fresh managed copy of the attendee
+            Attendee attendeeToDelete = attendeeRepository.findById(savedAttendee.getId()).orElseThrow();
+            attendeeRepository.delete(attendeeToDelete);
+            attendeeRepository.flush();
+
+            assertThat(addressBookContactRepository.findById(contactId)).isEmpty();
         }
     }
 }

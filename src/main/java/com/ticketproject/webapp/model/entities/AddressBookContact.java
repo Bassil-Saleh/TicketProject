@@ -6,6 +6,9 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 /**
  * AddressBookContact is an entity representing a record on someone
  * which an event host has previously invited to a private event.
@@ -51,6 +54,7 @@ public class AddressBookContact
         name = AppConstants.Database.AddressBookContacts.TableNames.COLUMN_ATTENDEE_ID,
         nullable = false
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Attendee attendee;
 
     /**
@@ -63,6 +67,7 @@ public class AddressBookContact
         name = AppConstants.Database.AddressBookContacts.TableNames.COLUMN_EVENT_HOST_ID,
         nullable = false
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private EventHost eventHost;
 
     /**
