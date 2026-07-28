@@ -12,6 +12,7 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
@@ -324,6 +325,27 @@ class AddressBookContactRepositoryTest
             })).isInstanceOf(DataIntegrityViolationException.class);
 
             assertThat(addressBookContactRepository.findAll()).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Constraint violation rolls back prior save in same transaction")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        void constraintViolationRollsBackPriorSave()
+        {
+            assertThatThrownBy(() -> txTemplate.execute(status ->
+            {
+                AddressBookContact contact1 = createContact();
+                contact1 = addressBookContactRepository.saveAndFlush(contact1);
+                assertThat(contact1).isNotNull();
+                assertThat(contact1.getId()).isNotNull();
+                assertThat(addressBookContactRepository.findById(contact1.getId())).isPresent();
+
+                AddressBookContact contact2 = createContact();
+                addressBookContactRepository.saveAndFlush(contact2);
+                return null;
+            })).isInstanceOf(DataIntegrityViolationException.class);
+
+            assertThat(addressBookContactRepository.count()).isZero();
         }
     }
 }
