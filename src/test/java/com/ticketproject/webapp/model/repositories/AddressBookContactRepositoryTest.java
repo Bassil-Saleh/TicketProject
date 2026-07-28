@@ -12,7 +12,6 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
@@ -346,6 +345,28 @@ class AddressBookContactRepositoryTest
             })).isInstanceOf(DataIntegrityViolationException.class);
 
             assertThat(addressBookContactRepository.count()).isZero();
+        }
+    }
+
+    @Nested
+    @DisplayName("Commit atomicity")
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    class CommitAtomicity
+    {
+        @Test
+        @DisplayName("Successful contact save commits atomically")
+        void successfulSaveCommitsAtomically()
+        {
+            Long contactId = txTemplate.execute(status ->
+            {
+                AddressBookContact contact = createContact();
+                AddressBookContact saved = addressBookContactRepository.saveAndFlush(contact);
+                assertThat(saved).isNotNull();
+                assertThat(saved.getId()).isNotNull();
+                return saved.getId();
+            });
+
+            assertThat(addressBookContactRepository.findById(contactId)).isPresent();
         }
     }
 }
