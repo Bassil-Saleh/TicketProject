@@ -137,5 +137,71 @@ class AddressBookContactRepositoryTest
             assertThatThrownBy(() -> addressBookContactRepository.saveAndFlush(saved))
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
+
+        @Test
+        @DisplayName("Duplicate composite key (attendee_id, event_host_id) violates unique constraint")
+        void duplicateCompositeKeyThrowsException()
+        {
+            AddressBookContact contact1 = createContact();
+            contact1 = addressBookContactRepository.saveAndFlush(contact1);
+
+            AddressBookContact contact2 = createContact();
+
+            assertThatThrownBy(() -> addressBookContactRepository.saveAndFlush(contact2))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Same attendee with different hosts is allowed")
+        void sameAttendeeDifferentHostsAllowed()
+        {
+            AddressBookContact contact1 = createContact();
+            contact1 = addressBookContactRepository.saveAndFlush(contact1);
+
+            EventHost host2 = new EventHost.Builder()
+                .firstName("Other")
+                .lastName("Host")
+                .dateOfBirth(LocalDate.of(1992, 7, 10))
+                .email("otherhost-" + UUID.randomUUID() + "@example.com")
+                .plaintextPassword("password123")
+                .build();
+            host2.generateVerificationToken();
+            EventHost savedHost2 = eventHostRepository.saveAndFlush(host2);
+
+            AddressBookContact contact2 = new AddressBookContact.Builder()
+                .attendee(savedAttendee)
+                .eventHost(savedHost2)
+                .build();
+
+            AddressBookContact saved = addressBookContactRepository.saveAndFlush(contact2);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+            assertThat(addressBookContactRepository.findAll()).hasSize(2);
+        }
+
+        @Test
+        @DisplayName("Same host with different attendees is allowed")
+        void sameHostDifferentAttendeesAllowed()
+        {
+            AddressBookContact contact1 = createContact();
+            contact1 = addressBookContactRepository.saveAndFlush(contact1);
+
+            Attendee attendee2 = new Attendee.Builder()
+                .firstName("Another")
+                .lastName("Contact")
+                .email("another-" + UUID.randomUUID() + "@example.com")
+                .build();
+            Attendee savedAttendee2 = attendeeRepository.saveAndFlush(attendee2);
+
+            AddressBookContact contact2 = new AddressBookContact.Builder()
+                .attendee(savedAttendee2)
+                .eventHost(savedHost)
+                .build();
+
+            AddressBookContact saved = addressBookContactRepository.saveAndFlush(contact2);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+            assertThat(addressBookContactRepository.findAll()).hasSize(2);
+        }
     }
 }
