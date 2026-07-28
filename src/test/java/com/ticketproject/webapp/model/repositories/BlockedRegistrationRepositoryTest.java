@@ -22,6 +22,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 
 import com.ticketproject.webapp.bridges.SpringContextBridge;
 import com.ticketproject.webapp.constants.AppConstants;
@@ -49,6 +50,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @DataJpaTest
 @Import({SpringContextBridge.class, CryptoService.class, BlindIndexService.class, HashingService.class})
 @ActiveProfiles("test")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class BlockedRegistrationRepositoryTest
 {
     @Autowired
@@ -283,6 +285,114 @@ class BlockedRegistrationRepositoryTest
             saved = blockedRegistrationRepository.saveAndFlush(block);
             assertThat(saved.getId()).isNotNull();
             assertThat(saved.getReason()).isNull();
+        }
+    }
+
+    @Nested
+    @DisplayName("Data integrity")
+    class DataIntegrity
+    {
+        @Test
+        @DisplayName("Block references valid attendee, event, and blocker after save")
+        void blockReferencesValidEntities()
+        {
+            BlockedRegistration block = createBlock();
+            BlockedRegistration saved = blockedRegistrationRepository.saveAndFlush(block);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+
+            BlockedRegistration loaded = blockedRegistrationRepository.findById(saved.getId()).orElseThrow();
+            assertThat(loaded).isNotNull();
+            assertThat(loaded.getAttendee()).isNotNull();
+            assertThat(loaded.getEvent()).isNotNull();
+            assertThat(loaded.getBlockedBy()).isNotNull();
+            assertThat(loaded.getAttendee().getId()).isNotNull();
+            assertThat(loaded.getEvent().getId()).isNotNull();
+            assertThat(loaded.getBlockedBy().getId()).isNotNull();
+
+            assertThat(loaded.getAttendee().getId()).isEqualTo(savedAttendee.getId());
+            assertThat(loaded.getEvent().getId()).isEqualTo(savedEvent.getId());
+            assertThat(loaded.getBlockedBy().getId()).isEqualTo(savedHost.getId());
+        }
+
+        @Test
+        @DisplayName("isActive returns true when revoked is null")
+        void isActiveWhenNotRevoked()
+        {
+            BlockedRegistration block = createBlock();
+            BlockedRegistration saved = blockedRegistrationRepository.saveAndFlush(block);
+
+            assertThat(saved).isNotNull();
+            assertThat(saved.isActive()).isTrue();
+        }
+
+        @Test
+        @DisplayName("isActive returns false after setting revoked timestamp")
+        void isNotActiveAfterRevoked()
+        {
+            BlockedRegistration block = createBlock();
+            BlockedRegistration saved = blockedRegistrationRepository.saveAndFlush(block);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+
+            saved.setRevoked(LocalDateTime.now());
+            saved = blockedRegistrationRepository.saveAndFlush(saved);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+
+            BlockedRegistration loaded = blockedRegistrationRepository.findById(saved.getId()).orElseThrow();
+            assertThat(loaded).isNotNull();
+            assertThat(loaded.isActive()).isFalse();
+            assertThat(loaded.getRevoked()).isNotNull();
+        }
+
+        @Test
+        @DisplayName("Multiple blocks for same attendee on different events are allowed")
+        void multipleBlocksDifferentEvents()
+        {
+            long blockedRegistrationCountBefore = blockedRegistrationRepository.count();
+
+            BlockedRegistration block1 = createBlock();
+            block1 = blockedRegistrationRepository.saveAndFlush(block1);
+
+            EventAddress address2 = new EventAddress.Builder()
+                .addressLine1("200 Other St")
+                .city("Othertown")
+                .state("CA")
+                .postalCode("90002")
+                .country("USA")
+                .build();
+
+            Event event2 = new Event.Builder()
+                .publicId(UUID.randomUUID().toString())
+                .eventHost(savedHost)
+                .name("Another Event")
+                .description("Another event")
+                .startDateTime(LocalDateTime.now().plusDays(60))
+                .endDateTime(LocalDateTime.now().plusDays(60).plusHours(2))
+                .eventType(EventType.PUBLIC)
+                .maxAttendees(100)
+                .build();
+
+            EventSigningKey signingKey2 = createSigningKey(event2);
+
+            event2.setEventAddress(address2);
+            event2.setRegistrationStatus(RegistrationStatus.OPEN);
+            event2.setEventStatus(EventStatus.PUBLISHED);
+            event2.setSigningKey(signingKey2);
+            Event savedEvent2 = eventRepository.saveAndFlush(event2);
+
+            BlockedRegistration block2 = new BlockedRegistration.Builder()
+                .attendee(savedAttendee)
+                .event(savedEvent2)
+                .blockedBy(savedHost)
+                .reason("Different reason")
+                .build();
+
+            BlockedRegistration saved2 = blockedRegistrationRepository.saveAndFlush(block2);
+            assertThat(saved2).isNotNull();
+            assertThat(saved2.getId()).isNotNull();
+            assertThat(blockedRegistrationRepository.count()).isEqualTo(blockedRegistrationCountBefore + 2);
         }
     }
 }
