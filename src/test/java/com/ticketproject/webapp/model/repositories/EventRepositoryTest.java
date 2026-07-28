@@ -23,7 +23,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,6 +76,7 @@ public class EventRepositoryTest
     private DataSource dataSource;
 
     private EventHost savedHost;
+    private TransactionTemplate txTemplate;
 
     /**
      * Creates and persists a shared EventHost used across tests.
@@ -84,6 +84,9 @@ public class EventRepositoryTest
     @BeforeEach
     void setUp()
     {
+        // Initialize a TransactionTemplate to programmatically manage transactions
+        txTemplate = new TransactionTemplate(transactionManager);
+
         EventHost host = new EventHost.Builder()
             .firstName("Test")
             .lastName("Host")
@@ -572,14 +575,6 @@ public class EventRepositoryTest
     @DisplayName("Rollback on failure")
     class RollbackOnFailure
     {
-        private TransactionTemplate txTemplate;
-
-        @BeforeEach
-        void setUpTransactionTemplate()
-        {
-            txTemplate = new TransactionTemplate(transactionManager);
-        }
-
         @Test
         @DisplayName("Diagnostic: Verify JDBC auto-commit is disabled")
         @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -633,12 +628,6 @@ public class EventRepositoryTest
             assertThat(eventSigningKeyRepository.count())
                 .as("EventSigningKey count should not increase after rollback")
                 .isEqualTo(signingKeyCountBefore);
-            // // The event should not have been persisted
-            // assertThat(eventRepository.findAll()).isEmpty();
-            // // The address should not have been persisted either
-            // assertThat(eventAddressRepository.findAll()).isEmpty();
-            // // The signing key should not have been persisted either
-            // assertThat(eventSigningKeyRepository.findAll()).isEmpty();
         }
 
         @Test
@@ -685,11 +674,6 @@ public class EventRepositoryTest
             assertThat(eventSigningKeyRepository.count())
                 .as("EventSigningKey count should not increase after rollback")
                 .isEqualTo(signingKeyCountBefore);
-
-            // // There should be no Event, EventAddress, or EventSigningKey entities at this point
-            // assertThat(eventRepository.count()).isZero();
-            // assertThat(eventAddressRepository.count()).isZero();
-            // assertThat(eventSigningKeyRepository.count()).isZero();
         }
     }
 
@@ -721,28 +705,32 @@ public class EventRepositoryTest
 
         @Test
         @DisplayName("Successful transaction commits all changes")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
         void successfulTransactionCommitsAll()
         {
             Event event = createEvent(UUID.randomUUID().toString());
-            Event saved = eventRepository.saveAndFlush(event);
-            assertThat(saved).isNotNull();
-            assertThat(saved.getId()).isNotNull();
 
-            EventSigningKey signingKey = saved.getSigningKey();
-            EventAddress address = saved.getEventAddress();
-            assertThat(signingKey).isNotNull();
-            assertThat(signingKey.getId()).isNotNull();
-            assertThat(address).isNotNull();
-            assertThat(address.getId()).isNotNull();
+            Event saved = txTemplate.execute(status ->
+            {
+                Event aSave = eventRepository.saveAndFlush(event);
+                assertThat(aSave).isNotNull();
+                assertThat(aSave.getId()).isNotNull();
 
-            TestTransaction.flagForCommit();
-            TestTransaction.end();
-            TestTransaction.start();
+                EventSigningKey signingKey = aSave.getSigningKey();
+                EventAddress address = aSave.getEventAddress();
+                assertThat(signingKey).isNotNull();
+                assertThat(signingKey.getId()).isNotNull();
+                assertThat(address).isNotNull();
+                assertThat(address.getId()).isNotNull();
 
-            // After commit, everything should be persisted
+                return aSave;
+            });
+
+            // After the lambda returns, the transaction should commit,
+            // so everything should be persisted.
             assertThat(eventRepository.findById(saved.getId())).isPresent();
-            assertThat(eventAddressRepository.findById(address.getId())).isPresent();
-            assertThat(eventSigningKeyRepository.findById(signingKey.getId())).isPresent();
+            assertThat(eventAddressRepository.findById(saved.getEventAddress().getId())).isPresent();
+            assertThat(eventSigningKeyRepository.findById(saved.getSigningKey().getId())).isPresent();
         }
     }
 
@@ -752,48 +740,54 @@ public class EventRepositoryTest
     {
         @Test
         @DisplayName("Uncommitted changes are not visible after rollback")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
         void uncommittedChangesNotVisibleAfterRollback()
         {
-            Event event = createEvent(UUID.randomUUID().toString());
-            Event saved = eventRepository.saveAndFlush(event);
-            assertThat(saved).isNotNull();
-            assertThat(saved.getId()).isNotNull();
+            Long eventId = txTemplate.execute(status ->
+            {
+                Event event = createEvent(UUID.randomUUID().toString());
+                Event saved = eventRepository.saveAndFlush(event);
+                assertThat(saved).isNotNull();
+                assertThat(saved.getId()).isNotNull();
 
-            Long eventId = saved.getId();
+                Long id = saved.getId();
 
-            // Within the transaction, check that the event is visible
-            assertThat(eventRepository.findById(eventId)).isPresent();
+                // Within the transaction, check that the event is visible
+                assertThat(eventRepository.findById(id)).isPresent();
 
-            // Roll back and start a new transaction
-            TestTransaction.flagForRollback();
-            TestTransaction.end();
-            TestTransaction.start();
-
+                // Flag the transaction for rollback
+                status.setRollbackOnly();
+                return id;
+            });
             // After rollback, the event should not be visible
             assertThat(eventRepository.findById(eventId)).isEmpty();
         }
 
         @Test
         @DisplayName("Committed changes are visible in subsequent transactions")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
         void committedChangesVisibleInSubsequentTransaction()
         {
             String publicId = UUID.randomUUID().toString();
 
             // First transaction: save and commit
-            Event event = createEvent(publicId);
-            Event saved = eventRepository.saveAndFlush(event);
-            assertThat(saved).isNotNull();
-            assertThat(saved.getId()).isNotNull();
-
-            Long eventId = saved.getId();
-            TestTransaction.flagForCommit();
-            TestTransaction.end();
+            Long eventId = txTemplate.execute(status ->
+            {
+                Event event = createEvent(publicId);
+                Event saved = eventRepository.saveAndFlush(event);
+                assertThat(saved).isNotNull();
+                assertThat(saved.getId()).isNotNull();
+                return saved.getId();
+            });
 
             // Second transaction: should see the committed data
-            TestTransaction.start();
-            Optional<Event> loaded = eventRepository.findById(eventId);
-            assertThat(loaded).isPresent();
-            assertThat(loaded.get().getPublicId()).isEqualTo(publicId);
+            txTemplate.execute(status ->
+            {
+                Optional<Event> loaded = eventRepository.findById(eventId);
+                assertThat(loaded).isPresent();
+                assertThat(loaded.get().getPublicId()).isEqualTo(publicId);
+                return null;
+            });
         }
     }
 }
