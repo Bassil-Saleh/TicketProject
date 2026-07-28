@@ -2,6 +2,7 @@ package com.ticketproject.webapp.model.repositories;
 
 import java.time.LocalDate;
 import java.util.UUID;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -12,6 +13,7 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
@@ -367,6 +369,57 @@ class AddressBookContactRepositoryTest
             });
 
             assertThat(addressBookContactRepository.findById(contactId)).isPresent();
+        }
+    }
+
+    @Nested
+    @DisplayName("Isolation")
+    class Isolation
+    {
+        @Test
+        @DisplayName("Rolled back contact is not visible in subsequent transaction")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        void rolledBackContactNotVisible()
+        {
+            Long contactId = txTemplate.execute(status ->
+            {
+                AddressBookContact contact = createContact();
+                AddressBookContact saved = addressBookContactRepository.saveAndFlush(contact);
+                assertThat(saved).isNotNull();
+                assertThat(saved.getId()).isNotNull();
+
+                Long id = saved.getId();
+
+                assertThat(addressBookContactRepository.findById(id)).isPresent();
+
+                // Flag the transaction for rollback
+                status.setRollbackOnly();
+                return id;
+            });
+
+            assertThat(addressBookContactRepository.findById(contactId)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Committed contact is visible in subsequent transaction")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        void committedContactVisible()
+        {
+            Long contactId = txTemplate.execute(status ->
+            {
+                AddressBookContact contact = createContact();
+                AddressBookContact saved = addressBookContactRepository.saveAndFlush(contact);
+                assertThat(saved).isNotNull();
+                assertThat(saved.getId()).isNotNull();
+                Long id = saved.getId();
+                return id;
+            });
+
+            Optional<AddressBookContact> loaded = addressBookContactRepository.findById(contactId);
+            assertThat(loaded).isPresent();
+            assertThat(loaded.get().getAttendee()).isNotNull();
+            assertThat(loaded.get().getAttendee().getId()).isNotNull();
+            assertThat(loaded.get().getAttendee().getId()).isEqualTo(savedAttendee.getId());
         }
     }
 }
