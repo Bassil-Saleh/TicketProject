@@ -14,6 +14,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import com.ticketproject.webapp.bridges.SpringContextBridge;
 import com.ticketproject.webapp.model.entities.AddressBookContact;
@@ -52,8 +56,12 @@ class AddressBookContactRepositoryTest
     @Autowired
     private EntityManager entityManager;
 
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
     private Attendee savedAttendee;
     private EventHost savedHost;
+    private TransactionTemplate txTemplate;
 
     /**
      * Creates and persists shared Attendee and EventHost entities used across tests.
@@ -61,6 +69,9 @@ class AddressBookContactRepositoryTest
     @BeforeEach
     void setUp()
     {
+        // Initialize a TransactionTemplate to programmatically manage transactions
+        txTemplate = new TransactionTemplate(transactionManager);
+
         Attendee attendee = new Attendee.Builder()
             .firstName("Contact")
             .lastName("Person")
@@ -292,6 +303,27 @@ class AddressBookContactRepositoryTest
             eventHostRepository.flush();
 
             assertThat(addressBookContactRepository.findById(contactId)).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("Rollback on failure")
+    class RollbackOnFailure
+    {
+        @Test
+        @DisplayName("Failed contact save does not persist the contact")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        void failedSaveDoesNotPersist()
+        {
+            assertThatThrownBy(() -> txTemplate.execute(status ->
+            {
+                AddressBookContact contact = createContact();
+                contact.setAttendee(null);
+                addressBookContactRepository.saveAndFlush(contact);
+                return null;
+            })).isInstanceOf(DataIntegrityViolationException.class);
+
+            assertThat(addressBookContactRepository.findAll()).isEmpty();
         }
     }
 }
