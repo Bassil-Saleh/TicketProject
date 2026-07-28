@@ -18,7 +18,10 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.transaction.TestTransaction;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 
 import com.ticketproject.webapp.bridges.SpringContextBridge;
@@ -65,12 +68,19 @@ class TicketRepositoryTest
     @Autowired
     private EventHostRepository eventHostRepository;
 
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
     private Attendee savedAttendee;
     private Event savedEvent;
+    private TransactionTemplate txTemplate;
 
     @BeforeEach
     void setUp()
     {
+        // Initialize a TransactionTemplate to programmatically manage transactions
+        txTemplate = new TransactionTemplate(transactionManager);
+
         Attendee attendee = new Attendee.Builder()
             .firstName("Jane")
             .lastName("Doe")
@@ -367,43 +377,46 @@ class TicketRepositoryTest
     {
         @Test
         @DisplayName("Failed ticket save does not persist the ticket")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
         void failedSaveDoesNotPersist()
         {
             Ticket ticket = createTicket();
             ticket.setPublicToken(null);
 
-            assertThatThrownBy(() -> ticketRepository.saveAndFlush(ticket))
-                .isInstanceOf(DataIntegrityViolationException.class);
-            
-            // Spring should automatically flag the poisoned transaction
-            // as rollback-only, so end the transaction and start a new one.
-            TestTransaction.end();
-            TestTransaction.start();
+            assertThatThrownBy(() -> txTemplate.execute(status ->
+            {
+                ticketRepository.saveAndFlush(ticket);
+                return null;
+            })).isInstanceOf(DataIntegrityViolationException.class);
 
+            // An exception in the lambda should cause an automatic rollback.
+            // Then this repository call should run in a new, short-lived read-only transaction.
             assertThat(ticketRepository.findAll()).isEmpty();
         }
 
         @Test
         @DisplayName("Constraint violation rolls back prior save in same transaction")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
         void constraintViolationRollsBackPriorSave()
         {
-            Ticket ticket1 = createTicket();
-            ticket1 = ticketRepository.saveAndFlush(ticket1);
-            assertThat(ticket1).isNotNull();
-            assertThat(ticket1.getId()).isNotNull();
-            assertThat(ticketRepository.findById(ticket1.getId())).isPresent();
+            assertThatThrownBy(() -> txTemplate.execute(status ->
+            {
+                Ticket ticket1 = createTicket();
+                ticket1 = ticketRepository.saveAndFlush(ticket1);
+                assertThat(ticket1).isNotNull();
+                assertThat(ticket1.getId()).isNotNull();
+                assertThat(ticketRepository.findById(ticket1.getId())).isPresent();
 
-            // Attempt to save a ticket with the same composite key
-            Ticket ticket2 = createTicket();
-            ticket2.setPublicToken(UUID.randomUUID().toString());
-            ticket2.setTokenIdentifier(UUID.randomUUID().toString());
+                // Attempt to save a ticket with the same composite key
+                Ticket ticket2 = createTicket();
+                ticket2.setPublicToken(UUID.randomUUID().toString());
+                ticket2.setTokenIdentifier(UUID.randomUUID().toString());
 
-            assertThatThrownBy(() -> ticketRepository.saveAndFlush(ticket2))
-                .isInstanceOf(DataIntegrityViolationException.class);
-
-            // End the poisoned transaction and start a new one.
-            TestTransaction.end();
-            TestTransaction.start();
+                // This should throw an exception, bubble out of the lambda,
+                // and trigger a rollback.
+                ticketRepository.saveAndFlush(ticket2);
+                return null;
+            })).isInstanceOf(DataIntegrityViolationException.class);
 
             // There should be no Ticket entities persisted in the database.
             assertThat(ticketRepository.findAll()).isEmpty();
@@ -416,44 +429,43 @@ class TicketRepositoryTest
     {
         @Test
         @DisplayName("Successful ticket save commits atomically")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
         void successfulSaveCommitsAtomically()
         {
             Ticket ticket = createTicket();
-            Ticket saved = ticketRepository.saveAndFlush(ticket);
-
-            TestTransaction.flagForCommit();
-            TestTransaction.end();
-            TestTransaction.start();
+            Ticket saved = txTemplate.execute(status -> ticketRepository.saveAndFlush(ticket));
 
             assertThat(ticketRepository.findById(saved.getId())).isPresent();
         }
 
         @Test
         @DisplayName("Multiple ticket saves in one transaction all commit")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
         void multipleSavesCommitAtomic()
         {
-            Attendee attendee2 = new Attendee.Builder()
-                .firstName("Multi")
-                .lastName("Test")
-                .email("multi-" + UUID.randomUUID() + "@example.com")
-                .build();
-            Attendee savedAttendee2 = attendeeRepository.saveAndFlush(attendee2);
+            txTemplate.execute(status ->
+            {
+                Attendee attendee2 = new Attendee.Builder()
+                    .firstName("Multi")
+                    .lastName("Test")
+                    .email("multi-" + UUID.randomUUID() + "@example.com")
+                    .build();
+                Attendee savedAttendee2 = attendeeRepository.saveAndFlush(attendee2);
 
-            Ticket ticket1 = createTicket();
-            ticket1 = ticketRepository.saveAndFlush(ticket1);
+                Ticket ticket1 = createTicket();
+                ticket1 = ticketRepository.saveAndFlush(ticket1);
 
-            Ticket ticket2 = new Ticket.Builder()
-                .publicToken(UUID.randomUUID().toString())
-                .tokenIdentifier(UUID.randomUUID().toString())
-                .attendee(savedAttendee2)
-                .event(savedEvent)
-                .invitationStatus(InvitationStatus.PENDING)
-                .build();
-            ticket2 = ticketRepository.saveAndFlush(ticket2);
+                Ticket ticket2 = new Ticket.Builder()
+                    .publicToken(UUID.randomUUID().toString())
+                    .tokenIdentifier(UUID.randomUUID().toString())
+                    .attendee(savedAttendee2)
+                    .event(savedEvent)
+                    .invitationStatus(InvitationStatus.PENDING)
+                    .build();
+                ticket2 = ticketRepository.saveAndFlush(ticket2);
 
-            TestTransaction.flagForCommit();
-            TestTransaction.end();
-            TestTransaction.start();
+                return null;
+            });
 
             assertThat(ticketRepository.findAll()).hasSize(2);
         }
@@ -465,18 +477,23 @@ class TicketRepositoryTest
     {
         @Test
         @DisplayName("Rolled back ticket is not visible in subsequent transaction")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
         void rolledBackTicketNotVisible()
         {
-            Ticket ticket = createTicket();
-            Ticket saved = ticketRepository.saveAndFlush(ticket);
-            assertThat(saved).isNotNull();
-            assertThat(saved.getId()).isNotNull();
-            Long ticketId = saved.getId();
+            Long ticketId = txTemplate.execute(status ->
+            {
+                Ticket ticket = createTicket();
+                Ticket saved = ticketRepository.saveAndFlush(ticket);
+                assertThat(saved).isNotNull();
+                assertThat(saved.getId()).isNotNull();
+                Long id = saved.getId();
 
-            assertThat(ticketRepository.findById(ticketId)).isPresent();
+                assertThat(ticketRepository.findById(id)).isPresent();
 
-            TestTransaction.flagForRollback();
-            TestTransaction.end();
+                // Manually flag the transaction for rollback
+                status.setRollbackOnly();
+                return id;
+            });
 
             assertThat(ticketRepository.findById(ticketId)).isEmpty();
         }
@@ -486,19 +503,21 @@ class TicketRepositoryTest
         void committedTicketVisible()
         {
             Ticket ticket = createTicket();
-            Ticket saved = ticketRepository.saveAndFlush(ticket);
-            assertThat(saved).isNotNull();
-            assertThat(saved.getId()).isNotNull();
-            Long ticketId = saved.getId();
-            TestTransaction.flagForCommit();
-            TestTransaction.end();
+            String publicToken = ticket.getPublicToken();
 
-            TestTransaction.start();
+            // First transaction: save and commit
+            Long ticketId = txTemplate.execute(status ->
+            {
+                Ticket saved = ticketRepository.saveAndFlush(ticket);
+                assertThat(saved).isNotNull();
+                assertThat(saved.getId()).isNotNull();
+                return saved.getId();
+            });
+            // Second transaction (implicit via Spring Data JPA read-only):
+            // should see the committed data
             Optional<Ticket> loaded = ticketRepository.findById(ticketId);
             assertThat(loaded).isPresent();
-            assertThat(loaded.get().getPublicToken()).isEqualTo(ticket.getPublicToken());
-            TestTransaction.flagForCommit();
-            TestTransaction.end();
+            assertThat(loaded.get().getPublicToken()).isEqualTo(publicToken);
         }
     }
 }
