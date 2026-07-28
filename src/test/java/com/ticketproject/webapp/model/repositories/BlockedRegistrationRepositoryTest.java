@@ -227,5 +227,62 @@ class BlockedRegistrationRepositoryTest
             assertThat(saved.getId()).isNotNull();
             assertThat(saved.getReason()).isNull();
         }
+
+        @Test
+        @DisplayName("Updating block with null attendee violates NOT NULL constraint")
+        void updateNullAttendeeThrowsException()
+        {
+            BlockedRegistration block = createBlock();
+            BlockedRegistration saved = blockedRegistrationRepository.saveAndFlush(block);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getAttendee()).isNotNull();
+            saved.setAttendee(null);
+
+            assertThatThrownBy(() -> blockedRegistrationRepository.saveAndFlush(saved))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Updating block with null event violates NOT NULL constraint")
+        void updateNullEventThrowsException()
+        {
+            BlockedRegistration block = createBlock();
+            BlockedRegistration saved = blockedRegistrationRepository.saveAndFlush(block);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getEvent()).isNotNull();
+            saved.setEvent(null);
+
+            assertThatThrownBy(() -> blockedRegistrationRepository.saveAndFlush(saved))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Updating block with null blockedBy violates NOT NULL constraint")
+        void updateNullBlockedByThrowsException()
+        {
+            BlockedRegistration block = createBlock();
+            BlockedRegistration saved = blockedRegistrationRepository.saveAndFlush(block);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getBlockedBy()).isNotNull();
+            saved.setBlockedBy(null);
+
+            assertThatThrownBy(() -> blockedRegistrationRepository.saveAndFlush(saved))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Updating block with null reason is allowed (optional field)")
+        void updateNullReasonIsAllowed()
+        {
+            BlockedRegistration block = createBlock();
+            BlockedRegistration saved = blockedRegistrationRepository.saveAndFlush(block);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getReason()).isNotNull();
+            saved.setReason(null);
+
+            saved = blockedRegistrationRepository.saveAndFlush(block);
+            assertThat(saved.getId()).isNotNull();
+            assertThat(saved.getReason()).isNull();
+        }
     }
 }
