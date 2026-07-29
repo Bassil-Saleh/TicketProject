@@ -226,7 +226,7 @@ public class Ticket
                "id=" + this.id +
                ", tokenIdentifier='" + this.tokenIdentifier + '\'' +
                ", attendeeId=" + (this.attendee != null ? this.attendee.getId() : null) +
-               ", event=" + (this.event != null ? this.event.getName() : null) +
+               ", eventId=" + (this.event != null ? this.event.getId() : null) +
                ", present=" + this.present +
                ", invitationStatus=" + this.invitationStatus +
                '}';

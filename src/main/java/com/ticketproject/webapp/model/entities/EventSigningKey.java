@@ -151,7 +151,7 @@ public class EventSigningKey
     {
         return "EventSigningKey{" +
                "id=" + this.id +
-               ", event=" + (this.event != null ? this.event.getName() : null) +
+               ", eventId=" + (this.event != null ? this.event.getId() : null) +
                ", created=" + this.created +
                '}';
     }
