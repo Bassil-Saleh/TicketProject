@@ -3,6 +3,7 @@ package com.ticketproject.webapp.model.repositories;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.Optional;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -446,6 +447,54 @@ class BlockedRegistrationRepositoryTest
 
             // Assert that the baseline count has NOT increased.
             assertThat(blockedRegistrationRepository.count()).isEqualTo(blockedRegistrationCountBefore);
+        }
+    }
+
+    @Nested
+    @DisplayName("Isolation")
+    class Isolation
+    {
+        @Test
+        @DisplayName("Rolled back block is not visible in subsequent transaction")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED) // Disable test-managed transaction for this test
+        void rolledBackBlockNotVisible()
+        {
+            // Capture baseline count before attempting the save
+            long blockedRegistrationCountBefore = blockedRegistrationRepository.count();
+
+            txTemplate.execute(status ->
+            {
+                BlockedRegistration block = createBlock();
+                BlockedRegistration saved = blockedRegistrationRepository.saveAndFlush(block);
+                assertThat(saved).isNotNull();
+                assertThat(saved.getId()).isNotNull();
+                assertThat(blockedRegistrationRepository.findById(saved.getId())).isPresent();
+
+                status.setRollbackOnly();
+                return null;
+            });
+
+            // Assert that the baseline count has NOT increased.
+            assertThat(blockedRegistrationRepository.count()).isEqualTo(blockedRegistrationCountBefore);
+        }
+
+        @Test
+        @DisplayName("Committed block is visible in subsequent transaction")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED) // Disable test-managed transaction for this test
+        void committedBlockVisible()
+        {
+            Long blockId = txTemplate.execute(status ->
+            {
+                BlockedRegistration block = createBlock();
+                BlockedRegistration saved = blockedRegistrationRepository.saveAndFlush(block);
+                assertThat(saved).isNotNull();
+                assertThat(saved.getId()).isNotNull();
+                return saved.getId();
+            });
+
+            Optional<BlockedRegistration> loaded = blockedRegistrationRepository.findById(blockId);
+            assertThat(loaded).isPresent();
+            assertThat(loaded.get().getReason()).isEqualTo("Spam registration");
         }
     }
 }
