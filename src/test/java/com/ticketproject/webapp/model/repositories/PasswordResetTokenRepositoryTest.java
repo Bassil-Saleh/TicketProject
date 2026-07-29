@@ -272,4 +272,56 @@ public class PasswordResetTokenRepositoryTest
             assertThat(passwordResetTokenRepository.findAll()).hasSize(2);
         }
     }
+
+    @Nested
+    @DisplayName("Rollback on failure")
+    class RollbackOnFailure
+    {
+        @Test
+        @DisplayName("Failed token save does not persist the token")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED) // Disable test-managed transaction for this test
+        void failedSaveDoesNotPersist()
+        {
+            // Get the baseline count BEFORE the transaction.
+            long tokenCount = passwordResetTokenRepository.count();
+
+            assertThatThrownBy(() -> txTemplate.execute(status ->
+            {
+                PasswordResetToken token = createToken();
+                token.setEventHost(null);
+                passwordResetTokenRepository.saveAndFlush(token);
+                return null;
+            })).isInstanceOf(DataIntegrityViolationException.class);
+
+            // The baseline count should not have changed.
+            assertThat(passwordResetTokenRepository.count()).isEqualTo(tokenCount);
+        }
+
+        @Test
+        @DisplayName("Constraint violation rolls back prior save in same transaction")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED) // Disable test-managed transaction for this test
+        void constraintViolationRollsBackPriorSave()
+        {
+            // Get the baseline count BEFORE the transaction.
+            long tokenCount = passwordResetTokenRepository.count();
+
+            assertThatThrownBy(() -> txTemplate.execute(status ->
+            {
+                PasswordResetToken token1 = createToken();
+                PasswordResetToken saved1 = passwordResetTokenRepository.saveAndFlush(token1);
+                assertThat(saved1).isNotNull();
+                assertThat(saved1.getId()).isNotNull();
+                assertThat(passwordResetTokenRepository.findById(saved1.getId())).isPresent();
+
+                // Force a NOT NULL violation
+                PasswordResetToken token2 = createToken();
+                token2.setEventHost(null);
+                passwordResetTokenRepository.saveAndFlush(token2);
+                return null;
+            })).isInstanceOf(DataIntegrityViolationException.class);
+
+            // The baseline count should not have changed.
+            assertThat(passwordResetTokenRepository.count()).isEqualTo(tokenCount);
+        }
+    }
 }
