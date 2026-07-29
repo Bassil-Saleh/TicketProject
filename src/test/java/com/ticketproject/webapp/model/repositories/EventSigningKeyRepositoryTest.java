@@ -294,5 +294,36 @@ public class EventSigningKeyRepositoryTest
             EventSigningKey loaded = eventSigningKeyRepository.findById(saved1.getSigningKey().getId()).orElseThrow();
             assertThat(loaded.getEvent().getId()).isEqualTo(event1.getId());
         }
+
+        @Test
+        @DisplayName("Private and public keys survive round-trip")
+        void keysSurviveRoundTrip()
+        {
+            EventSigningKey key1 = createSigningKey(event1);
+            event1.setSigningKey(key1);
+
+            Event saved1 = eventRepository.saveAndFlush(event1);
+            assertThat(saved1).isNotNull();
+            assertThat(saved1.getSigningKey()).isNotNull();
+            assertThat(saved1.getSigningKey().getId()).isNotNull();
+
+            EventSigningKey loadedKey1 = eventSigningKeyRepository
+                .findById(saved1.getSigningKey().getId()).orElseThrow();
+
+            assertThat(loadedKey1.getPrivateKey()).isEqualTo(key1.getPrivateKey());
+            assertThat(loadedKey1.getPublicKey()).isEqualTo(key1.getPublicKey());
+        }
+
+        @Test
+        @DisplayName("Created timestamp is set upon creation")
+        void createdTimestampIsSetAndNotUpdatable()
+        {
+            EventSigningKey key1 = createSigningKey(event1);
+            event1.setSigningKey(key1);
+            Event saved1 = eventRepository.saveAndFlush(event1);
+
+            assertThat(saved1).isNotNull();
+            assertThat(saved1.getCreated()).isNotNull();
+        }
     }
 }
