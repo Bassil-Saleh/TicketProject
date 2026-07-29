@@ -13,7 +13,6 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -337,6 +336,70 @@ class SessionRepositoryTest
 
             // The baseline count should not have changed.
             assertThat(sessionRepository.count()).isEqualTo(sessionCount);
+        }
+    }
+
+    @Nested
+    @DisplayName("Commit atomicity")
+    class CommitAtomicity
+    {
+        @Test
+        @DisplayName("Successful session save commits atomically")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED) // Disable test-managed transaction for this test
+        void successfulSaveCommitsAtomically()
+        {
+            Long sessionId = txTemplate.execute(status ->
+            {
+                Session session = createSession();
+                Session saved = sessionRepository.saveAndFlush(session);
+                assertThat(saved).isNotNull();
+                assertThat(saved.getId()).isNotNull();
+                return saved.getId();
+            });
+
+            assertThat(sessionRepository.findById(sessionId)).isPresent();
+        }
+    }
+
+    @Nested
+    @DisplayName("Isolation")
+    class Isolation
+    {
+        @Test
+        @DisplayName("Rolled back session is not visible in subsequent transaction")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED) // Disable test-managed transaction for this test
+        void rolledBackSessionNotVisible()
+        {
+            Long sessionId = txTemplate.execute(status ->
+            {
+                Session session = createSession();
+                Session saved = sessionRepository.saveAndFlush(session);
+                assertThat(saved).isNotNull();
+                assertThat(saved.getId()).isNotNull();
+
+                status.setRollbackOnly();
+                return saved.getId();
+            });
+
+            assertThat(sessionRepository.findById(sessionId)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Committed session is visible in subsequent transaction")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED) // Disable test-managed transaction for this test
+        void committedSessionVisible()
+        {
+            Long sessionId = txTemplate.execute(status ->
+            {
+                Session session = createSession();
+                Session saved = sessionRepository.saveAndFlush(session);
+                assertThat(saved).isNotNull();
+                assertThat(saved.getId()).isNotNull();
+
+                return saved.getId();
+            });
+
+            assertThat(sessionRepository.findById(sessionId)).isPresent();
         }
     }
 }
