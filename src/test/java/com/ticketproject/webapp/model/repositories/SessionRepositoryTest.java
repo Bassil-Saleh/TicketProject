@@ -133,5 +133,33 @@ class SessionRepositoryTest
             assertThatThrownBy(() -> sessionRepository.saveAndFlush(session))
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
+
+        @Test
+        @DisplayName("Updating session with null eventHost violates NOT NULL constraint")
+        void updateNullEventHostThrowsException()
+        {
+            Session session = createSession();
+            Session saved = sessionRepository.saveAndFlush(session);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getEventHost()).isNotNull();
+            saved.setEventHost(null);
+
+            assertThatThrownBy(() -> sessionRepository.saveAndFlush(saved))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Updating session with null clientType violates NOT NULL constraint")
+        void updateNullClientTypeThrowsException()
+        {
+            Session session = createSession();
+            Session saved = sessionRepository.saveAndFlush(session);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getClientType()).isNotNull();
+            saved.setClientType(null);
+
+            assertThatThrownBy(() -> sessionRepository.saveAndFlush(saved))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
     }
 }
