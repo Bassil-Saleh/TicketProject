@@ -254,5 +254,77 @@ public class TicketScanRepositoryTest
             assertThat(saved.getId()).isNotNull();
             assertThat(saved.getDeviceInfo()).isNull();
         }
+
+        @Test
+        @DisplayName("Updating scan with null ticket violates NOT NULL constraint")
+        void updateNullTicketThrowsException()
+        {
+            TicketScan scan = createScan();
+            TicketScan saved = ticketScanRepository.saveAndFlush(scan);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getTicket()).isNotNull();
+            saved.setTicket(null);
+
+            assertThatThrownBy(() -> ticketScanRepository.saveAndFlush(saved))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Updating scan with null scannedBy violates NOT NULL constraint")
+        void updateNullScannedByThrowsException()
+        {
+            TicketScan scan = createScan();
+            TicketScan saved = ticketScanRepository.saveAndFlush(scan);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getScannedBy()).isNotNull();
+            saved.setScannedBy(null);
+
+            assertThatThrownBy(() -> ticketScanRepository.saveAndFlush(saved))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Updating scan with null scannedAt violates NOT NULL constraint")
+        void updateNullScannedAtThrowsException()
+        {
+            TicketScan scan = createScan();
+            TicketScan saved = ticketScanRepository.saveAndFlush(scan);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getScannedAt()).isNotNull();
+            saved.setScannedAt(null);
+
+            assertThatThrownBy(() -> ticketScanRepository.saveAndFlush(saved))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Updating scan with null deviceInfo is allowed (optional field)")
+        void updateNullDeviceInfoIsAllowed()
+        {
+            TicketScan scan = createScan();
+            TicketScan saved = ticketScanRepository.saveAndFlush(scan);
+            assertThat(saved).isNotNull();
+            saved.setDeviceInfo(null);
+
+            saved = ticketScanRepository.saveAndFlush(saved);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+            assertThat(saved.getDeviceInfo()).isNull();
+        }
+
+        @Test
+        @DisplayName("Duplicate ticket_id violates unique constraint (one-to-one)")
+        void duplicateTicketIdThrowsException()
+        {
+            TicketScan scan1 = createScan();
+            TicketScan scanned1 = ticketScanRepository.saveAndFlush(scan1);
+            assertThat(scanned1).isNotNull();
+
+            // Try to create a second scan for the same ticket
+            TicketScan scan2 = createScan();
+
+            assertThatThrownBy(() -> ticketScanRepository.saveAndFlush(scan2))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
     }
 }
