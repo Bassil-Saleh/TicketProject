@@ -161,6 +161,35 @@ class SessionRepositoryTest
             assertThatThrownBy(() -> sessionRepository.saveAndFlush(saved))
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
+
+        @Test
+        @DisplayName("Duplicate tokenHash violates unique constraint")
+        void duplicateTokenHashThrowsException()
+        {
+            Session session1 = createSession();
+            Session savedSession1 = sessionRepository.saveAndFlush(session1);
+            assertThat(savedSession1).isNotNull();
+
+            // Create a second host so we can try to reuse the same token hash
+            EventHost host2 = new EventHost.Builder()
+                .firstName("Dup")
+                .lastName("Session")
+                .dateOfBirth(LocalDate.of(1985, 4, 4))
+                .email("dupsession-" + UUID.randomUUID() + "@example.com")
+                .plaintextPassword("password123")
+                .build();
+            host2.generateVerificationToken();
+            EventHost savedHost2 = eventHostRepository.saveAndFlush(host2);
+            assertThat(savedHost2).isNotNull();
+
+            Session session2 = createSession();
+            byte[] hash = (byte[]) ReflectionTestUtils.getField(savedSession1, "tokenHash");
+            // Manually set the same token hash as session1
+            ReflectionTestUtils.setField(session2, "tokenHash", hash);
+
+            assertThatThrownBy(() -> sessionRepository.saveAndFlush(session2))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
     }
 
     @Nested
