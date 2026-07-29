@@ -2,7 +2,6 @@ package com.ticketproject.webapp.model.repositories;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 import java.security.InvalidParameterException;
 import java.security.KeyPair;
@@ -18,6 +17,7 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -404,6 +404,58 @@ public class TicketScanRepositoryTest
             Ticket loaded = ticketRepository.findById(savedTicket.getId()).orElseThrow();
             assertThat(loaded).isNotNull();
             assertThat(loaded.isPresent()).isTrue();
+        }
+    }
+
+    @Nested
+    @DisplayName("Rollback on failure")
+    class RollbackOnFailure
+    {
+        @Test
+        @DisplayName("Failed scan save does not persist the scan")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        void failedSaveDoesNotPersist()
+        {
+            // Get baseline count BEFORE the transaction.
+            long scanCount = ticketScanRepository.count();
+            assertThatThrownBy(() -> txTemplate.execute(status ->
+            {
+                TicketScan scan = createScan();
+                scan.setTicket(null);
+                ticketScanRepository.saveAndFlush(scan);
+                return null;
+            })).isInstanceOf(DataIntegrityViolationException.class);
+
+            // The count should not have changed.
+            assertThat(ticketScanRepository.count()).isEqualTo(scanCount);
+        }
+
+        @Test
+        @DisplayName("Constraint violation rolls back prior save in same transaction")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        void constraintViolationRollsBackPriorSave()
+        {
+            // Get baseline count BEFORE the transaction.
+            long scanCount = ticketScanRepository.count();
+
+            assertThatThrownBy(() -> txTemplate.execute(status ->
+            {
+                TicketScan scan1 = createScan();
+                TicketScan saved1 = ticketScanRepository.saveAndFlush(scan1);
+                assertThat(saved1).isNotNull();
+                assertThat(saved1.getId()).isNotNull();
+                assertThat(ticketScanRepository.findById(saved1.getId())).isPresent();
+
+                // Force a NOT NULL violation
+                TicketScan scan2 = createScan();
+                scan2.setScannedBy(null);
+                ticketScanRepository.saveAndFlush(scan2);
+
+                return null;
+            })).isInstanceOf(DataIntegrityViolationException.class);
+
+            // The count should not have changed.
+            assertThat(ticketScanRepository.count()).isEqualTo(scanCount);
         }
     }
 }
