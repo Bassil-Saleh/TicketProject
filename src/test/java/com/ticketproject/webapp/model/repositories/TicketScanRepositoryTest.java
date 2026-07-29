@@ -17,7 +17,6 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -456,6 +455,70 @@ public class TicketScanRepositoryTest
 
             // The count should not have changed.
             assertThat(ticketScanRepository.count()).isEqualTo(scanCount);
+        }
+    }
+
+    @Nested
+    @DisplayName("Commit atomicity")
+    class CommitAtomicity
+    {
+        @Test
+        @DisplayName("Successful scan save commits atomically")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        void successfulSaveCommitsAtomically()
+        {
+            Long scanId = txTemplate.execute(status ->
+            {
+                TicketScan scan = createScan();
+                TicketScan saved = ticketScanRepository.saveAndFlush(scan);
+                assertThat(saved).isNotNull();
+                assertThat(saved.getId()).isNotNull();
+                return saved.getId();
+            });
+
+            assertThat(ticketScanRepository.findById(scanId)).isPresent();
+        }
+    }
+
+    @Nested
+    @DisplayName("Isolation")
+    class Isolation
+    {
+        @Test
+        @DisplayName("Rolled back scan is not visible in subsequent transaction")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        void rolledBackScanNotVisible()
+        {
+            Long scanId = txTemplate.execute(status ->
+            {
+                TicketScan scan = createScan();
+                TicketScan saved = ticketScanRepository.saveAndFlush(scan);
+                assertThat(saved).isNotNull();
+                assertThat(saved.getId()).isNotNull();
+
+                status.setRollbackOnly();
+                return saved.getId();
+            });
+
+            assertThat(ticketScanRepository.findById(scanId)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Committed scan is visible in subsequent transaction")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        void committedScanVisible()
+        {
+            Long scanId = txTemplate.execute(status ->
+            {
+                TicketScan scan = createScan();
+                TicketScan saved = ticketScanRepository.saveAndFlush(scan);
+                assertThat(saved).isNotNull();
+                assertThat(saved.getId()).isNotNull();
+
+                return saved.getId();
+            });
+
+            assertThat(ticketScanRepository.findById(scanId)).isPresent();
         }
     }
 }
