@@ -324,4 +324,68 @@ public class PasswordResetTokenRepositoryTest
             assertThat(passwordResetTokenRepository.count()).isEqualTo(tokenCount);
         }
     }
+
+    @Nested
+    @DisplayName("Commit atomicity")
+    class CommitAtomicity
+    {
+        @Test
+        @DisplayName("Successful token save commits atomically")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED) // Disable test-managed transaction for this test
+        void successfulSaveCommitsAtomically()
+        {
+            Long tokenId = txTemplate.execute(status ->
+            {
+                PasswordResetToken token = createToken();
+                PasswordResetToken saved = passwordResetTokenRepository.saveAndFlush(token);
+                assertThat(saved).isNotNull();
+                assertThat(saved.getId()).isNotNull();
+                return saved.getId();
+            });
+
+            assertThat(passwordResetTokenRepository.findById(tokenId)).isPresent();
+        }
+    }
+
+    @Nested
+    @DisplayName("Isolation")
+    class Isolation
+    {
+        @Test
+        @DisplayName("Rolled back token is not visible in subsequent transaction")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED) // Disable test-managed transaction for this test
+        void rolledBackTokenNotVisible()
+        {
+            Long tokenId = txTemplate.execute(status ->
+            {
+                PasswordResetToken token = createToken();
+                PasswordResetToken saved = passwordResetTokenRepository.saveAndFlush(token);
+                assertThat(saved).isNotNull();
+                assertThat(saved.getId()).isNotNull();
+
+                status.setRollbackOnly();
+                return saved.getId();
+            });
+
+            assertThat(passwordResetTokenRepository.findById(tokenId)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Committed token is visible in subsequent transaction")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED) // Disable test-managed transaction for this test
+        void committedTokenVisible()
+        {
+            Long tokenId = txTemplate.execute(status ->
+            {
+                PasswordResetToken token = createToken();
+                PasswordResetToken saved = passwordResetTokenRepository.saveAndFlush(token);
+                assertThat(saved).isNotNull();
+                assertThat(saved.getId()).isNotNull();
+
+                return saved.getId();
+            });
+
+            assertThat(passwordResetTokenRepository.findById(tokenId)).isPresent();
+        }
+    }
 }
