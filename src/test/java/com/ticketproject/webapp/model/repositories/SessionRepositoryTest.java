@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.ticketproject.webapp.bridges.SpringContextBridge;
 import com.ticketproject.webapp.model.entities.EventHost;
@@ -160,6 +161,129 @@ class SessionRepositoryTest
 
             assertThatThrownBy(() -> sessionRepository.saveAndFlush(saved))
                 .isInstanceOf(DataIntegrityViolationException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("Data integrity")
+    class DataIntegrity
+    {
+        @Test
+        @DisplayName("Session references valid eventHost after save")
+        void sessionReferencesValidEventHost()
+        {
+            Session session = createSession();
+            Session saved = sessionRepository.saveAndFlush(session);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+
+            Session loaded = sessionRepository.findById(saved.getId()).orElseThrow();
+            assertThat(loaded).isNotNull();
+            assertThat(loaded.getEventHost()).isNotNull();
+            assertThat(loaded.getEventHost().getId()).isNotNull();
+            assertThat(loaded.getEventHost().getId()).isEqualTo(savedHost.getId());
+        }
+
+        @Test
+        @DisplayName("isActive returns true for non-revoked, non-expired session")
+        void isActiveForValidSession()
+        {
+            Session session = createSession();
+            Session saved = sessionRepository.saveAndFlush(session);
+
+            assertThat(saved).isNotNull();
+            assertThat(saved.isActive()).isTrue();
+            assertThat(saved.isRevoked()).isFalse();
+            assertThat(saved.isExpired()).isFalse();
+        }
+
+        @Test
+        @DisplayName("isRevoked returns true after setting revoked timestamp")
+        void isRevokedAfterSettingRevoked()
+        {
+            Session session = createSession();
+            Session saved = sessionRepository.saveAndFlush(session);
+            assertThat(saved).isNotNull();
+
+            saved.setRevoked(LocalDateTime.now());
+            saved = sessionRepository.saveAndFlush(saved);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+
+            Session loaded = sessionRepository.findById(saved.getId()).orElseThrow();
+            assertThat(loaded).isNotNull();
+            assertThat(loaded.isRevoked()).isTrue();
+            assertThat(loaded.isActive()).isFalse();
+        }
+
+        @Test
+        @DisplayName("isExpired returns true for past expiry date")
+        void isExpiredForPastExpiry()
+        {
+            Session session = createSession();
+            // Bypass encapsulation to force a past expiry date
+            ReflectionTestUtils.setField(session, "expires", LocalDateTime.now().minusHours(1));
+            Session saved = sessionRepository.saveAndFlush(session);
+
+            assertThat(saved).isNotNull();
+            assertThat(saved.isExpired()).isTrue();
+            assertThat(saved.isActive()).isFalse();
+        }
+
+        @Test
+        @DisplayName("Client type persists correctly after round-trip")
+        void clientTypePersistsCorrectly()
+        {
+            Session session = new Session.Builder()
+                .eventHost(savedHost)
+                .clientType(ClientType.ANDROID)
+                .ipAddress("172.16.0.1")
+                .userAgent("AndroidApp/2.0")
+                .build();
+            session.generateToken();
+
+            Session saved = sessionRepository.saveAndFlush(session);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+
+            Session loaded = sessionRepository.findById(saved.getId()).orElseThrow();
+            assertThat(loaded).isNotNull();
+            assertThat(loaded.getClientType()).isNotNull();
+            assertThat(loaded.getClientType()).isEqualTo(ClientType.ANDROID);
+        }
+
+        @Test
+        @DisplayName("IP address and user agent survive round-trip")
+        void ipAddressAndUserAgentSurviveRoundTrip()
+        {
+            Session session = createSession();
+            String ip = session.getIpAddress();
+            String ua = session.getUserAgent();
+
+            Session saved = sessionRepository.saveAndFlush(session);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+
+            Session loaded = sessionRepository.findById(saved.getId()).orElseThrow();
+
+            assertThat(loaded).isNotNull();
+            assertThat(loaded.getIpAddress()).isEqualTo(ip);
+            assertThat(loaded.getUserAgent()).isEqualTo(ua);
+        }
+
+        @Test
+        @DisplayName("Multiple sessions for same eventHost are allowed")
+        void multipleSessionsForSameHost()
+        {
+            Session session1 = createSession();
+            Session saved1 = sessionRepository.saveAndFlush(session1);
+            assertThat(saved1).isNotNull();
+
+            Session session2 = createSession();
+            Session saved2 = sessionRepository.saveAndFlush(session2);
+            assertThat(saved2).isNotNull();
+
+            assertThat(sessionRepository.findAll()).hasSize(2);
         }
     }
 }
