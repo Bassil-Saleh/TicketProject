@@ -2,7 +2,6 @@ package com.ticketproject.webapp.model.repositories;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -20,7 +19,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
@@ -390,6 +388,83 @@ public class EventSigningKeyRepositoryTest
             // The counts should not have changed.
             assertThat(eventSigningKeyRepository.count()).isEqualTo(signingKeyCountBefore);
             assertThat(eventRepository.count()).isEqualTo(eventCountBefore);
+        }
+    }
+
+    @Nested
+    @DisplayName("Commit atomicity")
+    class CommitAtomicity
+    {
+        @Test
+        @DisplayName("Successful signing key save commits atomically")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        void successfulSaveCommitsAtomically()
+        {
+            Long signingKeyId = txTemplate.execute(status ->
+            {
+                Event event = createEvent();
+                EventSigningKey key = createSigningKey(event);
+                event.setSigningKey(key);
+                Event saved = eventRepository.saveAndFlush(event);
+
+                assertThat(saved).isNotNull();
+                assertThat(saved.getSigningKey()).isNotNull();
+                assertThat(saved.getSigningKey().getId()).isNotNull();
+
+                return saved.getSigningKey().getId();
+            });
+
+            assertThat(eventSigningKeyRepository.findById(signingKeyId)).isPresent();
+        }
+    }
+
+    @Nested
+    @DisplayName("Isolation")
+    class Isolation
+    {
+        @Test
+        @DisplayName("Rolled back signing key is not visible in subsequent transaction")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        void rolledBackKeyNotVisible()
+        {
+            Long signingKeyId = txTemplate.execute(status ->
+            {
+                Event event = createEvent();
+                EventSigningKey key = createSigningKey(event);
+                event.setSigningKey(key);
+                Event saved = eventRepository.saveAndFlush(event);
+
+                assertThat(saved).isNotNull();
+                assertThat(saved.getSigningKey()).isNotNull();
+                assertThat(saved.getSigningKey().getId()).isNotNull();
+
+                status.setRollbackOnly();
+                return saved.getSigningKey().getId();
+            });
+
+            assertThat(eventSigningKeyRepository.findById(signingKeyId)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Committed signing key is visible in subsequent transaction")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        void committedKeyVisible()
+        {
+            Long signingKeyId = txTemplate.execute(status ->
+            {
+                Event event = createEvent();
+                EventSigningKey key = createSigningKey(event);
+                event.setSigningKey(key);
+                Event saved = eventRepository.saveAndFlush(event);
+
+                assertThat(saved).isNotNull();
+                assertThat(saved.getSigningKey()).isNotNull();
+                assertThat(saved.getSigningKey().getId()).isNotNull();
+
+                return saved.getSigningKey().getId();
+            });
+
+            assertThat(eventSigningKeyRepository.findById(signingKeyId)).isPresent();
         }
     }
 }
