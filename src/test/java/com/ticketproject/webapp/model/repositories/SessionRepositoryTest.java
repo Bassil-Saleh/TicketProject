@@ -286,4 +286,57 @@ class SessionRepositoryTest
             assertThat(sessionRepository.findAll()).hasSize(2);
         }
     }
+
+    @Nested
+    @DisplayName("Rollback on failure")
+    class RollbackOnFailure
+    {
+        @Test
+        @DisplayName("Failed session save does not persist the session")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED) // Disable test-managed transaction for this test
+        void failedSaveDoesNotPersist()
+        {
+            // Get the baseline counts BEFORE the transaction.
+            long sessionCount = sessionRepository.count();
+
+            assertThatThrownBy(() -> txTemplate.execute(status ->
+            {
+                Session session = createSession();
+                session.setEventHost(null);
+                sessionRepository.saveAndFlush(session);
+                return null;
+            })).isInstanceOf(DataIntegrityViolationException.class);
+
+            // The baseline count should not have changed.
+            assertThat(sessionRepository.count()).isEqualTo(sessionCount);
+        }
+
+        @Test
+        @DisplayName("Constraint violation rolls back prior save in same transaction")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED) // Disable test-managed transaction for this test
+        void constraintViolationRollsBackPriorSave()
+        {
+            // Get the baseline counts BEFORE the transaction.
+            long sessionCount = sessionRepository.count();
+
+            assertThatThrownBy(() -> txTemplate.execute(status ->
+            {
+                Session session1 = createSession();
+                Session saved1 = sessionRepository.saveAndFlush(session1);
+                assertThat(saved1).isNotNull();
+                assertThat(saved1.getId()).isNotNull();
+                assertThat(sessionRepository.findById(saved1.getId())).isPresent();
+
+                // Force a NOT NULL violation
+                Session session2 = createSession();
+                session2.setClientType(null);
+                sessionRepository.saveAndFlush(session2);
+
+                return null;
+            })).isInstanceOf(DataIntegrityViolationException.class);
+
+            // The baseline count should not have changed.
+            assertThat(sessionRepository.count()).isEqualTo(sessionCount);
+        }
+    }
 }
