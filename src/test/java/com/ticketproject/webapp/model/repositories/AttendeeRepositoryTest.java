@@ -120,6 +120,7 @@ class AttendeeRepositoryTest
 
             assertThat(cammyIndex).isNotEqualTo(jerryIndex);
         }
+    }
 
     @Nested
     @DisplayName("Uniqueness constraint")
@@ -138,6 +139,5 @@ class AttendeeRepositoryTest
             assertThatThrownBy(() -> attendeeRepository.saveAndFlush(attendee2))
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
-    }
     }
 }
