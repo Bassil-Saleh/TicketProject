@@ -161,7 +161,7 @@ public class BlockedRegistration
         return "BlockedRegistration{" +
                "id=" + this.id +
                ", attendeeId=" + (this.attendee != null ? this.attendee.getId() : null) +
-               ", event=" + (this.event != null ? this.event.getName() : null) +
+               ", eventId=" + (this.event != null ? this.event.getId() : null) +
                ", active=" + isActive() +
                '}';
  
