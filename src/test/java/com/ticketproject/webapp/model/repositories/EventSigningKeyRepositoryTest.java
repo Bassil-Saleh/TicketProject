@@ -7,6 +7,9 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.InvalidParameterException;
+import java.sql.SQLException;
+import java.sql.Connection;
+import javax.sql.DataSource;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -64,6 +67,9 @@ public class EventSigningKeyRepositoryTest
 
     @Autowired
     private PlatformTransactionManager transactionManager;
+
+    @Autowired
+    private DataSource dataSource;
 
     private Event event1;
     private TransactionTemplate txTemplate;
@@ -331,6 +337,22 @@ public class EventSigningKeyRepositoryTest
     @DisplayName("Rollback on failure")
     class RollbackOnFailure
     {
+        @Test
+        @DisplayName("Diagnostic: Verify JDBC auto-commit is disabled")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        void verifyAutoCommitIsDisabled() throws SQLException
+        {
+            try (Connection conn = dataSource.getConnection())
+            {
+                boolean isAutoCommit = conn.getAutoCommit();
+
+                // If this assertion fails, auto-commit is ON, which breaks rollback testing.
+                assertThat(isAutoCommit)
+                    .as("JDBC auto-commit must be false for transaction rollbacks to work")
+                    .isFalse();
+            }
+        }
+
         @Test
         @DisplayName("Failed signing key save does not persist the key")
         @Transactional(propagation = Propagation.NOT_SUPPORTED)

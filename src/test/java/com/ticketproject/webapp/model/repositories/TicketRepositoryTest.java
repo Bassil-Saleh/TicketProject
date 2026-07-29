@@ -8,6 +8,9 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.InvalidParameterException;
+import java.sql.SQLException;
+import java.sql.Connection;
+import javax.sql.DataSource;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -67,6 +70,9 @@ class TicketRepositoryTest
 
     @Autowired
     private EventHostRepository eventHostRepository;
+
+    @Autowired
+    private DataSource dataSource;
 
     @Autowired
     private PlatformTransactionManager transactionManager;
@@ -375,6 +381,22 @@ class TicketRepositoryTest
     @DisplayName("Rollback on failure")
     class RollbackOnFailure
     {
+        @Test
+        @DisplayName("Diagnostic: Verify JDBC auto-commit is disabled")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        void verifyAutoCommitIsDisabled() throws SQLException
+        {
+            try (Connection conn = dataSource.getConnection())
+            {
+                boolean isAutoCommit = conn.getAutoCommit();
+
+                // If this assertion fails, auto-commit is ON, which breaks rollback testing.
+                assertThat(isAutoCommit)
+                    .as("JDBC auto-commit must be false for transaction rollbacks to work")
+                    .isFalse();
+            }
+        }
+
         @Test
         @DisplayName("Failed ticket save does not persist the ticket")
         @Transactional(propagation = Propagation.NOT_SUPPORTED)
