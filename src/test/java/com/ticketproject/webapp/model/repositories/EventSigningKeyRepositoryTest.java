@@ -65,7 +65,7 @@ public class EventSigningKeyRepositoryTest
     @Autowired
     private PlatformTransactionManager transactionManager;
 
-    private Event savedEvent;
+    private Event event1;
     private TransactionTemplate txTemplate;
 
     /**
@@ -76,6 +76,9 @@ public class EventSigningKeyRepositoryTest
     {
         // Initialize a TransactionTemplate to programmatically manage transactions
         txTemplate = new TransactionTemplate(transactionManager);
+
+        // Does not add a signing key or persist the event to the database
+        event1 = createEvent();
     }
 
     /**
@@ -166,12 +169,11 @@ public class EventSigningKeyRepositoryTest
         @DisplayName("Saving signing key with null event violates NOT NULL constraint")
         void nullEventThrowsException()
         {
-            Event event = createEvent();
-            EventSigningKey key = createSigningKey(event);
-            event.setSigningKey(key);
-            key.setEvent(null);
+            EventSigningKey key1 = createSigningKey(event1);
+            event1.setSigningKey(key1);
+            key1.setEvent(null);
 
-            assertThatThrownBy(() -> eventRepository.saveAndFlush(event))
+            assertThatThrownBy(() -> eventRepository.saveAndFlush(event1))
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
 
@@ -179,12 +181,11 @@ public class EventSigningKeyRepositoryTest
         @DisplayName("Saving signing key with null privateKey violates NOT NULL constraint")
         void nullPrivateKeyThrowsException()
         {
-            Event event = createEvent();
-            EventSigningKey key = createSigningKey(event);
-            event.setSigningKey(key);
-            key.setPrivateKey(null);
+            EventSigningKey key1 = createSigningKey(event1);
+            event1.setSigningKey(key1);
+            key1.setPrivateKey(null);
 
-            assertThatThrownBy(() -> eventRepository.saveAndFlush(event))
+            assertThatThrownBy(() -> eventRepository.saveAndFlush(event1))
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
 
@@ -192,12 +193,11 @@ public class EventSigningKeyRepositoryTest
         @DisplayName("Saving signing key with null publicKey violates NOT NULL constraint")
         void nullPublicKeyThrowsException()
         {
-            Event event = createEvent();
-            EventSigningKey key = createSigningKey(event);
-            event.setSigningKey(key);
-            key.setPublicKey(null);
+            EventSigningKey key1 = createSigningKey(event1);
+            event1.setSigningKey(key1);
+            key1.setPublicKey(null);
 
-            assertThatThrownBy(() -> eventRepository.saveAndFlush(event))
+            assertThatThrownBy(() -> eventRepository.saveAndFlush(event1))
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
 
@@ -205,18 +205,17 @@ public class EventSigningKeyRepositoryTest
         @DisplayName("Updating signing key with null event violates NOT NULL constraint")
         void updateNullEventThrowsException()
         {
-            Event event = createEvent();
-            EventSigningKey key = createSigningKey(event);
-            event.setSigningKey(key);
+            EventSigningKey key1 = createSigningKey(event1);
+            event1.setSigningKey(key1);
 
-            Event saved = eventRepository.saveAndFlush(event);
-            assertThat(saved).isNotNull();
-            assertThat(saved.getSigningKey()).isNotNull();
-            key = saved.getSigningKey();
-            key.setEvent(null);
-            saved.setSigningKey(key);
+            Event saved1 = eventRepository.saveAndFlush(event1);
+            assertThat(saved1).isNotNull();
+            assertThat(saved1.getSigningKey()).isNotNull();
+            key1 = saved1.getSigningKey();
+            key1.setEvent(null);
+            saved1.setSigningKey(key1);
 
-            assertThatThrownBy(() -> eventRepository.saveAndFlush(saved))
+            assertThatThrownBy(() -> eventRepository.saveAndFlush(saved1))
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
 
@@ -224,18 +223,17 @@ public class EventSigningKeyRepositoryTest
         @DisplayName("Updating signing key with null privateKey violates NOT NULL constraint")
         void updateNullPrivateKeyThrowsException()
         {
-            Event event = createEvent();
-            EventSigningKey key = createSigningKey(event);
-            event.setSigningKey(key);
+            EventSigningKey key1 = createSigningKey(event1);
+            event1.setSigningKey(key1);
 
-            Event saved = eventRepository.saveAndFlush(event);
-            assertThat(saved).isNotNull();
-            assertThat(saved.getSigningKey()).isNotNull();
-            key = saved.getSigningKey();
-            key.setPrivateKey(null);
-            saved.setSigningKey(key);
+            Event saved1 = eventRepository.saveAndFlush(event1);
+            assertThat(saved1).isNotNull();
+            assertThat(saved1.getSigningKey()).isNotNull();
+            key1 = saved1.getSigningKey();
+            key1.setPrivateKey(null);
+            saved1.setSigningKey(key1);
 
-            assertThatThrownBy(() -> eventRepository.saveAndFlush(saved))
+            assertThatThrownBy(() -> eventRepository.saveAndFlush(saved1))
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
 
@@ -243,18 +241,17 @@ public class EventSigningKeyRepositoryTest
         @DisplayName("Updating signing key with null publicKey violates NOT NULL constraint")
         void updateNullPublicKeyThrowsException()
         {
-            Event event = createEvent();
-            EventSigningKey key = createSigningKey(event);
-            event.setSigningKey(key);
+            EventSigningKey key1 = createSigningKey(event1);
+            event1.setSigningKey(key1);
 
-            Event saved = eventRepository.saveAndFlush(event);
-            assertThat(saved).isNotNull();
-            assertThat(saved.getSigningKey()).isNotNull();
-            key = saved.getSigningKey();
-            key.setPublicKey(null);
-            saved.setSigningKey(key);
+            Event saved1 = eventRepository.saveAndFlush(event1);
+            assertThat(saved1).isNotNull();
+            assertThat(saved1.getSigningKey()).isNotNull();
+            key1 = saved1.getSigningKey();
+            key1.setPublicKey(null);
+            saved1.setSigningKey(key1);
 
-            assertThatThrownBy(() -> eventRepository.saveAndFlush(saved))
+            assertThatThrownBy(() -> eventRepository.saveAndFlush(saved1))
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
 
@@ -262,7 +259,6 @@ public class EventSigningKeyRepositoryTest
         @DisplayName("Duplicate event_id violates unique constraint (one-to-one)")
         void duplicateEventIdThrowsException()
         {
-            Event event1 = createEvent();
             EventSigningKey key1 = createSigningKey(event1);
             event1.setSigningKey(key1);
             eventRepository.saveAndFlush(event1);
@@ -275,6 +271,28 @@ public class EventSigningKeyRepositoryTest
 
             assertThatThrownBy(() -> eventRepository.saveAndFlush(event2))
                 .isInstanceOf(DataIntegrityViolationException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("Data integrity")
+    class DataIntegrity
+    {
+        @Test
+        @DisplayName("Signing key references valid event after save")
+        void signingKeyReferencesValidEvent()
+        {
+            EventSigningKey key1 = createSigningKey(event1);
+            event1.setSigningKey(key1);
+            Event saved1 = eventRepository.saveAndFlush(event1);
+
+            assertThat(saved1).isNotNull();
+            assertThat(saved1.getId()).isNotNull();
+            assertThat(saved1.getSigningKey()).isNotNull();
+            assertThat(saved1.getSigningKey().getId()).isNotNull();
+
+            EventSigningKey loaded = eventSigningKeyRepository.findById(saved1.getSigningKey().getId()).orElseThrow();
+            assertThat(loaded.getEvent().getId()).isEqualTo(event1.getId());
         }
     }
 }
