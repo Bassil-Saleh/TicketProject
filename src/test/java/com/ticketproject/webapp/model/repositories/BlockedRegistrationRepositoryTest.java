@@ -2,7 +2,6 @@ package com.ticketproject.webapp.model.repositories;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -23,6 +22,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 
 import com.ticketproject.webapp.bridges.SpringContextBridge;
 import com.ticketproject.webapp.constants.AppConstants;
@@ -48,6 +48,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * rollback on failure, data constraints, data integrity, and commit atomicity.
  */
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import({SpringContextBridge.class, CryptoService.class, BlindIndexService.class, HashingService.class})
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -393,6 +394,58 @@ class BlockedRegistrationRepositoryTest
             assertThat(saved2).isNotNull();
             assertThat(saved2.getId()).isNotNull();
             assertThat(blockedRegistrationRepository.count()).isEqualTo(blockedRegistrationCountBefore + 2);
+        }
+    }
+
+    @Nested
+    @DisplayName("Rollback on failure")
+    class RollbackOnFailure
+    {
+        @Test
+        @DisplayName("Failed block save does not persist the block")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED) // Disable test-managed transaction for this test
+        void failedSaveDoesNotPersist()
+        {
+            // Capture baseline count before attempting the save
+            long blockedRegistrationCountBefore = blockedRegistrationRepository.count();
+
+            assertThatThrownBy(() -> txTemplate.execute(status ->
+            {
+                BlockedRegistration block = createBlock();
+                block.setAttendee(null);
+                blockedRegistrationRepository.saveAndFlush(block);
+                return null;
+            })).isInstanceOf(DataIntegrityViolationException.class);
+
+            // Assert that the baseline count has NOT increased.
+            assertThat(blockedRegistrationRepository.count()).isEqualTo(blockedRegistrationCountBefore);
+        }
+
+        @Test
+        @DisplayName("Constraint violation rolls back prior save in same transaction")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED) // Disable test-managed transaction for this test
+        void constraintViolationRollsBackPriorSave()
+        {
+            // Capture baseline count before attempting the save
+            long blockedRegistrationCountBefore = blockedRegistrationRepository.count();
+
+            assertThatThrownBy(() -> txTemplate.execute(status ->
+            {
+                BlockedRegistration block1 = createBlock();
+                BlockedRegistration saved1 = blockedRegistrationRepository.saveAndFlush(block1);
+                // Verify that the first block was saved
+                assertThat(saved1).isNotNull();
+                assertThat(saved1.getId()).isNotNull();
+
+                // Now try to save a second block that will force a NOT NULL violation
+                BlockedRegistration block2 = createBlock();
+                block2.setEvent(null);
+                blockedRegistrationRepository.saveAndFlush(block2);
+                return null;
+            })).isInstanceOf(DataIntegrityViolationException.class);
+
+            // Assert that the baseline count has NOT increased.
+            assertThat(blockedRegistrationRepository.count()).isEqualTo(blockedRegistrationCountBefore);
         }
     }
 }
