@@ -117,5 +117,33 @@ public class PasswordResetTokenRepositoryTest
             assertThatThrownBy(() -> passwordResetTokenRepository.saveAndFlush(token))
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
+
+        @Test
+        @DisplayName("Updating token with null eventHost violates NOT NULL constraint")
+        void updateNullEventHostThrowsException()
+        {
+            PasswordResetToken token = createToken();
+            PasswordResetToken saved = passwordResetTokenRepository.saveAndFlush(token);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getEventHost()).isNotNull();
+            saved.setEventHost(null);
+
+            assertThatThrownBy(() -> passwordResetTokenRepository.saveAndFlush(saved))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
+
+        @Test
+        @DisplayName("Updating token with null tokenHash violates NOT NULL constraint")
+        void updateNullTokenHashThrowsException()
+        {
+            PasswordResetToken token = createToken();
+            PasswordResetToken saved = passwordResetTokenRepository.saveAndFlush(token);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getTokenHash()).isNotNull();
+            saved.setTokenHash(null);
+
+            assertThatThrownBy(() -> passwordResetTokenRepository.saveAndFlush(saved))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
     }
 }
