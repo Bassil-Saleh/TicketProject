@@ -18,7 +18,9 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
@@ -324,6 +326,70 @@ public class EventSigningKeyRepositoryTest
 
             assertThat(saved1).isNotNull();
             assertThat(saved1.getCreated()).isNotNull();
+        }
+    }
+
+    @Nested
+    @DisplayName("Rollback on failure")
+    class RollbackOnFailure
+    {
+        @Test
+        @DisplayName("Failed signing key save does not persist the key")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        void failedSaveDoesNotPersist()
+        {
+            // Get the baseline counts BEFORE running the transaction.
+            long signingKeyCountBefore = eventSigningKeyRepository.count();
+            long eventCountBefore = eventRepository.count();
+
+            assertThatThrownBy(() -> txTemplate.execute(status ->
+            {
+                Event event = createEvent();
+                EventSigningKey key = createSigningKey(event);
+                key.setEvent(null);
+                eventRepository.saveAndFlush(event);
+                return null;
+            })).isInstanceOf(InvalidDataAccessApiUsageException.class);
+
+            // The counts should not have changed.
+            assertThat(eventSigningKeyRepository.count()).isEqualTo(signingKeyCountBefore);
+            assertThat(eventRepository.count()).isEqualTo(eventCountBefore);
+        }
+
+        @Test
+        @DisplayName("Constraint violation rolls back prior save in same transaction")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
+        void constraintViolationRollsBackPriorSave()
+        {
+            // Get the baseline counts BEFORE running the transaction.
+            long signingKeyCountBefore = eventSigningKeyRepository.count();
+            long eventCountBefore = eventRepository.count();
+
+            assertThatThrownBy(() -> txTemplate.execute(status ->
+            {
+                Event event = createEvent();
+                EventSigningKey key = createSigningKey(event);
+                event.setSigningKey(key);
+                Event saved = eventRepository.saveAndFlush(event);
+
+                assertThat(saved).isNotNull();
+                assertThat(saved.getId()).isNotNull();
+                assertThat(saved.getSigningKey()).isNotNull();
+                assertThat(saved.getSigningKey().getId()).isNotNull();
+
+                Event anotherEvent = createEvent();
+                EventSigningKey anotherKey = createSigningKey(anotherEvent);
+                // Force a NOT NULL violation.
+                anotherKey.setPrivateKey(null);
+                anotherEvent.setSigningKey(anotherKey);
+
+                eventRepository.saveAndFlush(anotherEvent);
+                return null;
+            })).isInstanceOf(DataIntegrityViolationException.class);
+
+            // The counts should not have changed.
+            assertThat(eventSigningKeyRepository.count()).isEqualTo(signingKeyCountBefore);
+            assertThat(eventRepository.count()).isEqualTo(eventCountBefore);
         }
     }
 }
