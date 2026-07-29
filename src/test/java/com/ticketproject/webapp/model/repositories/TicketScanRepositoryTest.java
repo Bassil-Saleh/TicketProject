@@ -327,4 +327,83 @@ public class TicketScanRepositoryTest
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
     }
+
+    @Nested
+    @DisplayName("Data integrity")
+    class DataIntegrity
+    {
+        @Test
+        @DisplayName("Scan references valid ticket and scanner after save")
+        void scanReferencesValidEntities()
+        {
+            TicketScan scan = createScan();
+            TicketScan saved = ticketScanRepository.saveAndFlush(scan);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+
+            TicketScan loaded = ticketScanRepository.findById(saved.getId()).orElseThrow();
+            assertThat(loaded).isNotNull();
+            assertThat(loaded.getTicket()).isNotNull();
+            assertThat(loaded.getScannedBy()).isNotNull();
+            assertThat(loaded.getTicket().getId()).isNotNull();
+            assertThat(loaded.getScannedBy().getId()).isNotNull();
+
+            assertThat(loaded.getTicket().getId()).isEqualTo(savedTicket.getId());
+            assertThat(loaded.getScannedBy().getId()).isEqualTo(savedScanner.getId());
+        }
+
+        @Test
+        @DisplayName("ScannedAt timestamp survives round-trip")
+        void scannedAtSurvivesRoundTrip()
+        {
+            LocalDateTime scanTime = LocalDateTime.of(2026, 7, 24, 19, 30, 0);
+            TicketScan scan = createScan();
+            scan.setScannedAt(scanTime);
+
+            TicketScan saved = ticketScanRepository.saveAndFlush(scan);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+
+            TicketScan loaded = ticketScanRepository.findById(saved.getId()).orElseThrow();
+            assertThat(loaded).isNotNull();
+            assertThat(loaded.getScannedAt()).isNotNull();
+            assertThat(loaded.getScannedAt()).isEqualTo(scanTime);
+        }
+
+        @Test
+        @DisplayName("DeviceInfo survives round-trip")
+        void deviceInfoSurvivesRoundTrip()
+        {
+            String deviceInfo = "iPhone 15 Pro, iOS 18.2";
+            TicketScan scan = createScan();
+            scan.setDeviceInfo(deviceInfo);
+
+            TicketScan saved = ticketScanRepository.saveAndFlush(scan);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+
+            TicketScan loaded = ticketScanRepository.findById(saved.getId()).orElseThrow();
+            assertThat(loaded).isNotNull();
+            assertThat(loaded.getDeviceInfo()).isNotNull();
+            assertThat(loaded.getDeviceInfo()).isEqualTo(deviceInfo);
+        }
+
+        @Test
+        @DisplayName("Updating ticket present status after scan persists correctly")
+        void updateTicketPresentAfterScan()
+        {
+            TicketScan scan = createScan();
+            TicketScan savedScan = ticketScanRepository.saveAndFlush(scan);
+            assertThat(savedScan).isNotNull();
+
+            savedTicket.setPresent(true);
+            savedTicket = ticketRepository.saveAndFlush(savedTicket);
+            assertThat(savedTicket).isNotNull();
+            assertThat(savedTicket.getId()).isNotNull();
+
+            Ticket loaded = ticketRepository.findById(savedTicket.getId()).orElseThrow();
+            assertThat(loaded).isNotNull();
+            assertThat(loaded.isPresent()).isTrue();
+        }
+    }
 }
