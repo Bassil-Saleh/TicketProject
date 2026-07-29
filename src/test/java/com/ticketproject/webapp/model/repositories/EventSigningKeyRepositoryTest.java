@@ -257,5 +257,24 @@ public class EventSigningKeyRepositoryTest
             assertThatThrownBy(() -> eventRepository.saveAndFlush(saved))
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
+
+        @Test
+        @DisplayName("Duplicate event_id violates unique constraint (one-to-one)")
+        void duplicateEventIdThrowsException()
+        {
+            Event event1 = createEvent();
+            EventSigningKey key1 = createSigningKey(event1);
+            event1.setSigningKey(key1);
+            eventRepository.saveAndFlush(event1);
+
+            Event event2 = createEvent();
+            // Try to create a second signing key for the same event (savedEvent).
+            // This should fail because event_id has a UNIQUE constraint.
+            EventSigningKey key2 = createSigningKey(event1);
+            event2.setSigningKey(key2);
+
+            assertThatThrownBy(() -> eventRepository.saveAndFlush(event2))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        }
     }
 }
