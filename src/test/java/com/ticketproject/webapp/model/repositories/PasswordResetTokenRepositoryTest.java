@@ -146,4 +146,130 @@ public class PasswordResetTokenRepositoryTest
                 .isInstanceOf(DataIntegrityViolationException.class);
         }
     }
+
+    @Nested
+    @DisplayName("Data integrity")
+    class DataIntegrity
+    {
+        @Test
+        @DisplayName("Token references valid eventHost after save")
+        void tokenReferencesValidEventHost()
+        {
+            PasswordResetToken token = createToken();
+            PasswordResetToken saved = passwordResetTokenRepository.saveAndFlush(token);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+
+            PasswordResetToken loaded = passwordResetTokenRepository.findById(saved.getId()).orElseThrow();
+            assertThat(loaded).isNotNull();
+            assertThat(loaded.getEventHost()).isNotNull();
+            assertThat(loaded.getEventHost().getId()).isNotNull();
+
+            assertThat(loaded.getEventHost().getId()).isEqualTo(savedHost.getId());
+        }
+
+        @Test
+        @DisplayName("Token hash survives round-trip")
+        void tokenHashSurvivesRoundTrip()
+        {
+            PasswordResetToken token = createToken();
+            byte[] originalHash = token.getTokenHash();
+
+            PasswordResetToken saved = passwordResetTokenRepository.saveAndFlush(token);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+
+            PasswordResetToken loaded = passwordResetTokenRepository.findById(saved.getId()).orElseThrow();
+            assertThat(loaded).isNotNull();
+            assertThat(loaded.getTokenHash()).isNotNull();
+
+            assertThat(loaded.getTokenHash()).isEqualTo(originalHash);
+        }
+
+        @Test
+        @DisplayName("isUsed returns false for new token")
+        void newTokenIsNotUsed()
+        {
+            PasswordResetToken token = createToken();
+            PasswordResetToken saved = passwordResetTokenRepository.saveAndFlush(token);
+
+            assertThat(saved).isNotNull();
+            assertThat(saved.isUsed()).isFalse();
+        }
+
+        @Test
+        @DisplayName("Setting used to true persists correctly")
+        void setUsedPersists()
+        {
+            PasswordResetToken token = createToken();
+            PasswordResetToken saved = passwordResetTokenRepository.saveAndFlush(token);
+            assertThat(saved).isNotNull();
+
+            saved.setUsed(true);
+            saved = passwordResetTokenRepository.saveAndFlush(saved);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+
+            PasswordResetToken loaded = passwordResetTokenRepository.findById(saved.getId()).orElseThrow();
+            assertThat(loaded).isNotNull();
+            assertThat(loaded.isUsed()).isTrue();
+        }
+
+        @Test
+        @DisplayName("isValid returns true for unused, non-expired token")
+        void isValidForUnusedNonExpired()
+        {
+            PasswordResetToken token = createToken();
+            PasswordResetToken saved = passwordResetTokenRepository.saveAndFlush(token);
+
+            assertThat(saved).isNotNull();
+            assertThat(saved.isValid()).isTrue();
+        }
+
+        @Test
+        @DisplayName("isValid returns false for used token")
+        void isNotValidForUsedToken()
+        {
+            PasswordResetToken token = createToken();
+            PasswordResetToken saved = passwordResetTokenRepository.saveAndFlush(token);
+            assertThat(saved).isNotNull();
+
+            saved.setUsed(true);
+            saved = passwordResetTokenRepository.saveAndFlush(saved);
+            assertThat(saved).isNotNull();
+            assertThat(saved.getId()).isNotNull();
+
+            PasswordResetToken loaded = passwordResetTokenRepository.findById(saved.getId()).orElseThrow();
+            assertThat(loaded.isValid()).isFalse();
+        }
+
+        @Test
+        @DisplayName("isValid returns false for expired token")
+        void isNotValidForExpiredToken()
+        {
+            PasswordResetToken token = createToken();
+            token.setExpires(LocalDateTime.now().minusHours(1));
+            PasswordResetToken saved = passwordResetTokenRepository.saveAndFlush(token);
+
+            assertThat(saved).isNotNull();
+            assertThat(saved.isExpired()).isTrue();
+            assertThat(saved.isValid()).isFalse();
+        }
+
+        @Test
+        @DisplayName("Multiple tokens for same eventHost are allowed")
+        void multipleTokensForSameHost()
+        {
+            PasswordResetToken token1 = createToken();
+            PasswordResetToken saved1 = passwordResetTokenRepository.saveAndFlush(token1);
+            assertThat(saved1).isNotNull();
+
+            PasswordResetToken token2 = createToken();
+            PasswordResetToken saved2 = passwordResetTokenRepository.saveAndFlush(token2);
+
+            assertThat(saved2).isNotNull();
+            assertThat(saved2.getId()).isNotNull();
+            assertThat(passwordResetTokenRepository.findAll()).hasSize(2);
+        }
+    }
 }
