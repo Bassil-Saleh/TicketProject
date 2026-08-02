@@ -31,6 +31,15 @@ public class EventHostService
         this.blindIndexService = blindIndexService;
     }
 
+    /**
+     * Service a request to create a new event host account.
+     * @param request request containing info to create a new event host account
+     * @return a CreateEventHostResponse on success, an ErrorResponse on failure
+     * @throws EventHostEmailAlreadyExistsException if the request contains
+     * an email address already used by a preexisting event host account
+     * @throws EventHostUnderageException if the request contains a date of birth
+     * less than 18 years old
+     */
     public CreateEventHostResponse createEventHost(CreateEventHostRequest request)
     {
         // Check if there already exists an event host account
