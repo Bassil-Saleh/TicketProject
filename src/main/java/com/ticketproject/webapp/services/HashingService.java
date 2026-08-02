@@ -96,7 +96,7 @@ public class HashingService
      */
     public String generateRandomToken()
     {
-        byte[] bytes = new byte[AppConstants.Crypto.HASH_LENGTH_BYTES];
+        byte[] bytes = new byte[AppConstants.Crypto.RANDOM_TOKEN_LENGTH_BYTES];
         new SecureRandom().nextBytes(bytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }

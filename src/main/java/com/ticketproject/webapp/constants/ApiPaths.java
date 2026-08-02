@@ -32,6 +32,7 @@ public final class ApiPaths
         }
 
         public static final String ROOT = "/event-hosts";
+        public static final String VERIFICATION = "/verification";
         public static final String PROFILE = "/profile";
         public static final String FULL_NAME = "/name";
         public static final String EMAIL = "/email";
