@@ -12,6 +12,10 @@ import java.time.temporal.ChronoUnit;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * EventHostService is a service used by controllers to handle API route requests
+ * involving EventHost entities (i.e. new account creation).
+ */
 @Service
 @Transactional
 public class EventHostService

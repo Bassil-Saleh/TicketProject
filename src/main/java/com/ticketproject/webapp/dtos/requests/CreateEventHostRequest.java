@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * CreateEventHostRequest specifies what a valid request to create
@@ -66,7 +67,7 @@ public record CreateEventHostRequest
     )
     String password,
 
-    @NotBlank(message = "Date of birth is required")
+    @NotNull(message = "Date of birth is required")
     @Past(message = "Date of birth must be in the past")
     LocalDate dateOfBirth
 ) {}
