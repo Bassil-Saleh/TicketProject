@@ -3,6 +3,8 @@ package com.ticketproject.webapp.services;
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.dtos.requests.CreateEventHostRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventHostResponse;
+import com.ticketproject.webapp.exceptions.EventHostEmailAlreadyExistsException;
+import com.ticketproject.webapp.exceptions.EventHostUnderageException;
 import com.ticketproject.webapp.model.entities.EventHost;
 import com.ticketproject.webapp.model.repositories.EventHostRepository;
 
@@ -36,7 +38,7 @@ public class EventHostService
         byte[] emailBlinxIndex = blindIndexService.computeIndex(request.email());
         if (eventHostRepository.existsByEmailIndex(emailBlinxIndex))
         {
-            throw new IllegalArgumentException("An account with the provided email address already exists");
+            throw new EventHostEmailAlreadyExistsException("An account with the provided email address already exists");
         }
 
         // Check that the user is at least 18 years old before
@@ -45,7 +47,7 @@ public class EventHostService
         long yearsOld = ChronoUnit.YEARS.between(request.dateOfBirth(), today);
         if (yearsOld < 18)
         {
-            throw new IllegalArgumentException("Must be at least 18 years old to create a new account");
+            throw new EventHostUnderageException("Must be at least 18 years old to create a new account");
         }
 
         // Create a new EventHost entity.
