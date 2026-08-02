@@ -836,6 +836,7 @@ public final class AppConstants
                 public static final int MAX_PASSWORD_LENGTH = 128;
                 public static final int MAX_NAME_LENGTH = 100;
                 public static final int MAX_EMAIL_LENGTH = 254;
+                public static final int VERIFICATION_LINK_DURATION_HOURS = 1;
             }
         }
     }

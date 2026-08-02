@@ -1,5 +1,7 @@
 package com.ticketproject.webapp.dtos.responses;
 
+import jakarta.validation.constraints.NotBlank;
+
 /**
  * CreateEventHostResponse specifies what a valid response to a request
  * for creating a new event host account should look like.
@@ -8,5 +10,9 @@ package com.ticketproject.webapp.dtos.responses;
  */
 public record CreateEventHostResponse
 (
-    String message
+    @NotBlank(message = "Response message cannot be blank")
+    String message,
+
+    @NotBlank(message = "Account verification token cannot be blank")
+    String accountVerificationToken
 ) {}
