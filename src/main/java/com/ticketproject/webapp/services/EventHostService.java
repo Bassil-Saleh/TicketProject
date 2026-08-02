@@ -84,7 +84,7 @@ public class EventHostService
             "Please click it to verify your account. " +
             "The link expires in " +
             AppConstants.DTO.EventHosts.Sizes.VERIFICATION_LINK_DURATION_HOURS +
-            "hour" + 
+            " hour" + 
             (AppConstants.DTO.EventHosts.Sizes.VERIFICATION_LINK_DURATION_HOURS > 1 ? "s" : "") +
             ".";
 
