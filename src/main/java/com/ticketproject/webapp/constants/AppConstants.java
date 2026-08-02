@@ -186,7 +186,7 @@ public final class AppConstants
                 }
 
                 public static final int NAME_LENGTH = 100;
-                public static final int EMAIL_LENGTH = 255;
+                public static final int EMAIL_LENGTH = 254;
             }
 
             public static final class Definitions
@@ -797,5 +797,46 @@ public final class AppConstants
         public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE;
         public static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
         public static final String BLIND_INDEX_KEY_ALGORITHM = "HmacSHA256";
+    }
+
+    public static final class DTO
+    {
+        /**
+         * Private constructor. Not meant to be used.
+         * @throws UnsupportedOperationException
+         */
+        private DTO()
+        {
+            throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+        }
+
+        public static final class EventHosts
+        {
+            /**
+             * Private constructor. Not meant to be used.
+             * @throws UnsupportedOperationException
+             */
+            private EventHosts()
+            {
+                throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+            }
+
+            public static final class Sizes
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private Sizes()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+
+                public static final int MIN_PASSWORD_LENGTH = 12;
+                public static final int MAX_PASSWORD_LENGTH = 128;
+                public static final int MAX_NAME_LENGTH = 100;
+                public static final int MAX_EMAIL_LENGTH = 254;
+            }
+        }
     }
 }

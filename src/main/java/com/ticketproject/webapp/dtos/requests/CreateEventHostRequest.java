@@ -1,0 +1,72 @@
+package com.ticketproject.webapp.dtos.requests;
+
+import com.ticketproject.webapp.constants.AppConstants;
+
+import java.time.LocalDate;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Past;
+
+/**
+ * CreateEventHostRequest specifies what a valid request to create
+ * a new event host account should look like.
+ * @param firstName first name
+ * @param middleName middle name (optional)
+ * @param lastName last name
+ * @param email email address
+ * @param password password
+ * @param dateOfBirth date of birth
+ */
+public record CreateEventHostRequest
+(
+    @NotBlank(message = "First name is required")
+    @Size
+    (
+        max = AppConstants.DTO.EventHosts.Sizes.MAX_NAME_LENGTH,
+        message = "First name must not exceed " + AppConstants.DTO.EventHosts.Sizes.MAX_NAME_LENGTH + " characters"
+    )
+    String firstName,
+
+    @Size
+    (
+        max = AppConstants.DTO.EventHosts.Sizes.MAX_NAME_LENGTH,
+        message = "Middle name must not exceed " + AppConstants.DTO.EventHosts.Sizes.MAX_NAME_LENGTH + " characters"
+    )
+    String middleName,
+
+    @Size
+    (
+        max = AppConstants.DTO.EventHosts.Sizes.MAX_NAME_LENGTH,
+        message = "Last name must not exceed " + AppConstants.DTO.EventHosts.Sizes.MAX_NAME_LENGTH + " characters"
+    )
+    @NotBlank(message = "Last name is required")
+    String lastName,
+
+    @NotBlank(message = "Email address is required")
+    @Email(message = "Must be a valid email address")
+    @Size
+    (
+        max = AppConstants.DTO.EventHosts.Sizes.MAX_EMAIL_LENGTH,
+        message = "Email address must not exceed " + AppConstants.DTO.EventHosts.Sizes.MAX_EMAIL_LENGTH + " characters"
+    )
+    String email,
+
+    @NotBlank(message = "Password is required")
+    @Size
+    (
+        min = AppConstants.DTO.EventHosts.Sizes.MIN_PASSWORD_LENGTH,
+        max = AppConstants.DTO.EventHosts.Sizes.MAX_PASSWORD_LENGTH,
+        message = "Password must be between " +
+        AppConstants.DTO.EventHosts.Sizes.MIN_PASSWORD_LENGTH +
+        " and " +
+        AppConstants.DTO.EventHosts.Sizes.MAX_PASSWORD_LENGTH +
+        " characters long"
+    )
+    String password,
+
+    @NotBlank(message = "Date of birth is required")
+    @Past(message = "Date of birth must be in the past")
+    LocalDate dateOfBirth
+) {}
