@@ -838,6 +838,7 @@ public final class AppConstants
                 public static final int MAX_NAME_LENGTH = 100;
                 public static final int MAX_EMAIL_LENGTH = 254;
                 public static final int VERIFICATION_LINK_DURATION_HOURS = 1;
+                public static final int MAX_ACCOUNT_VERIFICATION_TOKEN_LENGTH = 2 * AppConstants.Crypto.RANDOM_TOKEN_LENGTH_BYTES;
             }
         }
     }

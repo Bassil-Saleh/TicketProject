@@ -2,14 +2,21 @@ package com.ticketproject.webapp.services;
 
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.dtos.requests.CreateEventHostRequest;
+import com.ticketproject.webapp.dtos.requests.VerifyEventHostRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventHostResponse;
+import com.ticketproject.webapp.dtos.responses.VerifyEventHostResponse;
 import com.ticketproject.webapp.exceptions.EventHostEmailAlreadyExistsException;
+import com.ticketproject.webapp.exceptions.EventHostToVerifyNotFoundException;
 import com.ticketproject.webapp.exceptions.EventHostUnderageException;
+import com.ticketproject.webapp.exceptions.EventHostVerificationPeriodExpiredException;
+import com.ticketproject.webapp.exceptions.EventHostInactiveException;
 import com.ticketproject.webapp.model.entities.EventHost;
 import com.ticketproject.webapp.model.repositories.EventHostRepository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,11 +31,13 @@ public class EventHostService
 {
     private final EventHostRepository eventHostRepository;
     private final BlindIndexService blindIndexService;
+    private final HashingService hashingService;
 
-    public EventHostService(EventHostRepository eventHostRepository, BlindIndexService blindIndexService)
+    public EventHostService(EventHostRepository eventHostRepository, BlindIndexService blindIndexService, HashingService hashingService)
     {
         this.eventHostRepository = eventHostRepository;
         this.blindIndexService = blindIndexService;
+        this.hashingService = hashingService;
     }
 
     /**
@@ -90,5 +99,54 @@ public class EventHostService
 
         // Return a response to the user.
         return new CreateEventHostResponse(responseMessage, accountVerificationToken);
+    }
+
+    /**
+     * Service a request to verify an event host account.
+     * @param request request containing a verification token to verify an account
+     * @return a VerifyEventHostResponse on success, an ErrorResponse on failure
+     * @throws EventHostToVerifyNotFoundException if no existing event host account
+     * using the verification token included in the request was found
+     * @throws EventHostVerificationPeriodExpiredException if the verification token
+     * included in the request has expired
+     * @throws EventHostInactiveException if the event host account associated
+     * with the verification token is currently inactive
+     */
+    public VerifyEventHostResponse verifyEventHost(VerifyEventHostRequest request)
+    {
+        // Hash the verification token and search for an EventHost with a matching verification token hash.
+        byte[] hashedVerificationToken = hashingService.hashToken(request.verificationToken());
+        Optional<EventHost> foundEventHost = eventHostRepository.findByVerificationKeyHash(hashedVerificationToken);
+        if (foundEventHost.isEmpty())
+        {
+            throw new EventHostToVerifyNotFoundException("No existing event host account using that verification token was found");
+        }
+
+        EventHost eventHostToVerify = foundEventHost.get();
+
+        // Check whether the verification token has already expired.
+        if (!eventHostToVerify.isVerified() && LocalDateTime.now().isAfter(eventHostToVerify.getVerificationExpires()))
+        {
+            throw new EventHostVerificationPeriodExpiredException("The verification token has expired");
+        }
+
+        // Check whether the event host account is inactive.
+        if (!eventHostToVerify.isActive())
+        {
+            throw new EventHostInactiveException("The event host account is no longer active");
+        }
+
+        // Check whether the account is already verified.
+        if (eventHostToVerify.isVerified())
+        {
+            return new VerifyEventHostResponse("Your account has already been verified.");
+        }
+
+        // Mark the account as verified.
+        eventHostToVerify.setVerified(true);
+        eventHostToVerify.setLastUpdated(LocalDateTime.now());
+        eventHostRepository.save(eventHostToVerify);
+
+        return new VerifyEventHostResponse("Your account has been successfully verified.");
     }
 }

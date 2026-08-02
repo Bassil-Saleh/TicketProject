@@ -75,6 +75,84 @@ public class GlobalExceptionHandler
     }
 
     /**
+     * Handles EventHostToVerifyNotFoundException by returning a
+     * 404 Not Found response.
+     * 
+     * @param ex the exception that was thrown
+     * @param request the HTTP servlet request
+     * @return a ResponseEntity containing the error response and a 404 status
+     */
+    @ExceptionHandler(EventHostToVerifyNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEventHostToVerifyNotFound
+    (
+        EventHostToVerifyNotFoundException ex,
+        HttpServletRequest request
+    )
+    {
+        ErrorResponse errorResponse = new ErrorResponse
+        (
+            Instant.now(),
+            HttpStatus.NOT_FOUND.value(),
+            HttpStatus.NOT_FOUND.getReasonPhrase(),
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Handles EventHostVerificationPeriodExpiredException by returning a
+     * 409 Conflict response.
+     * 
+     * @param ex the exception that was thrown
+     * @param request the HTTP servlet request
+     * @return a ResponseEntity containing the error response and a 409 status
+     */
+    @ExceptionHandler(EventHostVerificationPeriodExpiredException.class)
+    public ResponseEntity<ErrorResponse> handleEventHostVerificationPeriodExpired
+    (
+        EventHostToVerifyNotFoundException ex,
+        HttpServletRequest request
+    )
+    {
+        ErrorResponse errorResponse = new ErrorResponse
+        (
+            Instant.now(),
+            HttpStatus.CONFLICT.value(),
+            HttpStatus.CONFLICT.getReasonPhrase(),
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    /**
+     * Handles EventHostInactiveException by returning a
+     * 409 Conflict response.
+     * 
+     * @param ex the exception that was thrown
+     * @param request the HTTP servlet request
+     * @return a ResponseEntity containing the error response and a 409 status
+     */
+    @ExceptionHandler(EventHostInactiveException.class)
+    public ResponseEntity<ErrorResponse> handleEventHostInactive
+    (
+        EventHostToVerifyNotFoundException ex,
+        HttpServletRequest request
+    )
+    {
+        ErrorResponse errorResponse = new ErrorResponse
+        (
+            Instant.now(),
+            HttpStatus.CONFLICT.value(),
+            HttpStatus.CONFLICT.getReasonPhrase(),
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    /**
      * Handles MethodArgumentNotValidException (thrown when @Valid
      * validation fails on a request body) by returning a
      * 400 Bad Request response with all field-level validation errors
