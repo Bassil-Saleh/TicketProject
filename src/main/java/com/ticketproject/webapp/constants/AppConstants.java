@@ -840,6 +840,20 @@ public final class AppConstants
                 public static final int VERIFICATION_LINK_DURATION_HOURS = 1;
                 public static final int MAX_ACCOUNT_VERIFICATION_TOKEN_LENGTH = 2 * AppConstants.Crypto.RANDOM_TOKEN_LENGTH_BYTES;
             }
+
+            public static final class Definitions
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private Definitions()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+
+                public static final String EMAIL_ADDRESS_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+            }
         }
     }
 }

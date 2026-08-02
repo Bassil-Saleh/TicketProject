@@ -49,9 +49,9 @@ public record CreateEventHostRequest
     @Email
     (
         // Without this regular expression, the @Email annotation will accept
-        // email addresses without a top-level domain. I can't send emails to
-        // addresses without a top-level domain.
-        regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+        // email addresses without a top-level domain, which isn't want I want
+        // because I can't send emails to addresses without a top-level domain.
+        regexp = AppConstants.DTO.EventHosts.Definitions.EMAIL_ADDRESS_REGEX,
         message = "Must be a valid email address"
     )
     @Size
