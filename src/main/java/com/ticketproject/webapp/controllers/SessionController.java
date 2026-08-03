@@ -3,10 +3,12 @@ package com.ticketproject.webapp.controllers;
 import com.ticketproject.webapp.dtos.requests.LoginSessionRequest;
 import com.ticketproject.webapp.dtos.responses.LoginSessionResponse;
 import com.ticketproject.webapp.dtos.responses.LogoutAllDevicesSessionResponse;
+import com.ticketproject.webapp.dtos.responses.LogoutSessionResponse;
 import com.ticketproject.webapp.services.SessionService;
 import com.ticketproject.webapp.constants.ApiPaths;
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.model.entities.EventHost;
+import com.ticketproject.webapp.model.entities.Session;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -55,6 +57,11 @@ public class SessionController
         return sessionService.login(request);
     }
 
+    /**
+     * Handles a request to log out an event host account from all devices.
+     * @param request an HttpServletRequest containing a JWT
+     * @return a LogoutAllDevicesSessionResponse after performing the logout
+     */
     @PatchMapping(ApiPaths.Sessions.LOGOUT_ALL_DEVICES)
     @ResponseStatus(HttpStatus.OK)
     public LogoutAllDevicesSessionResponse logoutAllDevices(HttpServletRequest request)
@@ -65,5 +72,17 @@ public class SessionController
             throw new UnauthorizedException("Authentication required");
         }
         return sessionService.logoutAllDevices(eventHost);
+    }
+
+    @PatchMapping(ApiPaths.Sessions.LOGOUT)
+    @ResponseStatus(HttpStatus.OK)
+    public LogoutSessionResponse logout(HttpServletRequest request)
+    {
+        Session session = (Session) request.getAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_SESSION_ATTRIBUTE);
+        if (session == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+        return sessionService.logout(session);
     }
 }
