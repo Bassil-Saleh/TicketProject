@@ -74,6 +74,11 @@ public class SessionController
         return sessionService.logoutAllDevices(eventHost);
     }
 
+    /**
+     * Handles a request to log out an event host account from the given session.
+     * @param request an HttpServletRequest containing a JWT
+     * @return a LogoutSessionResponse after performing the logout
+     */
     @PatchMapping(ApiPaths.Sessions.LOGOUT)
     @ResponseStatus(HttpStatus.OK)
     public LogoutSessionResponse logout(HttpServletRequest request)

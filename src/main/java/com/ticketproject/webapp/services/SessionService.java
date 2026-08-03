@@ -128,6 +128,16 @@ public class SessionService
         return new LoginSessionResponse(jwt);
     }
 
+    /**
+     * Handle a request to log out of all devices by authenticating the event host
+     * and then marking all active sessions under their account as revoked.
+     * 
+     * @param eventHost the event host (authenticated by JwtAuthenticationFilter)
+     * @return a LogoutAllDevicesSessionResponse containing a message of the request's result
+     * @throws UnauthorizedException if eventHost is null (which can occur if
+     * JwtAuthenticationFilter determines that no proper authentication was
+     * included in the request)
+     */
     public LogoutAllDevicesSessionResponse logoutAllDevices(EventHost eventHost)
     {
         if (eventHost == null)
@@ -151,6 +161,15 @@ public class SessionService
         return new LogoutAllDevicesSessionResponse("You have been logged out from all of your devices.");
     }
 
+    /**
+     * Handle a request to log out of a session by marking
+     * the authenticated session as revoked.
+     * @param session the session (authenticated by JwtAuthenticationFilter)
+     * @return a LogoutSessionResponse containing a message of the request's result
+     * @throws UnauthorizedException if session is null (which can occur if
+     * JwtAuthenticationFilter determines that no proper authentication was
+     * included in the request)
+     */
     public LogoutSessionResponse logout(Session session)
     {
         if (session == null)
