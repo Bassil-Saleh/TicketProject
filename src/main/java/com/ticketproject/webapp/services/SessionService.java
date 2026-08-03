@@ -12,6 +12,7 @@ import com.ticketproject.webapp.model.enums.ClientType;
 import com.ticketproject.webapp.model.repositories.EventHostRepository;
 import com.ticketproject.webapp.model.repositories.SessionRepository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -102,6 +103,9 @@ public class SessionService
         {
             throw new AccountNotVerifiedException("Please verify your account before logging in");
         }
+
+        // Record the date and time which the event host logged in.
+        eventHost.setLastLogin(LocalDateTime.now());
 
         // Create a new Session entity.
         Session session = new Session.Builder()
