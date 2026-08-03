@@ -11,7 +11,7 @@
 
 1. Clone this Git repository to your local machine.
 2. Create a MariaDB database on your local machine.
-3. Use the following command twice to generate two secret encryption keys in Base64 encoding.
+3. Use the following command to generate three secret encryption keys in Base64 encoding.
 They will be used by the application for encrypting/decrypting sensitive information stored
 in some database tables, as well as for computing blind indexes:
 
@@ -49,6 +49,8 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MariaDBDialect
 app.encryption.key-base64=your_first_base64_encoded_secret_key_goes_here
 # For computing blind indexes
 app.blind-index.key-base64=your_second_base64_encoded_secret_key_goes_here
+# For signing and authenticating JSON Web Tokens.
+app.jwt.secret-base64=your_third_base64_encoded_secret_key_goes_here
 ```
 
 5a. To run the application, use this command:
