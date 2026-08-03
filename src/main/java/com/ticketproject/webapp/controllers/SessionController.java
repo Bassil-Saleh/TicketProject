@@ -2,14 +2,20 @@ package com.ticketproject.webapp.controllers;
 
 import com.ticketproject.webapp.dtos.requests.LoginSessionRequest;
 import com.ticketproject.webapp.dtos.responses.LoginSessionResponse;
+import com.ticketproject.webapp.dtos.responses.LogoutAllDevicesSessionResponse;
 import com.ticketproject.webapp.services.SessionService;
 import com.ticketproject.webapp.constants.ApiPaths;
+import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.model.entities.EventHost;
+import com.ticketproject.webapp.exceptions.UnauthorizedException;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -47,5 +53,17 @@ public class SessionController
     )
     {
         return sessionService.login(request);
+    }
+
+    @PatchMapping(ApiPaths.Sessions.LOGOUT_ALL_DEVICES)
+    @ResponseStatus(HttpStatus.OK)
+    public LogoutAllDevicesSessionResponse logoutAllDevices(HttpServletRequest request)
+    {
+        EventHost eventHost = (EventHost) request.getAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_EVENT_HOST_ATTRIBUTE);
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+        return sessionService.logoutAllDevices(eventHost);
     }
 }

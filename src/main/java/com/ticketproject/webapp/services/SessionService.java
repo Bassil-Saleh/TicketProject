@@ -1,11 +1,12 @@
 package com.ticketproject.webapp.services;
 
-import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.dtos.requests.LoginSessionRequest;
 import com.ticketproject.webapp.dtos.responses.LoginSessionResponse;
+import com.ticketproject.webapp.dtos.responses.LogoutAllDevicesSessionResponse;
 import com.ticketproject.webapp.exceptions.AccountNotVerifiedException;
 import com.ticketproject.webapp.exceptions.EventHostInactiveException;
 import com.ticketproject.webapp.exceptions.InvalidCredentialsException;
+import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.model.entities.EventHost;
 import com.ticketproject.webapp.model.entities.Session;
 import com.ticketproject.webapp.model.enums.ClientType;
@@ -14,6 +15,7 @@ import com.ticketproject.webapp.model.repositories.SessionRepository;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -123,5 +125,28 @@ public class SessionService
         String jwt = jwtService.generateToken(rawSessionToken, session.getExpires());
 
         return new LoginSessionResponse(jwt);
+    }
+
+    public LogoutAllDevicesSessionResponse logoutAllDevices(EventHost eventHost)
+    {
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+        // Find every Session entity associated with the logged in event host.
+        List<Session> activeSessions = sessionRepository.findAllActiveSessionsByEventHost(eventHost);
+        // Mark each Session entity as revoked and save them to the database.
+        LocalDateTime revokedDateTime = LocalDateTime.now();
+        List<Session> revokedSessions = activeSessions
+            .stream()
+            .map(session ->
+            {
+                session.setRevoked(revokedDateTime);
+                return session;
+            })
+            .toList();
+        sessionRepository.saveAll(revokedSessions);
+
+        return new LogoutAllDevicesSessionResponse("You have been logged out from all of your devices.");
     }
 }
