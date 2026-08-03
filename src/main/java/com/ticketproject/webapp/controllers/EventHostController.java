@@ -3,10 +3,15 @@ package com.ticketproject.webapp.controllers;
 import com.ticketproject.webapp.dtos.requests.CreateEventHostRequest;
 import com.ticketproject.webapp.dtos.requests.VerifyEventHostRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventHostResponse;
+import com.ticketproject.webapp.dtos.responses.GetEventHostProfileResponse;
 import com.ticketproject.webapp.dtos.responses.VerifyEventHostResponse;
+import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.services.EventHostService;
 import com.ticketproject.webapp.constants.ApiPaths;
+import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.model.entities.EventHost;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -16,7 +21,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
+import org.springframework.web.bind.annotation.GetMapping;
 
 /**
  * EventHostController is a REST controller that routes requests
@@ -63,5 +68,16 @@ public class EventHostController
     )
     {
         return eventHostService.verifyEventHost(request);
+    }
+
+    @GetMapping(ApiPaths.EventHosts.PROFILE)
+    public GetEventHostProfileResponse getEventHostProfile(HttpServletRequest request)
+    {
+        EventHost eventHost = (EventHost) request.getAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_EVENT_HOST_ATTRIBUTE);
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+        return eventHostService.getEventHostProfile(eventHost);
     }
 }

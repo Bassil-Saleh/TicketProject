@@ -4,13 +4,16 @@ import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.dtos.requests.CreateEventHostRequest;
 import com.ticketproject.webapp.dtos.requests.VerifyEventHostRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventHostResponse;
+import com.ticketproject.webapp.dtos.responses.GetEventHostProfileResponse;
 import com.ticketproject.webapp.dtos.responses.VerifyEventHostResponse;
 import com.ticketproject.webapp.exceptions.EventHostEmailAlreadyExistsException;
 import com.ticketproject.webapp.exceptions.EventHostToVerifyNotFoundException;
 import com.ticketproject.webapp.exceptions.EventHostUnderageException;
 import com.ticketproject.webapp.exceptions.EventHostVerificationPeriodExpiredException;
+import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.exceptions.EventHostInactiveException;
 import com.ticketproject.webapp.model.entities.EventHost;
+import com.ticketproject.webapp.model.repositories.AddressBookContactRepository;
 import com.ticketproject.webapp.model.repositories.EventHostRepository;
 
 import java.time.LocalDate;
@@ -29,15 +32,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class EventHostService
 {
+    private final AddressBookContactRepository addressBookContactRepository;
     private final EventHostRepository eventHostRepository;
     private final BlindIndexService blindIndexService;
     private final HashingService hashingService;
 
-    public EventHostService(EventHostRepository eventHostRepository, BlindIndexService blindIndexService, HashingService hashingService)
+    public EventHostService(EventHostRepository eventHostRepository, BlindIndexService blindIndexService, HashingService hashingService, AddressBookContactRepository addressBookContactRepository)
     {
         this.eventHostRepository = eventHostRepository;
         this.blindIndexService = blindIndexService;
         this.hashingService = hashingService;
+        this.addressBookContactRepository = addressBookContactRepository;
     }
 
     /**
@@ -148,5 +153,21 @@ public class EventHostService
         eventHostRepository.save(eventHostToVerify);
 
         return new VerifyEventHostResponse("Your account has been successfully verified.");
+    }
+
+    public GetEventHostProfileResponse getEventHostProfile(EventHost eventHost)
+    {
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+        return new GetEventHostProfileResponse
+        (
+            eventHost.getFirstName(),
+            eventHost.getMiddleName(),
+            eventHost.getLastName(),
+            eventHost.getEmail(),
+            eventHost.getLastLogin()
+        );
     }
 }

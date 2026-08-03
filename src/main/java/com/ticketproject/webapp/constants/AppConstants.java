@@ -887,5 +887,29 @@ public final class AppConstants
          * Matches the login session duration.
          */
         public static final int EXPIRATION_HOURS = AppConstants.Database.Sessions.Sizes.LOGIN_SESSION_DURATION_HOURS;
+
+        public static final class Filter
+        {
+            /**
+             * Private constructor. Not meant to be used.
+             * @throws UnsupportedOperationException
+             */
+            private Filter()
+            {
+                throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+            }
+            /**
+             * The request attribute key under which the authenticated EventHost is stored.
+             */
+            public static final String AUTHENTICATED_EVENT_HOST_ATTRIBUTE = "authenticatedEventHost";
+
+            /**
+             * The request attribute key under which the authenticated Session is stored.
+             */
+            public static final String AUTHENTICATED_SESSION_ATTRIBUTE = "authenticatedSession";
+
+            public static final String AUTHORIZATION_HEADER = "Authorization";
+            public static final String BEARER_PREFIX = "Bearer ";
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.ticketproject.webapp.filters;
 
+import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.model.entities.EventHost;
 import com.ticketproject.webapp.model.entities.Session;
 import com.ticketproject.webapp.model.repositories.SessionRepository;
@@ -35,19 +36,6 @@ import java.util.Optional;
  */
 public class JwtAuthenticationFilter implements Filter
 {
-    /**
-     * The request attribute key under which the authenticated EventHost is stored.
-     */
-    public static final String AUTHENTICATED_EVENT_HOST_ATTRIBUTE = "authenticatedEventHost";
-
-    /**
-     * The request attribute key under which the authenticated Session is stored.
-     */
-    public static final String AUTHENTICATED_SESSION_ATTRIBUTE = "authenticatedSession";
-
-    private static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String BEARER_PREFIX = "Bearer ";
-
     private final JwtService jwtService;
     private final HashingService hashingService;
     private final SessionRepository sessionRepository;
@@ -102,13 +90,13 @@ public class JwtAuthenticationFilter implements Filter
      */
     private void authenticateRequest(HttpServletRequest httpRequest)
     {
-        String authHeader = httpRequest.getHeader(AUTHORIZATION_HEADER);
-        if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX))
+        String authHeader = httpRequest.getHeader(AppConstants.Jwt.Filter.AUTHORIZATION_HEADER);
+        if (authHeader == null || !authHeader.startsWith(AppConstants.Jwt.Filter.BEARER_PREFIX))
         {
             return;
         }
 
-        String jwt = authHeader.substring(BEARER_PREFIX.length());
+        String jwt = authHeader.substring(AppConstants.Jwt.Filter.BEARER_PREFIX.length());
 
         try
         {
@@ -134,8 +122,8 @@ public class JwtAuthenticationFilter implements Filter
 
             // Set the authenticated EventHost and Session as request attributes.
             EventHost eventHost = session.getEventHost();
-            httpRequest.setAttribute(AUTHENTICATED_EVENT_HOST_ATTRIBUTE, eventHost);
-            httpRequest.setAttribute(AUTHENTICATED_SESSION_ATTRIBUTE, session);
+            httpRequest.setAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_EVENT_HOST_ATTRIBUTE, eventHost);
+            httpRequest.setAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_SESSION_ATTRIBUTE, session);
         }
         catch (JwtException e)
         {

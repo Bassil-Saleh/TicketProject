@@ -20,6 +20,6 @@ public interface SessionRepository extends JpaRepository<Session, Long>
      * @param hash the token hash to search for
      * @return an Optional containing the Session if found, empty otherwise
      */
-    @Query("SELECT s FROM Session s WHERE s.tokenHash = :hash")
+    @Query("SELECT s FROM Session s JOIN FETCH s.eventHost WHERE s.tokenHash = :hash")
     Optional<Session> findByTokenHash(@Param("hash") byte[] hash);
 }
