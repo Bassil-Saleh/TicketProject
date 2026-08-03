@@ -70,6 +70,13 @@ public class EventHostController
         return eventHostService.verifyEventHost(request);
     }
 
+    /**
+     * Handles a request to retrieve profile info on a logged in EventHost.
+     * @param request an HttpServletRequest from the client
+     * containing a JWT in the Authorization header
+     * @return a GetEventHostProfileResponse containing profile info
+     * on the logged in EventHost
+     */
     @GetMapping(ApiPaths.EventHosts.PROFILE)
     public GetEventHostProfileResponse getEventHostProfile(HttpServletRequest request)
     {
