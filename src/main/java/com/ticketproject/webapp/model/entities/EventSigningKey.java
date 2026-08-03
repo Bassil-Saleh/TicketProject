@@ -11,6 +11,9 @@ import java.security.PublicKey;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 /**
  * EventSigningKey is an entity representing a record that stores a key pair
  * (a public key and a private key) for each event, used to authenticate
@@ -51,6 +54,7 @@ public class EventSigningKey
         name = AppConstants.Database.EventSigningKeys.TableNames.COLUMN_EVENT_ID,
         nullable = false
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Event event;
 
     /**

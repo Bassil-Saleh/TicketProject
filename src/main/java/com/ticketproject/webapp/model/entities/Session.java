@@ -9,6 +9,9 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 /**
  * Session is an entity representing a record of info used
  * to maintain an event host's login session.
@@ -42,6 +45,7 @@ public class Session
         name = AppConstants.Database.Sessions.TableNames.COLUMN_EVENT_HOST_ID,
         nullable = false
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private EventHost eventHost;
 
     /**

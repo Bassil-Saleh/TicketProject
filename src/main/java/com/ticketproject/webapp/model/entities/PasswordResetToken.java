@@ -8,6 +8,9 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 /**
  * PasswordResetToken is an entity representing a record on
  * a password reset token sent to an event host.
@@ -33,6 +36,7 @@ public class PasswordResetToken
         name = AppConstants.Database.PasswordResetTokens.TableNames.COLUMN_EVENT_HOST_ID,
         nullable = false
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private EventHost eventHost;
 
     /**

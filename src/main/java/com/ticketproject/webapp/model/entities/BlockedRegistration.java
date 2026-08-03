@@ -3,6 +3,9 @@ package com.ticketproject.webapp.model.entities;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.ticketproject.webapp.constants.AppConstants;
 
 import jakarta.persistence.Column;
@@ -40,6 +43,7 @@ public class BlockedRegistration
         name = AppConstants.Database.BlockedRegistrations.TableNames.COLUMN_ATTENDEE_ID,
         nullable = false
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Attendee attendee;
 
     /**
@@ -52,6 +56,7 @@ public class BlockedRegistration
         name = AppConstants.Database.BlockedRegistrations.TableNames.COLUMN_EVENT_ID,
         nullable = false
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Event event;
 
     /**
@@ -64,6 +69,7 @@ public class BlockedRegistration
         name = AppConstants.Database.BlockedRegistrations.TableNames.COLUMN_BLOCKED_BY,
         nullable = false
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private EventHost blockedBy;
 
     /**

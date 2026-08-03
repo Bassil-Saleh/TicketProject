@@ -7,6 +7,9 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 /**
  * Ticket is an entity representing a record that stores info
  * on a digital ticket for use by an attendee.
@@ -76,6 +79,7 @@ public class Ticket
         name = AppConstants.Database.Tickets.TableNames.COLUMN_ATTENDEE_ID,
         nullable = false
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Attendee attendee;
 
     /**
@@ -87,6 +91,7 @@ public class Ticket
         name = AppConstants.Database.Tickets.TableNames.COLUMN_EVENT_ID,
         nullable = false
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Event event;
 
     /**

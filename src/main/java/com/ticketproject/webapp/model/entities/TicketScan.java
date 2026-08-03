@@ -6,6 +6,9 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 /**
  * TicketScan is an entity representing a record that stores info on a scanned ticket,
  * such as when the ticket was scanned and by whom it was scanned.
@@ -39,6 +42,7 @@ public class TicketScan
         name = AppConstants.Database.TicketScans.TableNames.COLUMN_TICKET_ID,
         nullable = false
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Ticket ticket;
 
     /**
@@ -50,6 +54,7 @@ public class TicketScan
         name = AppConstants.Database.TicketScans.TableNames.COLUMN_SCANNED_BY,
         nullable = false
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private EventHost scannedBy;
 
     /**
