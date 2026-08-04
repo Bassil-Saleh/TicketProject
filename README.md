@@ -51,6 +51,18 @@ app.encryption.key-base64=your_first_base64_encoded_secret_key_goes_here
 app.blind-index.key-base64=your_second_base64_encoded_secret_key_goes_here
 # For signing and authenticating JSON Web Tokens.
 app.jwt.secret-base64=your_third_base64_encoded_secret_key_goes_here
+
+# SMTP server config used by this application to send out emails to users
+spring.mail.host=your_smtp_hostname_goes_here
+spring.mail.port=your_smtp_port_goes_here
+spring.mail.username=your_smtp_username_goes_here
+spring.mail.password=your_smtp_password_goes_here
+# Enable/disable SMTP authentication.
+# Set this to true or false based on your needs.
+spring.mail.properties.mail.smtp.auth=true_or_false
+# Enable/disable StartTLS encryption.
+# Set this to true or false based on your needs.
+spring.mail.properties.mail.smtp.starttls.enable=true_or_false
 ```
 
 5a. To run the application, use this command:
