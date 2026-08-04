@@ -237,6 +237,13 @@ public class EventHost
     @OneToMany(mappedBy = AppConstants.Database.EventHosts.MappedByNames.MAPPED_BY_SCANNED_BY)
     private Set<TicketScan> ticketScans = new HashSet<>();
 
+    /**
+     * An event host can have multiple login sessions over the lifespan of their account,
+     * but each session can only belong to a single event host.
+     */
+    @OneToMany(mappedBy = AppConstants.Database.EventHosts.MappedByNames.MAPPED_BY_EVENT_HOST)
+    private Set<Session> sessions = new HashSet<>();
+
     // ************************************************
     // Constructors
     // ************************************************
@@ -303,6 +310,7 @@ public class EventHost
     public Set<PasswordResetToken> getPasswordResetTokens()   { return this.passwordResetTokens; }
     public Set<BlockedRegistration> getBlockedRegistrations() { return this.blockedRegistrations; }
     public Set<TicketScan> getTicketScans()                   { return this.ticketScans; }
+    public Set<Session> getSessions()                         { return this.sessions; }
 
     // ************************************************
     // Setters
@@ -360,6 +368,7 @@ public class EventHost
     public void setPasswordResetTokens(Set<PasswordResetToken> passwordResetTokens)    { this.passwordResetTokens = passwordResetTokens; }
     public void setBlockedRegistrations(Set<BlockedRegistration> blockedRegistrations) { this.blockedRegistrations = blockedRegistrations; }
     public void setTicketScans(Set<TicketScan> ticketScans)                            { this.ticketScans = ticketScans; }
+    public void setSessions(Set<Session> sessions)                                     { this.sessions = sessions; }
     /**
      * To handle edge cases where JPA loads a partially-constructed
      * entity or when someone uses reflection.
