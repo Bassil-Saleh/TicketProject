@@ -2,8 +2,10 @@ package com.ticketproject.webapp.services;
 
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.dtos.requests.CreateEventHostRequest;
+import com.ticketproject.webapp.dtos.requests.EditEventHostNameRequest;
 import com.ticketproject.webapp.dtos.requests.VerifyEventHostRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventHostResponse;
+import com.ticketproject.webapp.dtos.responses.EditEventHostNameResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventHostProfileResponse;
 import com.ticketproject.webapp.dtos.responses.VerifyEventHostResponse;
 import com.ticketproject.webapp.exceptions.EventHostEmailAlreadyExistsException;
@@ -155,6 +157,14 @@ public class EventHostService
         return new VerifyEventHostResponse("Your account has been successfully verified.");
     }
 
+    /**
+     * Service a request to get an event host account's profile info.
+     * 
+     * @param eventHost the authenticated EventHost
+     * @return a GetEventHostProfileResponse on success, an ErrorResponse on failure
+     * @throws UnauthorizedException if eventHost is null (implying that the 
+     * JWT authentication filter could not authenticate an EventHost)
+     */
     public GetEventHostProfileResponse getEventHostProfile(EventHost eventHost)
     {
         if (eventHost == null)
@@ -169,5 +179,29 @@ public class EventHostService
             eventHost.getEmail(),
             eventHost.getLastLogin()
         );
+    }
+
+    /**
+     * Service a request to edit an event host's full name.
+     * @param eventHost the authenticated EventHost
+     * @param request the request body
+     * @return an EditEventHostNameResponse on success, an ErrorResponse on failure
+     * @throws UnauthorizedException if eventHost is null (implying that the 
+     * JWT authentication filter could not authenticate an EventHost)
+     */
+    public EditEventHostNameResponse editEventHostName(EventHost eventHost, EditEventHostNameRequest request)
+    {
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+
+        eventHost.setFirstName(request.firstName());
+        eventHost.setMiddleName(request.middleName());
+        eventHost.setLastName(request.lastName());
+        eventHost.setLastUpdated(LocalDateTime.now());
+        eventHostRepository.save(eventHost);
+
+        return new EditEventHostNameResponse("Your name has been updated.");
     }
 }

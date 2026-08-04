@@ -1,10 +1,12 @@
 package com.ticketproject.webapp.controllers;
 
 import com.ticketproject.webapp.dtos.requests.CreateEventHostRequest;
+import com.ticketproject.webapp.dtos.requests.EditEventHostNameRequest;
 import com.ticketproject.webapp.dtos.requests.VerifyEventHostRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventHostResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventHostProfileResponse;
 import com.ticketproject.webapp.dtos.responses.VerifyEventHostResponse;
+import com.ticketproject.webapp.dtos.responses.EditEventHostNameResponse;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.services.EventHostService;
 import com.ticketproject.webapp.constants.ApiPaths;
@@ -86,5 +88,29 @@ public class EventHostController
             throw new UnauthorizedException("Authentication required");
         }
         return eventHostService.getEventHostProfile(eventHost);
+    }
+
+    /**
+     * Handles a request to change the full name of the logged in EventHost.
+     * @param request the request body
+     * @param servletRequest an HttpServletRequest from the client
+     * containing a JWT in the Authorization header
+     * @return an EditEventHostNameResponse describing the request's result
+     */
+    @PatchMapping(ApiPaths.EventHosts.FULL_NAME)
+    public EditEventHostNameResponse editEventHostName
+    (
+        @Valid
+        @RequestBody
+        EditEventHostNameRequest request,
+        HttpServletRequest servletRequest
+    )
+    {
+        EventHost eventHost = (EventHost) servletRequest.getAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_EVENT_HOST_ATTRIBUTE);
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+        return eventHostService.editEventHostName(eventHost, request);
     }
 }
