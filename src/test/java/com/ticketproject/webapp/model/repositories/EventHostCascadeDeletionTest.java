@@ -289,5 +289,45 @@ public class EventHostCascadeDeletionTest
             deleteEventHost();
             assertThat(eventRepository.findById(eventId)).isEmpty();
         }
+
+        @Test
+        @DisplayName("Deleting EventHost removes associated Sessions")
+        void deletingEventHostRemovesSessions()
+        {
+            deleteEventHost();
+            assertThat(sessionRepository.findById(sessionId)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deleting EventHost removes associated PasswordResetTokens")
+        void deletingEventHostRemovesPasswordResetTokens()
+        {
+            deleteEventHost();
+            assertThat(passwordResetTokenRepository.findById(passwordResetTokenId)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deleting EventHost removes associated AddressBookContacts")
+        void deletingEventHostRemovesAddressBookContacts()
+        {
+            deleteEventHost();
+            assertThat(addressBookContactRepository.findById(addressBookContactId)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deleting EventHost removes BlockedRegistrations where blockedBy is the host")
+        void deletingEventHostRemovesBlockedRegistrationsViaBlockedBy()
+        {
+            deleteEventHost();
+            assertThat(blockedRegistrationRepository.findById(blockedRegistrationId)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deleting EventHost removes TicketScans where scannedBy is the host")
+        void deletingEventHostRemovesTicketScansViaScannedBy()
+        {
+            deleteEventHost();
+            assertThat(ticketScanRepository.findById(ticketScanId)).isEmpty();
+        }
     }
 }
