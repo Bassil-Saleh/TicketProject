@@ -6,6 +6,7 @@ import com.ticketproject.webapp.dtos.requests.EditEventHostNameRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventHostPasswordRequest;
 import com.ticketproject.webapp.dtos.requests.VerifyEventHostRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventHostResponse;
+import com.ticketproject.webapp.dtos.responses.DeleteEventHostResponse;
 import com.ticketproject.webapp.dtos.responses.EditEventHostEmailResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventHostProfileResponse;
 import com.ticketproject.webapp.dtos.responses.VerifyEventHostResponse;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
@@ -162,5 +164,22 @@ public class EventHostController
             throw new UnauthorizedException("Authentication required");
         }
         return eventHostService.editEventHostEmail(eventHost, request);
+    }
+
+    /**
+     * Handles a reques to delete the logged in event host's account
+     * (which should also delete any other data related to said account).
+     * @param request the HttpServletRequest from the client
+     * @return an DeleteEventHostResponse describing the request's result
+     */
+    @DeleteMapping
+    public DeleteEventHostResponse deleteEventHost(HttpServletRequest request)
+    {
+        EventHost eventHost = (EventHost) request.getAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_EVENT_HOST_ATTRIBUTE);
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+        return eventHostService.deleteEventHost(eventHost);
     }
 }

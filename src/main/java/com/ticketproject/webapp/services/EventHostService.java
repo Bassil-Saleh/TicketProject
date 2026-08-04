@@ -7,6 +7,7 @@ import com.ticketproject.webapp.dtos.requests.EditEventHostNameRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventHostPasswordRequest;
 import com.ticketproject.webapp.dtos.requests.VerifyEventHostRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventHostResponse;
+import com.ticketproject.webapp.dtos.responses.DeleteEventHostResponse;
 import com.ticketproject.webapp.dtos.responses.EditEventHostNameResponse;
 import com.ticketproject.webapp.dtos.responses.EditEventHostPasswordResponse;
 import com.ticketproject.webapp.dtos.responses.EditEventHostEmailResponse;
@@ -16,12 +17,14 @@ import com.ticketproject.webapp.exceptions.EventHostEmailAlreadyExistsException;
 import com.ticketproject.webapp.exceptions.EventHostToVerifyNotFoundException;
 import com.ticketproject.webapp.exceptions.EventHostUnderageException;
 import com.ticketproject.webapp.exceptions.EventHostVerificationPeriodExpiredException;
+import com.ticketproject.webapp.exceptions.PendingEventsExistException;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.exceptions.EventHostInactiveException;
 import com.ticketproject.webapp.model.entities.EventHost;
 import com.ticketproject.webapp.model.repositories.AddressBookContactRepository;
 import com.ticketproject.webapp.model.repositories.EventHostRepository;
 
+import com.ticketproject.webapp.model.repositories.EventRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -39,17 +42,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class EventHostService
 {
+    private final EventRepository eventRepository;
     private final AddressBookContactRepository addressBookContactRepository;
     private final EventHostRepository eventHostRepository;
     private final BlindIndexService blindIndexService;
     private final HashingService hashingService;
 
-    public EventHostService(EventHostRepository eventHostRepository, BlindIndexService blindIndexService, HashingService hashingService, AddressBookContactRepository addressBookContactRepository)
+    public EventHostService(EventHostRepository eventHostRepository, BlindIndexService blindIndexService, HashingService hashingService, AddressBookContactRepository addressBookContactRepository, EventRepository eventRepository)
     {
         this.eventHostRepository = eventHostRepository;
         this.blindIndexService = blindIndexService;
         this.hashingService = hashingService;
         this.addressBookContactRepository = addressBookContactRepository;
+        this.eventRepository = eventRepository;
     }
 
     /**
@@ -263,5 +268,31 @@ public class EventHostService
         eventHostRepository.save(eventHost);
 
         return new EditEventHostEmailResponse("Your email address has been updated.");
+    }
+
+    /**
+     * Services a request to delete an event host's account.
+     * @param eventHost the authenticated EventHost
+     * @return a DeleteEventHostResponse on success
+     * @throws UnauthorizedException if eventHost is null (implying that the 
+     * JWT authentication filter could not authenticate an EventHost)
+     * @throws PendingEventsExistException if there exists at least one event
+     * under the event host's account which has not ended yet
+     */
+    public DeleteEventHostResponse deleteEventHost(EventHost eventHost)
+    {
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+
+        if (eventRepository.activeEventsByEventHostIdExist(eventHost.getId()))
+        {
+            throw new PendingEventsExistException
+            ("You have at least one event under your account that has not ended yet. Please cancel those events before deleting your account.");
+        }
+
+        eventHostRepository.delete(eventHost);
+        return new DeleteEventHostResponse("Your account has been successfully deleted.");
     }
 }
