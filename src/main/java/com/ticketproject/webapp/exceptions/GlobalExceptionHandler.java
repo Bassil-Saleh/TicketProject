@@ -231,6 +231,32 @@ public class GlobalExceptionHandler
     }
 
     /**
+     * Handles EmailSendFailedException by returning a
+     * 503 Service Unavailable response.
+     *
+     * @param ex      the exception that was thrown
+     * @param request the HTTP servlet request
+     * @return a ResponseEntity containing the error response and a 503 status
+     */
+    @ExceptionHandler(EmailSendFailedException.class)
+    public ResponseEntity<ErrorResponse> handleEmailSendFailed
+    (
+        EmailSendFailedException ex,
+        HttpServletRequest request
+    )
+    {
+        ErrorResponse errorResponse = new ErrorResponse
+        (
+            Instant.now(),
+            HttpStatus.SERVICE_UNAVAILABLE.value(),
+            HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase(),
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    /**
      * Handles MethodArgumentNotValidException (thrown when @Valid
      * validation fails on a request body) by returning a
      * 400 Bad Request response with all field-level validation errors
