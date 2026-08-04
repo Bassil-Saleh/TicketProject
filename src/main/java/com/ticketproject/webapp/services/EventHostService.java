@@ -5,7 +5,6 @@ import com.ticketproject.webapp.dtos.requests.CreateEventHostRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventHostEmailRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventHostNameRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventHostPasswordRequest;
-import com.ticketproject.webapp.dtos.requests.VerifyEventHostRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventHostResponse;
 import com.ticketproject.webapp.dtos.responses.DeleteEventHostResponse;
 import com.ticketproject.webapp.dtos.responses.EditEventHostNameResponse;
@@ -47,14 +46,16 @@ public class EventHostService
     private final EventHostRepository eventHostRepository;
     private final BlindIndexService blindIndexService;
     private final HashingService hashingService;
+    private final EmailService emailService;
 
-    public EventHostService(EventHostRepository eventHostRepository, BlindIndexService blindIndexService, HashingService hashingService, AddressBookContactRepository addressBookContactRepository, EventRepository eventRepository)
+    public EventHostService(EventHostRepository eventHostRepository, BlindIndexService blindIndexService, HashingService hashingService, AddressBookContactRepository addressBookContactRepository, EventRepository eventRepository, EmailService emailService)
     {
         this.eventHostRepository = eventHostRepository;
         this.blindIndexService = blindIndexService;
         this.hashingService = hashingService;
         this.addressBookContactRepository = addressBookContactRepository;
         this.eventRepository = eventRepository;
+        this.emailService = emailService;
     }
 
     /**
@@ -97,12 +98,13 @@ public class EventHostService
             .plaintextPassword(request.password())
             .build();
         String accountVerificationToken = newEventHost.generateVerificationToken();
-        // TODO: instead of returning the account verification token
-        // directly in the response, call a service to send an email
-        // which includes a URL with the account verification token in it.
-        //
-        // Also, do not commit anything to the database unless
-        // the email has been successfully sent.
+
+        // Send the verification email FIRST, before persisting to the database.
+        // If the email fails to send, the @Transactional annotation will roll back
+        // the transaction and nothing will be persisted.
+        emailService.sendVerificationEmail(request.email(), accountVerificationToken);
+
+        // Only persist the entity after the email has been successfully sent.
         newEventHost = eventHostRepository.save(newEventHost);
 
         String responseMessage = 
@@ -115,24 +117,24 @@ public class EventHostService
             ".";
 
         // Return a response to the user.
-        return new CreateEventHostResponse(responseMessage, accountVerificationToken);
+        return new CreateEventHostResponse(responseMessage);
     }
 
     /**
      * Service a request to verify an event host account.
-     * @param request request containing a verification token to verify an account
+     * @param verificationToken the verification token from the email link
      * @return a VerifyEventHostResponse on success, an ErrorResponse on failure
      * @throws EventHostToVerifyNotFoundException if no existing event host account
-     * using the verification token included in the request was found
+     * using the verification token was found
      * @throws EventHostVerificationPeriodExpiredException if the verification token
-     * included in the request has expired
+     * has expired
      * @throws EventHostInactiveException if the event host account associated
      * with the verification token is currently inactive
      */
-    public VerifyEventHostResponse verifyEventHost(VerifyEventHostRequest request)
+    public VerifyEventHostResponse verifyEventHost(String verificationToken)
     {
         // Hash the verification token and search for an EventHost with a matching verification token hash.
-        byte[] hashedVerificationToken = hashingService.hashToken(request.verificationToken());
+        byte[] hashedVerificationToken = hashingService.hashToken(verificationToken);
         Optional<EventHost> foundEventHost = eventHostRepository.findByVerificationKeyHash(hashedVerificationToken);
         if (foundEventHost.isEmpty())
         {
