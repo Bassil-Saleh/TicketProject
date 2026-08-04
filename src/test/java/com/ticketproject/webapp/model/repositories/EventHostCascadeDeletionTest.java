@@ -330,4 +330,49 @@ public class EventHostCascadeDeletionTest
             assertThat(ticketScanRepository.findById(ticketScanId)).isEmpty();
         }
     }
+
+    @Nested
+    @DisplayName("Cascade through Event to deeper children")
+    class CascadeThroughEvent
+    {
+        @Test
+        @DisplayName("Deleting EventHost cascades through Event to remove EventAddress")
+        void deletingEventHostCascadesThroughEventToEventAddress()
+        {
+            deleteEventHost();
+            assertThat(eventAddressRepository.findById(eventAddressId)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deleting EventHost cascades through Event to remove EventSigningKey")
+        void deletingEventHostCascadesThroughEventToEventSigningKey()
+        {
+            deleteEventHost();
+            assertThat(eventSigningKeyRepository.findById(eventSigningKeyId)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deleting EventHost cascades through Event to remove Tickets")
+        void deletingEventHostCascadesThroughEventToTickets()
+        {
+            deleteEventHost();
+            assertThat(ticketRepository.findById(ticketId)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deleting EventHost cascades through Event and Ticket to remove TicketScans")
+        void deletingEventHostCascadesThroughEventToTicketScans()
+        {
+            deleteEventHost();
+            assertThat(ticketScanRepository.findById(ticketScanId)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deleting EventHost cascades through Event to remove BlockedRegistrations")
+        void deletingEventHostCascadesThroughEventToBlockedRegistrations()
+        {
+            deleteEventHost();
+            assertThat(blockedRegistrationRepository.findById(blockedRegistrationId)).isEmpty();
+        }
+    }
 }
