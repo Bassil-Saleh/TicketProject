@@ -4,7 +4,6 @@ import com.ticketproject.webapp.dtos.requests.CreateEventHostRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventHostEmailRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventHostNameRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventHostPasswordRequest;
-import com.ticketproject.webapp.dtos.requests.VerifyEventHostRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventHostResponse;
 import com.ticketproject.webapp.dtos.responses.DeleteEventHostResponse;
 import com.ticketproject.webapp.dtos.responses.EditEventHostEmailResponse;
@@ -27,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -64,18 +64,18 @@ public class EventHostController
 
     /**
      * Handles a request to verify a new EventHost.
-     * @param request a VerifyEventHostRequest from the client
+     * This endpoint is accessed via a clickable link in the verification email.
+     * @param verificationToken the verification token from the email link
      * @return a VerifyEventHostResponse indicating the result of the request
      */
-    @PatchMapping(ApiPaths.EventHosts.VERIFICATION)
+    @GetMapping(ApiPaths.EventHosts.VERIFICATION)
     @ResponseStatus(HttpStatus.OK)
     public VerifyEventHostResponse verifyEventHost
     (
-        @Valid
-        @RequestBody VerifyEventHostRequest request
+        @RequestParam("token") String verificationToken
     )
     {
-        return eventHostService.verifyEventHost(request);
+        return eventHostService.verifyEventHost(verificationToken);
     }
 
     /**
