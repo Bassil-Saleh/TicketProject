@@ -10,9 +10,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
 /**
  * EventAddress is an entity representing a record on an event's physical address.
  */
@@ -150,7 +147,6 @@ public class EventAddress
      */
     @OneToOne
     (mappedBy = AppConstants.Database.EventAddresses.MappedByNames.MAPPED_BY_EVENT_ADDRESS)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Event event;
 
     // ************************************************

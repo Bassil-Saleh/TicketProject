@@ -203,7 +203,11 @@ public class EventHost
     /**
      * An event host can create many events, but each event can only be authored by a single event host.
      */
-    @OneToMany(mappedBy = AppConstants.Database.EventHosts.MappedByNames.MAPPED_BY_EVENT_HOST)
+    @OneToMany
+    (
+        mappedBy = AppConstants.Database.EventHosts.MappedByNames.MAPPED_BY_EVENT_HOST,
+        cascade = CascadeType.REMOVE
+    )
     private Set<Event> events = new HashSet<>();
 
     /**

@@ -123,6 +123,7 @@ public class Event
         name = AppConstants.Database.Events.TableNames.COLUMN_EVENT_ADDRESS_ID,
         nullable = false
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private EventAddress eventAddress;
 
     /**
