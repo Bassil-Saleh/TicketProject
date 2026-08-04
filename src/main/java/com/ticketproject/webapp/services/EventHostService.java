@@ -2,12 +2,14 @@ package com.ticketproject.webapp.services;
 
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.dtos.requests.CreateEventHostRequest;
+import com.ticketproject.webapp.dtos.requests.EditEventHostEmailRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventHostNameRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventHostPasswordRequest;
 import com.ticketproject.webapp.dtos.requests.VerifyEventHostRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventHostResponse;
 import com.ticketproject.webapp.dtos.responses.EditEventHostNameResponse;
 import com.ticketproject.webapp.dtos.responses.EditEventHostPasswordResponse;
+import com.ticketproject.webapp.dtos.responses.EditEventHostEmailResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventHostProfileResponse;
 import com.ticketproject.webapp.dtos.responses.VerifyEventHostResponse;
 import com.ticketproject.webapp.exceptions.EventHostEmailAlreadyExistsException;
@@ -24,6 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+import java.util.Arrays;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -226,5 +229,39 @@ public class EventHostService
         eventHostRepository.save(eventHost);
 
         return new EditEventHostPasswordResponse("Your password has been updated.");
+    }
+
+    /**
+     * Services a request to change an event host's email address.
+     * @param eventHost the authenticated EventHost
+     * @param request the request body
+     * @return an EditEventHostEmailResponse on success
+     * @throws UnauthorizedException if eventHost is null (implying that the 
+     * JWT authentication filter could not authenticate an EventHost)
+     * @throws EditEventHostEmailResponse if the new email address is
+     * already in use by a different, preexisting event host account
+     */
+    public EditEventHostEmailResponse editEventHostEmail(EventHost eventHost, EditEventHostEmailRequest request)
+    {
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+
+        byte[] newEmailBlindIndex = blindIndexService.computeIndex(request.email());
+        if (Arrays.equals(eventHost.getEmailBlindIndex(), newEmailBlindIndex))
+        {
+            return new EditEventHostEmailResponse("The provided email address is the same as your current email address.");
+        }
+
+        if (eventHostRepository.existsByEmailIndex(newEmailBlindIndex))
+        {
+            throw new EventHostEmailAlreadyExistsException("The provided email address is already in use by a different account.");
+        }
+
+        eventHost.setEmail(request.email());
+        eventHostRepository.save(eventHost);
+
+        return new EditEventHostEmailResponse("Your email address has been updated.");
     }
 }

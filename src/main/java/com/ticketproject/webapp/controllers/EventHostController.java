@@ -1,10 +1,12 @@
 package com.ticketproject.webapp.controllers;
 
 import com.ticketproject.webapp.dtos.requests.CreateEventHostRequest;
+import com.ticketproject.webapp.dtos.requests.EditEventHostEmailRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventHostNameRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventHostPasswordRequest;
 import com.ticketproject.webapp.dtos.requests.VerifyEventHostRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventHostResponse;
+import com.ticketproject.webapp.dtos.responses.EditEventHostEmailResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventHostProfileResponse;
 import com.ticketproject.webapp.dtos.responses.VerifyEventHostResponse;
 import com.ticketproject.webapp.dtos.responses.EditEventHostNameResponse;
@@ -137,5 +139,28 @@ public class EventHostController
             throw new UnauthorizedException("Authentication required");
         }
         return eventHostService.editEventHostPassword(eventHost, request);
+    }
+
+    /**
+     * Handles a request to change the email address of the logged in EventHost.
+     * @param request the request body
+     * @param servletRequest an HttpServletRequest from the client
+     * @return an EditEventHostEmailResponse describing the request's result
+     */
+    @PatchMapping(ApiPaths.EventHosts.EMAIL)
+    public EditEventHostEmailResponse editEventHostEmail
+    (
+        @Valid
+        @RequestBody
+        EditEventHostEmailRequest request,
+        HttpServletRequest servletRequest
+    )
+    {
+        EventHost eventHost = (EventHost) servletRequest.getAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_EVENT_HOST_ATTRIBUTE);
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+        return eventHostService.editEventHostEmail(eventHost, request);
     }
 }
