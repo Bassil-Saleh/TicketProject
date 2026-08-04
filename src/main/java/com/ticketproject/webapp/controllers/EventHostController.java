@@ -2,11 +2,13 @@ package com.ticketproject.webapp.controllers;
 
 import com.ticketproject.webapp.dtos.requests.CreateEventHostRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventHostNameRequest;
+import com.ticketproject.webapp.dtos.requests.EditEventHostPasswordRequest;
 import com.ticketproject.webapp.dtos.requests.VerifyEventHostRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventHostResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventHostProfileResponse;
 import com.ticketproject.webapp.dtos.responses.VerifyEventHostResponse;
 import com.ticketproject.webapp.dtos.responses.EditEventHostNameResponse;
+import com.ticketproject.webapp.dtos.responses.EditEventHostPasswordResponse;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.services.EventHostService;
 import com.ticketproject.webapp.constants.ApiPaths;
@@ -112,5 +114,28 @@ public class EventHostController
             throw new UnauthorizedException("Authentication required");
         }
         return eventHostService.editEventHostName(eventHost, request);
+    }
+
+    /**
+     * Handles a request to change the password of the logged in EventHost.
+     * @param request the request body
+     * @param servletRequest an HttpServletRequest from the client
+     * @return an EditEventHostPasswordResponse describing the request's result
+     */
+    @PatchMapping(ApiPaths.EventHosts.PASSWORD)
+    public EditEventHostPasswordResponse editEventHostPassword
+    (
+        @Valid
+        @RequestBody
+        EditEventHostPasswordRequest request,
+        HttpServletRequest servletRequest
+    )
+    {
+        EventHost eventHost = (EventHost) servletRequest.getAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_EVENT_HOST_ATTRIBUTE);
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+        return eventHostService.editEventHostPassword(eventHost, request);
     }
 }

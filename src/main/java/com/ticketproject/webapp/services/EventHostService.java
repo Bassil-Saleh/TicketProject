@@ -3,9 +3,11 @@ package com.ticketproject.webapp.services;
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.dtos.requests.CreateEventHostRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventHostNameRequest;
+import com.ticketproject.webapp.dtos.requests.EditEventHostPasswordRequest;
 import com.ticketproject.webapp.dtos.requests.VerifyEventHostRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventHostResponse;
 import com.ticketproject.webapp.dtos.responses.EditEventHostNameResponse;
+import com.ticketproject.webapp.dtos.responses.EditEventHostPasswordResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventHostProfileResponse;
 import com.ticketproject.webapp.dtos.responses.VerifyEventHostResponse;
 import com.ticketproject.webapp.exceptions.EventHostEmailAlreadyExistsException;
@@ -203,5 +205,26 @@ public class EventHostService
         eventHostRepository.save(eventHost);
 
         return new EditEventHostNameResponse("Your name has been updated.");
+    }
+
+    /**
+     * Service a reques to change an event host's password.
+     * @param eventHost the authenticated EventHost
+     * @param request the request body
+     * @return an EditEventHostPasswordResponse on success
+     * @throws UnauthorizedException if eventHost is null (implying that the 
+     * JWT authentication filter could not authenticate an EventHost)
+     */
+    public EditEventHostPasswordResponse editEventHostPassword(EventHost eventHost, EditEventHostPasswordRequest request)
+    {
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+
+        eventHost.setPassword(request.password());
+        eventHostRepository.save(eventHost);
+
+        return new EditEventHostPasswordResponse("Your password has been updated.");
     }
 }
