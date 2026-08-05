@@ -10,8 +10,6 @@ import com.ticketproject.webapp.dtos.requests.CreatePasswordResetTokenRequest;
 import com.ticketproject.webapp.dtos.requests.UsePasswordResetTokenRequest;
 import com.ticketproject.webapp.dtos.responses.CreatePasswordResetTokenResponse;
 import com.ticketproject.webapp.dtos.responses.UsePasswordResetTokenResponse;
-import com.ticketproject.webapp.exceptions.AccountNotVerifiedException;
-import com.ticketproject.webapp.exceptions.EventHostToVerifyNotFoundException;
 import com.ticketproject.webapp.exceptions.InvalidCredentialsException;
 import com.ticketproject.webapp.model.repositories.PasswordResetTokenRepository;
 import com.ticketproject.webapp.model.entities.PasswordResetToken;

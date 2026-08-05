@@ -1,14 +1,12 @@
 package com.ticketproject.webapp.controllers;
 
 import com.ticketproject.webapp.constants.ApiPaths;
-import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.dtos.requests.CreatePasswordResetTokenRequest;
 import com.ticketproject.webapp.dtos.requests.UsePasswordResetTokenRequest;
 import com.ticketproject.webapp.dtos.responses.CreatePasswordResetTokenResponse;
 import com.ticketproject.webapp.dtos.responses.UsePasswordResetTokenResponse;
 import com.ticketproject.webapp.services.PasswordResetTokenService;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
