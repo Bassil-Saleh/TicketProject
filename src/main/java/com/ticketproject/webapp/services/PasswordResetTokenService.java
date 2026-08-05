@@ -1,12 +1,18 @@
 package com.ticketproject.webapp.services;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ticketproject.webapp.dtos.requests.CreatePasswordResetTokenRequest;
+import com.ticketproject.webapp.dtos.requests.UsePasswordResetTokenRequest;
 import com.ticketproject.webapp.dtos.responses.CreatePasswordResetTokenResponse;
+import com.ticketproject.webapp.dtos.responses.UsePasswordResetTokenResponse;
+import com.ticketproject.webapp.exceptions.AccountNotVerifiedException;
+import com.ticketproject.webapp.exceptions.EventHostToVerifyNotFoundException;
+import com.ticketproject.webapp.exceptions.InvalidCredentialsException;
 import com.ticketproject.webapp.model.repositories.PasswordResetTokenRepository;
 import com.ticketproject.webapp.model.entities.PasswordResetToken;
 import com.ticketproject.webapp.model.entities.EventHost;
@@ -24,19 +30,22 @@ public class PasswordResetTokenService
     private final EventHostRepository eventHostRepository;
     private final EmailService emailService;
     private final BlindIndexService blindIndexService;
+    private final HashingService hashingService;
 
     public PasswordResetTokenService
     (
         PasswordResetTokenRepository passwordResetTokenRepository,
         EventHostRepository eventHostRepository,
         EmailService emailService,
-        BlindIndexService blindIndexService
+        BlindIndexService blindIndexService,
+        HashingService hashingService
     )
     {
         this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.eventHostRepository = eventHostRepository;
         this.emailService = emailService;
         this.blindIndexService = blindIndexService;
+        this.hashingService = hashingService;
     }
 
     /**
@@ -76,5 +85,37 @@ public class PasswordResetTokenService
 
         return new CreatePasswordResetTokenResponse
         ("If an account with the provided email address exists, a password reset token will be sent to that address.");
+    }
+
+    /**
+     * Services a request to use a password reset token.
+     * 
+     * @param request the request body
+     * @return a UsePasswordResetTokenResponse on success
+     * @throws InvalidCredentialsException if no account is found
+     * with the password reset token provided in the request
+     */
+    public UsePasswordResetTokenResponse usePasswordResetToken(UsePasswordResetTokenRequest request)
+    {
+        byte[] tokenHash = hashingService.hashToken(request.passwordResetToken());
+        Optional<PasswordResetToken> passwordResetToken = passwordResetTokenRepository.findByTokenHash(tokenHash);
+
+        if (passwordResetToken.isEmpty())
+        {
+            throw new InvalidCredentialsException("No account found with that password reset token");
+        }
+
+        PasswordResetToken foundToken = passwordResetToken.get();
+        EventHost foundEventHost = foundToken.getEventHost();
+
+        foundEventHost.setPassword(request.password());
+        foundEventHost.setLastUpdated(LocalDateTime.now());
+        foundToken.setUsed(true);
+        foundToken.setEventHost(foundEventHost);
+
+        foundToken = passwordResetTokenRepository.save(foundToken);
+        foundEventHost = eventHostRepository.save(foundEventHost);
+
+        return new UsePasswordResetTokenResponse("Your password has been reset.");
     }
 }

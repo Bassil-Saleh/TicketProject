@@ -68,6 +68,5 @@ public final class ApiPaths
         }
 
         public static final String ROOT = "/password-reset-tokens";
-        public static final String RESET_PASSWORD = "/reset";
     }
 }
