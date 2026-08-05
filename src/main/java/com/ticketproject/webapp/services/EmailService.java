@@ -27,6 +27,7 @@ public class EmailService
 {
     private static final String FROM_ADDRESS = "noreply@ticketproject.local";
     private static final String FROM_NAME = "TicketProject";
+    private static final String PASSWORD_RESET_EMAIL_SUBJECT = "TicketProject Account Password Reset Request";
     private static final String VERIFICATION_EMAIL_TEMPLATE = "email/verification-email";
     private static final String VERIFICATION_EMAIL_SUBJECT = "Verify Your TicketProject Account";
 
@@ -42,6 +43,35 @@ public class EmailService
     {
         this.mailSender = mailSender;
         this.templateEngine = templateEngine;
+    }
+
+    /**
+     * Sends a password reset token to the specified email address.
+     * 
+     * @param toEmail the recipient's email address
+     * @param rawToken the raw password reset token to include in the email message
+     */
+    public void sendPasswordResetEmail(String toEmail, String rawToken)
+    {
+        try
+        {
+            // Create and send an email containing the password reset token.
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(FROM_ADDRESS, FROM_NAME);
+            helper.setTo(toEmail);
+            helper.setSubject(PASSWORD_RESET_EMAIL_SUBJECT);
+            helper.setText("Your password reset token is " + rawToken, false);
+
+            mailSender.send(message);
+        }
+        catch (MailException | MessagingException | UnsupportedEncodingException e)
+        {
+            throw new EmailSendFailedException
+            (
+                "Password reset email could not be sent. Please try again later."
+            );
+        }
     }
 
     /**
@@ -82,7 +112,8 @@ public class EmailService
         }
         catch (MailException | MessagingException | UnsupportedEncodingException e)
         {
-            throw new EmailSendFailedException(
+            throw new EmailSendFailedException
+            (
                 "Account verification email could not be sent. Please try creating a new account later."
             );
         }
