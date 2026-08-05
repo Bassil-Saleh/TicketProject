@@ -55,13 +55,20 @@ public class EmailService
     {
         try
         {
+            String messageBody =
+                "Your password reset token is " +
+                rawToken +
+                "\nThe token expires in " +
+                AppConstants.Database.PasswordResetTokens.Sizes.TOKEN_DURATION_HOURS +
+                " hour" + 
+                (AppConstants.Database.PasswordResetTokens.Sizes.TOKEN_DURATION_HOURS > 1 ? "s." : ".");
             // Create and send an email containing the password reset token.
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setFrom(FROM_ADDRESS, FROM_NAME);
             helper.setTo(toEmail);
             helper.setSubject(PASSWORD_RESET_EMAIL_SUBJECT);
-            helper.setText("Your password reset token is " + rawToken, false);
+            helper.setText(messageBody, false);
 
             mailSender.send(message);
         }
