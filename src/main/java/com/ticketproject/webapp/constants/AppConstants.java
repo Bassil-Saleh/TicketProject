@@ -881,6 +881,62 @@ public final class AppConstants
                 public static final int MAX_PASSWORD_RESET_TOKEN_LENGTH = 2 * AppConstants.Crypto.RANDOM_TOKEN_LENGTH_BYTES;
             }
         }
+
+        public static final class Events
+        {
+            /**
+             * Private constructor. Not meant to be used.
+             * @throws UnsupportedOperationException
+             */
+            private Events()
+            {
+                throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+            }
+
+            public static final class Sizes
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private Sizes()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+                public static final int NAME_LENGTH = 255;
+                public static final int DESCRIPTION_LENGTH = 5000;
+                public static final int MIN_ATTENDEES = 1;
+            }
+        }
+
+        public static final class EventAddresses
+        {
+            /**
+             * Private constructor. Not meant to be used.
+             * @throws UnsupportedOperationException
+             */
+            private EventAddresses()
+            {
+                throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+            }
+
+            public static final class Sizes
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private Sizes()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+                public static final int ADDRESS_LINE_LENGTH = 255;
+                public static final int CITY_LENGTH = 100;
+                public static final int STATE_LENGTH = 100;
+                public static final int POSTAL_CODE_LENGTH = 20;
+                public static final int COUNTRY_LENGTH = 100;
+            }
+        }
     }
 
     /**

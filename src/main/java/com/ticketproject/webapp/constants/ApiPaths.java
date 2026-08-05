@@ -69,4 +69,18 @@ public final class ApiPaths
 
         public static final String ROOT = "/password-reset-tokens";
     }
+
+    public static final class Events
+    {
+        /**
+         * Private constructor. Not meant to be used.
+         * @throws UnsupportedOperationException
+         */
+        private Events()
+        {
+            throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+        }
+
+        public static final String ROOT = "/events";
+    }
 }
