@@ -20,7 +20,6 @@ import com.ticketproject.webapp.exceptions.PendingEventsExistException;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.exceptions.EventHostInactiveException;
 import com.ticketproject.webapp.model.entities.EventHost;
-import com.ticketproject.webapp.model.repositories.AddressBookContactRepository;
 import com.ticketproject.webapp.model.repositories.EventHostRepository;
 
 import com.ticketproject.webapp.model.repositories.EventRepository;
@@ -42,18 +41,23 @@ import org.springframework.transaction.annotation.Transactional;
 public class EventHostService
 {
     private final EventRepository eventRepository;
-    private final AddressBookContactRepository addressBookContactRepository;
     private final EventHostRepository eventHostRepository;
     private final BlindIndexService blindIndexService;
     private final HashingService hashingService;
     private final EmailService emailService;
 
-    public EventHostService(EventHostRepository eventHostRepository, BlindIndexService blindIndexService, HashingService hashingService, AddressBookContactRepository addressBookContactRepository, EventRepository eventRepository, EmailService emailService)
+    public EventHostService
+    (
+        EventHostRepository eventHostRepository,
+        BlindIndexService blindIndexService,
+        HashingService hashingService,
+        EventRepository eventRepository,
+        EmailService emailService
+    )
     {
         this.eventHostRepository = eventHostRepository;
         this.blindIndexService = blindIndexService;
         this.hashingService = hashingService;
-        this.addressBookContactRepository = addressBookContactRepository;
         this.eventRepository = eventRepository;
         this.emailService = emailService;
     }
