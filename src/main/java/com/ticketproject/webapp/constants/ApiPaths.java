@@ -55,4 +55,18 @@ public final class ApiPaths
         public static final String LOGOUT = "/logout";
         public static final String LOGOUT_ALL_DEVICES = "/logout-all-devices";
     }
+
+    public static final class PasswordResetTokens
+    {
+        /**
+         * Private constructor. Not meant to be used.
+         * @throws UnsupportedOperationException
+         */
+        private PasswordResetTokens()
+        {
+            throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+        }
+
+        public static final String ROOT = "/password-reset-tokens";
+    }
 }
