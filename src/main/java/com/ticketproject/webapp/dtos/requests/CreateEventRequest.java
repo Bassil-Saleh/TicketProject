@@ -6,6 +6,7 @@ import com.ticketproject.webapp.model.enums.EventType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Min;
 
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
@@ -60,9 +61,9 @@ public record CreateEventRequest
     @NotNull(message = "Event type cannot be null")
     EventType eventType,
 
-    @Size
+    @Min
     (
-        min = AppConstants.DTO.Events.Sizes.MIN_ATTENDEES,
+        value = AppConstants.DTO.Events.Sizes.MIN_ATTENDEES,
         message = "Max # of attendees cannot be less than 1"
     )
     Integer maxAttendees,

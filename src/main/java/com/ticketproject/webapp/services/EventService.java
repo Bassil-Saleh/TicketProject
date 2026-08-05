@@ -1,0 +1,149 @@
+package com.ticketproject.webapp.services;
+
+import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.dtos.requests.CreateEventRequest;
+import com.ticketproject.webapp.dtos.responses.CreateEventResponse;
+import com.ticketproject.webapp.exceptions.InvalidRequestException;
+import com.ticketproject.webapp.exceptions.UnauthorizedException;
+import com.ticketproject.webapp.model.entities.EventHost;
+import com.ticketproject.webapp.model.entities.Event;
+import com.ticketproject.webapp.model.entities.EventAddress;
+import com.ticketproject.webapp.model.entities.EventSigningKey;
+import com.ticketproject.webapp.model.enums.EventStatus;
+import com.ticketproject.webapp.model.enums.RegistrationStatus;
+import com.ticketproject.webapp.model.repositories.EventRepository;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.security.InvalidParameterException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
+
+/**
+ * EventService is a service used by controllers to handle
+ * API route requests involving Event entities
+ * (i.e. creating/editing/deleting events).
+ */
+@Service
+@Transactional
+public class EventService
+{
+    private final EventRepository eventRepository;
+
+    public EventService (EventRepository eventRepository)
+    {
+        this.eventRepository = eventRepository;
+    }
+
+    public CreateEventResponse createEvent(EventHost eventHost, CreateEventRequest request)
+    {
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+        // If a precise location was provided, make sure that both
+        // latitude and longitude coordinates are present.
+        if ((request.latitude() == null) != (request.longitude() == null))
+        {
+            throw new InvalidRequestException
+            ("If the event has a precise location, both latitude and longitude coordinates must be provided.");
+        }
+
+        try
+        {
+            Event newEvent = buildNewEvent(eventHost, request);
+            eventRepository.save(newEvent);
+        }
+        catch (InvalidRequestException e)
+        {
+            throw new InvalidRequestException("Invalid request - " + e.getMessage());
+        }
+
+        return new CreateEventResponse("Event successfully created.");
+    }
+
+    private Event buildNewEvent(EventHost eventHost, CreateEventRequest request)
+    {
+        Event newEvent = new Event.Builder()
+            .name(request.name())
+            .description(request.description())
+            .startDateTime(request.startDateTime())
+            .endDateTime(request.endDateTime())
+            .maxAttendees(request.maxAttendees())
+            .eventHost(eventHost)
+            .eventType(request.eventType())
+            // .publicId(hashingService.generateRandomToken())
+            .publicId(UUID.randomUUID().toString())
+            .build();
+        
+        newEvent.setEventStatus(EventStatus.DRAFT);
+        newEvent.setRegistrationStatus(RegistrationStatus.OPEN);
+        
+        EventAddress address = new EventAddress.Builder()
+            .addressLine1(request.addressLine1())
+            .addressLine2(request.addressLine2())
+            .city(request.city())
+            .state(request.state())
+            .postalCode(request.postalCode())
+            .country(request.country())
+            .build();
+
+        try
+        {
+            address.setLatitude(request.latitude());
+            address.setLongitude(request.longitude());
+        }
+        catch (IllegalArgumentException e)
+        {
+            throw new InvalidRequestException("Invalid scale/precision for latitude/longitude coordinates.");
+        }
+
+        EventSigningKey signingKey = createSigningKey(newEvent);
+        newEvent.setSigningKey(signingKey);
+        newEvent.setEventAddress(address);
+
+        return newEvent;
+    }
+
+    /**
+     * Generates a fresh key pair for constructing an EventSigningKey.
+     * @return a KeyPair
+     * @throws RuntimeException if key pair generation fails
+     */
+    private KeyPair generateKeyPair()
+    {
+        try
+        {
+            KeyPairGenerator generator = KeyPairGenerator
+                .getInstance(AppConstants.Crypto.PUBLIC_PRIVATE_KEY_ALGORITHM);
+            generator.initialize(AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+            return generator.generateKeyPair();
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            throw new RuntimeException("Cannot generate keypair - algorithm not supported", e);
+        }
+        catch (InvalidParameterException e)
+        {
+            throw new RuntimeException("Cannot generate keypair - key size not supported", e);
+        }
+    }
+
+    /**
+     * Helper method to create a valid EventSigningKey for a given event.
+     * @param event the event to associate the signing key with
+     * @return a new EventSigningKey entity (not yet persisted)
+     */
+    private EventSigningKey createSigningKey(Event event)
+    {
+        KeyPair keyPair = generateKeyPair();
+        return new EventSigningKey.Builder()
+            .event(event)
+            .privateKey(keyPair.getPrivate())
+            .publicKey(keyPair.getPublic())
+            .build();
+    }
+}

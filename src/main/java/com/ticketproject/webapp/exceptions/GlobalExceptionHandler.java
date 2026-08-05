@@ -288,4 +288,27 @@ public class GlobalExceptionHandler
         );
         return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.BAD_REQUEST);
     }
+
+    /**
+     * Handles InvalidRequestException by returning a 400 Bad Request response.
+     * @param ex      the exception that was thrown
+     * @param request the HTTP servlet request
+     * @return a ResponseEntity containing the error response and a 400 status
+     */
+    @ExceptionHandler(InvalidRequestException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidRequests
+    (
+        InvalidRequestException ex,
+        HttpServletRequest request
+    )
+    {
+        ErrorResponse errorResponse = new ErrorResponse(
+            Instant.now(),
+            HttpStatus.BAD_REQUEST.value(),
+            HttpStatus.BAD_REQUEST.getReasonPhrase(),
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
 }
