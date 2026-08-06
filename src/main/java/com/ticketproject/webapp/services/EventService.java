@@ -3,10 +3,12 @@ package com.ticketproject.webapp.services;
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.dtos.requests.CreateEventRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventAddressByPublicIdRequest;
+import com.ticketproject.webapp.dtos.requests.EditEventDescriptionByPublicIdRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventNameByPublicIdRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventResponse;
 import com.ticketproject.webapp.dtos.responses.DeleteEventByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.EditEventAddressByPublicIdResponse;
+import com.ticketproject.webapp.dtos.responses.EditEventDescriptionByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.EditEventNameByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventsResponse;
@@ -451,5 +453,47 @@ public class EventService
         foundEvent = eventRepository.save(foundEvent);
 
         return new EditEventNameByPublicIdResponse("Event name changed.");
+    }
+
+    public EditEventDescriptionByPublicIdResponse editEventDescriptionByPublicId(EventHost eventHost, EditEventDescriptionByPublicIdRequest request)
+    {
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+
+        if (request.publicId() == null)
+        {
+            throw new InvalidRequestException("Event public id cannot be null.");
+        }
+
+        if (request.publicId().length() > AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH)
+        {
+            throw new InvalidRequestException
+            (
+                "Event public id cannot be longer than " +
+                AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH +
+                " characters."
+            );
+        }
+
+        Optional<Event> event = eventRepository.findByPublicId(request.publicId());
+        if (event.isEmpty())
+        {
+            throw new EntityNotFoundException("Could not find an event with the provided public id.");
+        }
+
+        Event foundEvent = event.get();
+
+        if (Long.compare(foundEvent.getEventHost().getId(), eventHost.getId()) != 0)
+        {
+            throw new InvalidCredentialsException("Only the event host who created the event can edit it.");
+        }
+
+        foundEvent.setDescription(request.description());
+        foundEvent.setLastUpdated(LocalDateTime.now());
+        foundEvent = eventRepository.save(foundEvent);
+
+        return new EditEventDescriptionByPublicIdResponse("Event description changed.");
     }
 }
