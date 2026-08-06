@@ -6,10 +6,12 @@ import com.ticketproject.webapp.dtos.responses.GetEventByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventsResponse;
 import com.ticketproject.webapp.dtos.responses.DeleteEventByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.EditEventAddressByPublicIdResponse;
+import com.ticketproject.webapp.dtos.responses.EditEventNameByPublicIdResponse;
 import com.ticketproject.webapp.exceptions.InvalidRequestException;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.dtos.requests.CreateEventRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventAddressByPublicIdRequest;
+import com.ticketproject.webapp.dtos.requests.EditEventNameByPublicIdRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventResponse;
 import com.ticketproject.webapp.model.entities.EventHost;
 import com.ticketproject.webapp.services.EventService;
@@ -155,5 +157,22 @@ public class EventController
             throw new UnauthorizedException("Authentication required");
         }
         return eventService.editEventAddressByPublicId(eventHost, request);
+    }
+
+    @PatchMapping(ApiPaths.Events.NAME)
+    @ResponseStatus(HttpStatus.OK)
+    public EditEventNameByPublicIdResponse editEventNameByPublicId
+    (
+        @Valid
+        @RequestBody EditEventNameByPublicIdRequest request,
+        HttpServletRequest servletRequest
+    )
+    {
+        EventHost eventHost = (EventHost) servletRequest.getAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_EVENT_HOST_ATTRIBUTE);
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+        return eventService.editEventNameByPublicId(eventHost, request);
     }
 }
