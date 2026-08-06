@@ -1,6 +1,7 @@
 package com.ticketproject.webapp.model.entities;
 
 import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.converters.EncryptedStringConverter;
 import com.ticketproject.webapp.model.enums.ClientType;
 import com.ticketproject.webapp.services.HashingService;
 import com.ticketproject.webapp.bridges.SpringContextBridge;
@@ -75,6 +76,7 @@ public class Session
     /**
      * The IP address where the log in originated from.
      */
+    @Convert(converter = EncryptedStringConverter.class)
     @Column
     (
         name = AppConstants.Database.Sessions.TableNames.COLUMN_IP_ADDRESS,
@@ -85,6 +87,7 @@ public class Session
     /**
      * Stores info about the device which the event host is logged in from.
      */
+    @Convert(converter = EncryptedStringConverter.class)
     @Column
     (
         name = AppConstants.Database.Sessions.TableNames.COLUMN_USER_AGENT,
