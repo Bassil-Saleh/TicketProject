@@ -1,17 +1,27 @@
 #!/bin/sh
 
-if [ -z "$1" ]; then
-	echo "Need to supply a password reset token"
-	exit 1;
-fi
+# Defaults
+passwordResetToken=""
+password=""
 
-if [ -z "$2" ]; then
-	echo "Need to supply the new password"
-	exit 1;
+# Parse named parameters
+while [ $# -gt 0 ]; do
+	case "$1" in
+		--token)    passwordResetToken="$2"; shift 2 ;;
+		--password) password="$2";           shift 2 ;;
+		*)          shift ;;
+	esac
+done
+
+# Validate mandatory parameters
+if [ -z "$passwordResetToken" ] || [ -z "$password" ]; then
+	echo "Usage: $0 --token <value> --password <value>"
+	exit 1
 fi
 
 contentTypeHeader="Content-Type: application/json"
-json="{\"passwordResetToken\": \"$1\","
-json="${json} \"password\": \"$2\"}"
+json="{\"passwordResetToken\": \"$passwordResetToken\""
+json="${json}, \"password\": \"$password\"}"
 
 curl -X PATCH -H "$contentTypeHeader" -d "$json" http://localhost:8080/api/v1/password-reset-tokens
+echo
