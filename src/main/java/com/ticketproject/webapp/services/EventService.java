@@ -243,6 +243,14 @@ public class EventService
             .limit(count)
             .toList();
         
+        if (formattedEvents.size() == 0)
+        {
+            return new GetEventsResponse
+            (
+                formattedEvents,
+                "You currently have no events."
+            );
+        }
         return new GetEventsResponse
         (
             formattedEvents,
