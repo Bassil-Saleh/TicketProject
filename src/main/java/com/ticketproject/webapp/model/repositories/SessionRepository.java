@@ -1,6 +1,5 @@
 package com.ticketproject.webapp.model.repositories;
 
-import com.ticketproject.webapp.model.entities.EventHost;
 import com.ticketproject.webapp.model.entities.Session;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,12 +26,12 @@ public interface SessionRepository extends JpaRepository<Session, Long>
     Optional<Session> findByTokenHash(@Param("hash") byte[] hash);
 
     /**
-     * Find and retrieve a list of all active Session
-     * entities associated with a specified EventHost.
+     * Find and retrieve a list of all active Session entities
+     * associated with a specified EventHost ID number.
      * 
-     * @param eventHost an EventHost entity
+     * @param eventHost ID number of an EventHost entity
      * @return a List of Session entities
      */
-    @Query("SELECT s FROM Session s WHERE s.eventHost = :eventHost AND s.revoked IS NULL AND s.expires >= CURRENT_TIMESTAMP")
-    List<Session> findAllActiveSessionsByEventHost(@Param("eventHost") EventHost eventHost);
+    @Query("SELECT s FROM Session s WHERE s.eventHost.id = :eventHostId AND s.revoked IS NULL AND s.expires >= CURRENT_TIMESTAMP")
+    List<Session> findAllActiveSessionsByEventHostId(@Param("eventHostId") Long eventHostId);
 }

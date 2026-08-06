@@ -145,7 +145,7 @@ public class SessionService
             throw new UnauthorizedException("Authentication required");
         }
         // Find every Session entity associated with the logged in event host.
-        List<Session> activeSessions = sessionRepository.findAllActiveSessionsByEventHost(eventHost);
+        List<Session> activeSessions = sessionRepository.findAllActiveSessionsByEventHostId(eventHost.getId());
         // Mark each Session entity as revoked and save them to the database.
         LocalDateTime revokedDateTime = LocalDateTime.now();
         List<Session> revokedSessions = activeSessions
