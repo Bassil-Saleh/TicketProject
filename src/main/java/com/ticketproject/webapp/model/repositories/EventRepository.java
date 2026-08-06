@@ -19,7 +19,7 @@ public interface EventRepository extends JpaRepository<Event, Long>
     @Query("SELECT COUNT(e) > 0 FROM Event e WHERE e.eventHost.id = :eventHostId AND e.endDateTime >= CURRENT_TIMESTAMP")
     boolean activeEventsByEventHostIdExist(@Param("eventHostId") Long eventHostId);
 
-    @Query("SELECT e FROM Event e WHERE e.publicId = :publicId LIMIT 1")
+    @Query("SELECT e FROM Event e JOIN FETCH e.eventHost WHERE e.publicId = :publicId LIMIT 1")
     Optional<Event> findByPublicId(@Param("publicId") String publicId);
 
     @Query("SELECT e FROM Event e WHERE e.eventHost.id = :eventHostId")

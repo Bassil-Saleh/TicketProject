@@ -4,6 +4,7 @@ import com.ticketproject.webapp.constants.ApiPaths;
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.dtos.responses.GetEventByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventsResponse;
+import com.ticketproject.webapp.dtos.responses.DeleteEventByPublicIdResponse;
 import com.ticketproject.webapp.exceptions.InvalidRequestException;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.dtos.requests.CreateEventRequest;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -96,5 +98,21 @@ public class EventController
             throw new UnauthorizedException("Authentication required");
         }
         return eventService.getEvents(eventHost, count);
+    }
+
+    @DeleteMapping(ApiPaths.Events.BY_PUBLIC_ID)
+    @ResponseStatus(HttpStatus.OK)
+    public DeleteEventByPublicIdResponse deleteEventByPublicId
+    (
+        @PathVariable String publicId,
+        HttpServletRequest servletRequest
+    )
+    {
+        EventHost eventHost = (EventHost) servletRequest.getAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_EVENT_HOST_ATTRIBUTE);
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+        return eventService.deleteEventByPublicId(eventHost, publicId);
     }
 }

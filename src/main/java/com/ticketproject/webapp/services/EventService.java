@@ -3,9 +3,11 @@ package com.ticketproject.webapp.services;
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.dtos.requests.CreateEventRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventResponse;
+import com.ticketproject.webapp.dtos.responses.DeleteEventByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventsResponse;
 import com.ticketproject.webapp.exceptions.InvalidRequestException;
+import com.ticketproject.webapp.exceptions.InvalidCredentialsException;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.model.entities.EventHost;
 import com.ticketproject.webapp.model.entities.Event;
@@ -259,5 +261,40 @@ public class EventService
             " event" +
             (formattedEvents.size() > 1 ? "s." : ".")
         );
+    }
+
+    public DeleteEventByPublicIdResponse deleteEventByPublicId(EventHost eventHost, String publicId)
+    {
+        if (publicId == null)
+        {
+            throw new InvalidRequestException("Event public id cannot be null.");
+        }
+
+        if (publicId.length() > AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH)
+        {
+            throw new InvalidRequestException
+            (
+                "Event public id cannot be longer than " +
+                AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH +
+                " characters."
+            );
+        }
+
+        Optional<Event> event = eventRepository.findByPublicId(publicId);
+        if (event.isEmpty())
+        {
+            throw new EntityNotFoundException("Could not find an event with the provided public id.");
+        }
+
+        Event foundEvent = event.get();
+
+        if (Long.compare(foundEvent.getEventHost().getId(), eventHost.getId()) != 0)
+        {
+            throw new InvalidCredentialsException("Only the event host who created the event can delete it.");
+        }
+
+        eventRepository.delete(foundEvent);
+
+        return new DeleteEventByPublicIdResponse("Event deleted.");
     }
 }
