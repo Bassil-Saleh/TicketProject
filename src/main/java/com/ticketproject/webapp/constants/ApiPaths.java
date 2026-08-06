@@ -82,5 +82,6 @@ public final class ApiPaths
         }
 
         public static final String ROOT = "/events";
+        public static final String BY_ID = "/{id}";
     }
 }

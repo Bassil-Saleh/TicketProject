@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.persistence.EntityNotFoundException;
 
 /**
  * GlobalExceptionHandler is a centralized exception handler for all
@@ -310,5 +311,29 @@ public class GlobalExceptionHandler
             request.getRequestURI()
         );
         return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handles EntityNotFoundException by returning a 404 Not Found response.
+     * @param ex      the exception that was thrown
+     * @param request the HTTP servlet request
+     * @return a ResponseEntity containing the error response and a 404 status
+     */
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEntityNotFound
+    (
+        EntityNotFoundException ex,
+        HttpServletRequest request
+    )
+    {
+        ErrorResponse errorResponse = new ErrorResponse
+        (
+            Instant.now(),
+            HttpStatus.NOT_FOUND.value(),
+            HttpStatus.NOT_FOUND.getReasonPhrase(),
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.NOT_FOUND);
     }
 }

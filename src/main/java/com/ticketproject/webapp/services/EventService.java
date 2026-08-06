@@ -3,6 +3,7 @@ package com.ticketproject.webapp.services;
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.dtos.requests.CreateEventRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventResponse;
+import com.ticketproject.webapp.dtos.responses.GetEventByIdResponse;
 import com.ticketproject.webapp.exceptions.InvalidRequestException;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.model.entities.EventHost;
@@ -13,6 +14,8 @@ import com.ticketproject.webapp.model.enums.EventStatus;
 import com.ticketproject.webapp.model.enums.RegistrationStatus;
 import com.ticketproject.webapp.model.repositories.EventRepository;
 
+import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +24,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
+import java.util.Optional;
 
 /**
  * EventService is a service used by controllers to handle
@@ -145,5 +149,39 @@ public class EventService
             .privateKey(keyPair.getPrivate())
             .publicKey(keyPair.getPublic())
             .build();
+    }
+
+    public GetEventByIdResponse getEventById(Long id)
+    {
+        if (id == null)
+        {
+            throw new InvalidRequestException("Event ID cannot be null.");
+        }
+
+        Optional<Event> event = eventRepository.findById(id);
+        if (event.isEmpty())
+        {
+            throw new EntityNotFoundException("Could not find an event with the provided ID.");
+        }
+
+        Event foundEvent = event.get();
+        EventAddress foundEventAddress = foundEvent.getEventAddress();
+
+        return new GetEventByIdResponse
+        (
+            foundEvent.getName(),
+            foundEvent.getDescription(),
+            foundEvent.getStartDateTime(),
+            foundEvent.getEndDateTime(),
+            foundEvent.getMaxAttendees(),
+            foundEventAddress.getAddressLine1(),
+            foundEventAddress.getAddressLine2(),
+            foundEventAddress.getCity(),
+            foundEventAddress.getState(),
+            foundEventAddress.getPostalCode(),
+            foundEventAddress.getCountry(),
+            foundEventAddress.getLatitude(),
+            foundEventAddress.getLongitude()
+        );
     }
 }

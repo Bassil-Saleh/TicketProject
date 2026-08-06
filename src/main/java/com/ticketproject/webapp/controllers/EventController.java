@@ -2,6 +2,7 @@ package com.ticketproject.webapp.controllers;
 
 import com.ticketproject.webapp.constants.ApiPaths;
 import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.dtos.responses.GetEventByIdResponse;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.dtos.requests.CreateEventRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventResponse;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
@@ -50,5 +53,20 @@ public class EventController
         }
         return eventService.createEvent(eventHost, request);
     }
-    
+
+    @GetMapping(ApiPaths.Events.BY_ID)
+    @ResponseStatus(HttpStatus.OK)
+    public GetEventByIdResponse getEventById
+    (
+        @PathVariable Long id,
+        HttpServletRequest servletRequest
+    )
+    {
+        EventHost eventHost = (EventHost) servletRequest.getAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_EVENT_HOST_ATTRIBUTE);
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+        return eventService.getEventById(id);
+    }
 }
