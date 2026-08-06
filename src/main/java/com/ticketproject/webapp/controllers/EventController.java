@@ -2,7 +2,7 @@ package com.ticketproject.webapp.controllers;
 
 import com.ticketproject.webapp.constants.ApiPaths;
 import com.ticketproject.webapp.constants.AppConstants;
-import com.ticketproject.webapp.dtos.responses.GetEventByIdResponse;
+import com.ticketproject.webapp.dtos.responses.GetEventByPublicIdResponse;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.dtos.requests.CreateEventRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventResponse;
@@ -54,11 +54,11 @@ public class EventController
         return eventService.createEvent(eventHost, request);
     }
 
-    @GetMapping(ApiPaths.Events.BY_ID)
+    @GetMapping(ApiPaths.Events.BY_PUBLIC_ID)
     @ResponseStatus(HttpStatus.OK)
-    public GetEventByIdResponse getEventById
+    public GetEventByPublicIdResponse getEventByPublicId
     (
-        @PathVariable Long id,
+        @PathVariable String publicId,
         HttpServletRequest servletRequest
     )
     {
@@ -67,6 +67,6 @@ public class EventController
         {
             throw new UnauthorizedException("Authentication required");
         }
-        return eventService.getEventById(id);
+        return eventService.getEventByPublicId(publicId);
     }
 }

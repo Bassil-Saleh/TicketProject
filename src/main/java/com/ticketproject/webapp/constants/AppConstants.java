@@ -906,6 +906,7 @@ public final class AppConstants
                 public static final int NAME_LENGTH = 255;
                 public static final int DESCRIPTION_LENGTH = 5000;
                 public static final int MIN_ATTENDEES = 1;
+                public static final int MAX_GET_EVENTS_COUNT = 500;
             }
         }
 

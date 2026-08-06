@@ -3,7 +3,7 @@ package com.ticketproject.webapp.services;
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.dtos.requests.CreateEventRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventResponse;
-import com.ticketproject.webapp.dtos.responses.GetEventByIdResponse;
+import com.ticketproject.webapp.dtos.responses.GetEventByPublicIdResponse;
 import com.ticketproject.webapp.exceptions.InvalidRequestException;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.model.entities.EventHost;
@@ -59,14 +59,13 @@ public class EventService
         try
         {
             Event newEvent = buildNewEvent(eventHost, request);
-            eventRepository.save(newEvent);
+            newEvent = eventRepository.save(newEvent);
+            return new CreateEventResponse(newEvent.getPublicId(), "Event successfully created.");
         }
         catch (InvalidRequestException e)
         {
             throw new InvalidRequestException("Invalid request - " + e.getMessage());
         }
-
-        return new CreateEventResponse("Event successfully created.");
     }
 
     private Event buildNewEvent(EventHost eventHost, CreateEventRequest request)
@@ -151,24 +150,35 @@ public class EventService
             .build();
     }
 
-    public GetEventByIdResponse getEventById(Long id)
+    public GetEventByPublicIdResponse getEventByPublicId(String publicId)
     {
-        if (id == null)
+        if (publicId == null)
         {
-            throw new InvalidRequestException("Event ID cannot be null.");
+            throw new InvalidRequestException("Event public id cannot be null.");
         }
 
-        Optional<Event> event = eventRepository.findById(id);
+        if (publicId.length() > AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH)
+        {
+            throw new InvalidRequestException
+            (
+                "Event public id cannot be longer than " +
+                AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH +
+                " characters."
+            );
+        }
+
+        Optional<Event> event = eventRepository.findByPublicId(publicId);
         if (event.isEmpty())
         {
-            throw new EntityNotFoundException("Could not find an event with the provided ID.");
+            throw new EntityNotFoundException("Could not find an event with the provided public id.");
         }
 
         Event foundEvent = event.get();
         EventAddress foundEventAddress = foundEvent.getEventAddress();
 
-        return new GetEventByIdResponse
+        return new GetEventByPublicIdResponse
         (
+            foundEvent.getPublicId(),
             foundEvent.getName(),
             foundEvent.getDescription(),
             foundEvent.getStartDateTime(),

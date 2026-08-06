@@ -6,8 +6,11 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public record GetEventByIdResponse
+public record GetEventByPublicIdResponse
 (
+    @NotNull(message = "Event public id cannot be null")
+    String publicId,
+
     @NotBlank(message = "Event name cannot be blank")
     String name,
 
