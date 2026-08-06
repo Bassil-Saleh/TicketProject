@@ -5,6 +5,12 @@ import com.ticketproject.webapp.constants.AppConstants;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+/**
+ * EditEventHostPasswordRequest specifies what a valid request to
+ * change the logged in event host's password should look like.
+ * 
+ * @param password the new password
+ */
 public record EditEventHostPasswordRequest
 (
     @NotBlank(message = "Password is required")

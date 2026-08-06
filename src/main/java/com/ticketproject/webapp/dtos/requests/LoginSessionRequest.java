@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 /**
  * LoginSessionRequest specifies what a valid request
  * to log into an event host account should look like.
+ * 
  * @param email an email address
  * @param password a password
  */
