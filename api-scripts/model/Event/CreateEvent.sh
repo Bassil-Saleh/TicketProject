@@ -1,95 +1,73 @@
 #!/bin/sh
 
-if [ -z "$1" ]; then
-	echo "Need to supply a JSON Web Token"
-	exit 1;
+# Defaults
+token=""
+name=""
+description=""
+startDateTime=""
+endDateTime=""
+eventType=""
+maxAttendees=""
+addressLine1=""
+addressLine2=""
+city=""
+state=""
+postalCode=""
+country=""
+latitude=""
+longitude=""
+
+# Parse named parameters
+while [ $# -gt 0 ]; do
+	case "$1" in
+		--token)          token="$2";          shift 2 ;;
+		--name)           name="$2";           shift 2 ;;
+		--description)    description="$2";    shift 2 ;;
+		--start-date)     startDateTime="$2";  shift 2 ;;
+		--end-date)       endDateTime="$2";    shift 2 ;;
+		--event-type)     eventType="$2";      shift 2 ;;
+		--max-attendees)  maxAttendees="$2";   shift 2 ;;
+		--address-line1)  addressLine1="$2";   shift 2 ;;
+		--address-line2)  addressLine2="$2";   shift 2 ;;
+		--city)           city="$2";           shift 2 ;;
+		--state)          state="$2";          shift 2 ;;
+		--postal-code)    postalCode="$2";     shift 2 ;;
+		--country)        country="$2";        shift 2 ;;
+		--latitude)       latitude="$2";       shift 2 ;;
+		--longitude)      longitude="$2";      shift 2 ;;
+		*)                shift ;;
+	esac
+done
+
+# Validate mandatory parameters
+if [ -z "$token" ] || [ -z "$name" ] || [ -z "$description" ] || [ -z "$startDateTime" ] || [ -z "$endDateTime" ] || [ -z "$eventType" ] || [ -z "$maxAttendees" ] || [ -z "$addressLine1" ] || [ -z "$city" ] || [ -z "$state" ] || [ -z "$postalCode" ] || [ -z "$country" ]; then
+	echo "Usage: $0 --token <value> --name <value> --description <value> --start-date <value> --end-date <value> --event-type <value> --max-attendees <value> --address-line1 <value> --city <value> --state <value> --postal-code <value> --country <value> [--address-line2 <value>] [--latitude <value>] [--longitude <value>]"
+	exit 1
 fi
 
-if [ -z "$2" ]; then
-	echo "Need to supply a name"
-	exit 1;
-fi
-
-if [ -z "$3" ]; then
-	echo "Need to supply a description"
-	exit 1;
-fi
-
-if [ -z "$4" ]; then
-	echo "Need to supply a start date and time"
-	exit 1;
-fi
-
-if [ -z "$5" ]; then
-	echo "Need to supply an end date and time"
-	exit 1;
-fi
-
-if [ -z "$6" ]; then
-	echo "Need to supply an event type"
-	exit 1;
-fi
-
-if [ -z "$7" ]; then
-	echo "Need to supply a max number of attendees"
-	exit 1;
-fi
-
-if [ -z "$8" ]; then
-	echo "Need to supply a 1st address line"
-	exit 1;
-fi
-
-if [ -z "$9" ]; then
-	echo "Need to supply a 2nd address line"
-	exit 1;
-fi
-
-if [ -z "${10}" ]; then
-	echo "Need to supply a city"
-	exit 1;
-fi
-
-if [ -z "${11}" ]; then
-	echo "Need to supply a state"
-	exit 1;
-fi
-
-if [ -z "${12}" ]; then
-	echo "Need to supply a postal code"
-	exit 1;
-fi
-
-if [ -z "${13}" ]; then
-	echo "Need to supply a country"
-	exit 1;
-fi
-
-if [ -z "${14}" ]; then
-	echo "Need to supply a latitude"
-	exit 1;
-fi
-
-if [ -z "${15}" ]; then
-	echo "Need to supply a longitude"
-	exit 1;
-fi
-
-authHeader="Authorization: Bearer $1"
+authHeader="Authorization: Bearer $token"
 contentTypeHeader="Content-Type: application/json"
-json="{\"name\": \"$2\","
-json="${json} \"description\": \"$3\","
-json="${json} \"startDateTime\": \"$4\","
-json="${json} \"endDateTime\": \"$5\","
-json="${json} \"eventType\": \"$6\","
-json="${json} \"maxAttendees\": $7,"
-json="${json} \"addressLine1\": \"$8\","
-json="${json} \"addressLine2\": \"$9\","
-json="${json} \"city\": \"${10}\","
-json="${json} \"state\": \"${11}\","
-json="${json} \"postalCode\": \"${12}\","
-json="${json} \"country\": \"${13}\","
-json="${json} \"latitude\": ${14},"
-json="${json} \"longitude\": ${15} }"
+json="{\"name\": \"$name\""
+json="${json}, \"description\": \"$description\""
+json="${json}, \"startDateTime\": \"$startDateTime\""
+json="${json}, \"endDateTime\": \"$endDateTime\""
+json="${json}, \"eventType\": \"$eventType\""
+json="${json}, \"maxAttendees\": $maxAttendees"
+json="${json}, \"addressLine1\": \"$addressLine1\""
+if [ -n "$addressLine2" ]; then
+	json="${json}, \"addressLine2\": \"$addressLine2\""
+fi
+json="${json}, \"city\": \"$city\""
+json="${json}, \"state\": \"$state\""
+json="${json}, \"postalCode\": \"$postalCode\""
+json="${json}, \"country\": \"$country\""
+if [ -n "$latitude" ]; then
+	json="${json}, \"latitude\": $latitude"
+fi
+if [ -n "$longitude" ]; then
+	json="${json}, \"longitude\": $longitude"
+fi
+json="${json}}"
 
 curl -X POST -H "$authHeader" -H "$contentTypeHeader" -d "$json" http://localhost:8080/api/v1/events
+echo
