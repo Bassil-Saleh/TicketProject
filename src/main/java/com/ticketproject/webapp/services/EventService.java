@@ -4,6 +4,7 @@ import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.dtos.requests.CreateEventRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventByPublicIdResponse;
+import com.ticketproject.webapp.dtos.responses.GetEventsResponse;
 import com.ticketproject.webapp.exceptions.InvalidRequestException;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.model.entities.EventHost;
@@ -25,6 +26,7 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import java.util.Optional;
+import java.util.List;
 
 /**
  * EventService is a service used by controllers to handle
@@ -192,6 +194,62 @@ public class EventService
             foundEventAddress.getCountry(),
             foundEventAddress.getLatitude(),
             foundEventAddress.getLongitude()
+        );
+    }
+
+    public GetEventsResponse getEvents(EventHost eventHost, Long count)
+    {
+        if (count == null || count < 1)
+        {
+            throw new InvalidRequestException("Number of events to retrieve must be at least 1");
+        }
+        if (count > AppConstants.DTO.Events.Sizes.MAX_GET_EVENTS_COUNT)
+        {
+            throw new InvalidRequestException("Number of events to retrieve cannot be more than " + AppConstants.DTO.Events.Sizes.MAX_GET_EVENTS_COUNT);
+        }
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+
+        List<Event> foundEvents = eventRepository.findAllByEventHostId(eventHost.getId());
+
+        List<GetEventByPublicIdResponse> formattedEvents = foundEvents
+            .stream()
+            .map
+            (event ->
+            {
+                EventAddress address = event.getEventAddress();
+                GetEventByPublicIdResponse record =
+                    new GetEventByPublicIdResponse
+                        (
+                            event.getPublicId(),
+                            event.getName(),
+                            event.getDescription(),
+                            event.getStartDateTime(),
+                            event.getEndDateTime(),
+                            event.getMaxAttendees(),
+                            address.getAddressLine1(),
+                            address.getAddressLine2(),
+                            address.getCity(),
+                            address.getState(),
+                            address.getPostalCode(),
+                            address.getCountry(),
+                            address.getLatitude(),
+                            address.getLongitude()
+                        );
+                return record;
+            })
+            .limit(count)
+            .toList();
+        
+        return new GetEventsResponse
+        (
+            formattedEvents,
+            "Retrieved " +
+            formattedEvents.size() +
+            " event" +
+            (formattedEvents.size() > 1 ? "s." : ".")
         );
     }
 }

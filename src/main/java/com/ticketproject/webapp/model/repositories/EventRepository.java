@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.List;
 
 /**
  * EventRepository is used to perform CRUD operations with Event entities.
@@ -20,4 +21,7 @@ public interface EventRepository extends JpaRepository<Event, Long>
 
     @Query("SELECT e FROM Event e WHERE e.publicId = :publicId LIMIT 1")
     Optional<Event> findByPublicId(@Param("publicId") String publicId);
+
+    @Query("SELECT e FROM Event e WHERE e.eventHost.id = :eventHostId")
+    List<Event> findAllByEventHostId(@Param("eventHostId") Long eventHostId);
 }
