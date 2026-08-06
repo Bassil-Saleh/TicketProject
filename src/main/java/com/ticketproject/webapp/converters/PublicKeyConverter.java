@@ -20,6 +20,9 @@ import jakarta.persistence.Converter;
 public class PublicKeyConverter implements AttributeConverter<PublicKey, byte[]>
 {
 
+    /**
+     * Takes a PublicKey object and converts it to a byte[].
+     */
     @Override
     public byte[] convertToDatabaseColumn(PublicKey publicKey)
     {
@@ -28,6 +31,9 @@ public class PublicKeyConverter implements AttributeConverter<PublicKey, byte[]>
         return publicKey.getEncoded();
     }
 
+    /**
+     * Takes a byte[] and constructs a PublicKey object from it.
+     */
     @Override
     public PublicKey convertToEntityAttribute(byte[] dbData)
     {

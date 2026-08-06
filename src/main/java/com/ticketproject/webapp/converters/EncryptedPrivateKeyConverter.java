@@ -34,6 +34,9 @@ public class EncryptedPrivateKeyConverter implements AttributeConverter<PrivateK
         return cryptoService;
     }
 
+    /**
+     * Takes a PrivateKey object, encrypts it, and returns a byte[] of the ciphertext.
+     */
     @Override
     public byte[] convertToDatabaseColumn(PrivateKey privateKey)
     {
@@ -50,6 +53,10 @@ public class EncryptedPrivateKeyConverter implements AttributeConverter<PrivateK
         }
     }
 
+    /**
+     * Takes a byte[] of ciphertext, decrypts it, and constructs a
+     * PrivateKey object from the resulting plaintext.
+     */
     @Override
     public PrivateKey convertToEntityAttribute(byte[] ciphertext)
     {

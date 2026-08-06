@@ -30,6 +30,9 @@ public class EncryptedStringConverter implements AttributeConverter<String, byte
         return cryptoService;
     }
 
+    /**
+     * Takes a String object, encrypts it, and returns a byte[] of the resulting plaintext.
+     */
     @Override
     public byte[] convertToDatabaseColumn(String plaintext)
     {
@@ -45,6 +48,10 @@ public class EncryptedStringConverter implements AttributeConverter<String, byte
         }
     }
 
+    /**
+     * Takes a byte[] of ciphertext, decrypts it, and constructs a
+     * String object from the resulting plaintext.
+     */
     @Override
     public String convertToEntityAttribute(byte[] ciphertext)
     {

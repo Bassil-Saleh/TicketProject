@@ -31,6 +31,9 @@ public class EncryptedLocalDateTimeConverter implements AttributeConverter<Local
         return cryptoService;
     }
 
+    /**
+     * Takes a LocalDateTime object, encrypts it, and returns a byte[] of the ciphertext.
+     */
     @Override
     public byte[] convertToDatabaseColumn(LocalDateTime dateTime)
     {
@@ -46,6 +49,10 @@ public class EncryptedLocalDateTimeConverter implements AttributeConverter<Local
         }
     }
 
+    /**
+     * Takes a byte[] of ciphertext, decrypts it, and constructs a
+     * LocalDateTime object from the resulting plaintext.
+     */
     @Override
     public LocalDateTime convertToEntityAttribute(byte[] ciphertext)
     {

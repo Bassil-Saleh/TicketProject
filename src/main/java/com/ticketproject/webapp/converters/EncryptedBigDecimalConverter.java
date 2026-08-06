@@ -31,6 +31,10 @@ public class EncryptedBigDecimalConverter implements AttributeConverter<BigDecim
         return cryptoService;
     }
 
+    /**
+     * Takes a BigDecimal object, encrypts it, and returns the
+     * ciphertext as a byte[].
+     */
     @Override
     public byte[] convertToDatabaseColumn(BigDecimal decimal)
     {
@@ -46,6 +50,10 @@ public class EncryptedBigDecimalConverter implements AttributeConverter<BigDecim
         }
     }
 
+    /**
+     * Takes a byte[] of ciphertext, decrypts it, and constructs
+     * a BigDecimal object from the resulting plaintext.
+     */
     @Override
     public BigDecimal convertToEntityAttribute(byte[] ciphertext)
     {
