@@ -42,6 +42,13 @@ public class EventController
         this.eventService = eventService;
     }
 
+    /**
+     * Handles a request to let a logged in user create a new Event.
+     * 
+     * @param request the request body
+     * @param servletRequest the HTTP Servlet request
+     * @return a CreateEventResponse on success
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CreateEventResponse createEvent
@@ -59,6 +66,13 @@ public class EventController
         return eventService.createEvent(eventHost, request);
     }
 
+    /**
+     * Handles a request to retrieve info on a single event based on its public ID.
+     * 
+     * @param publicId the event's public ID
+     * @param servletRequest the HTTP Servlet request
+     * @return a GetEventByPublicIdResponse on success
+     */
     @GetMapping(ApiPaths.Events.BY_PUBLIC_ID)
     @ResponseStatus(HttpStatus.OK)
     public GetEventByPublicIdResponse getEventByPublicId
@@ -75,6 +89,14 @@ public class EventController
         return eventService.getEventByPublicId(publicId);
     }
 
+    /**
+     * Handles a request to let the logged in user retrieve info
+     * on multiple events they've created.
+     * 
+     * @param count number of events to retrieve
+     * @param servletRequest the HTTP Servlet request
+     * @return a GetEventsResponse on success
+     */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public GetEventsResponse getEvents
@@ -100,6 +122,15 @@ public class EventController
         return eventService.getEvents(eventHost, count);
     }
 
+    /**
+     * Handles a request to let a logged in user delete an event
+     * identified by its public ID. Only the logged in user who
+     * created the event should be allowed to delete that event.
+     * 
+     * @param publicId the event's public ID
+     * @param servletRequest the HTTP Servlet request
+     * @return a DeleteEventByPublicIdResponse on success
+     */
     @DeleteMapping(ApiPaths.Events.BY_PUBLIC_ID)
     @ResponseStatus(HttpStatus.OK)
     public DeleteEventByPublicIdResponse deleteEventByPublicId

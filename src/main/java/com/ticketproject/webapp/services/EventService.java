@@ -46,6 +46,13 @@ public class EventService
         this.eventRepository = eventRepository;
     }
 
+    /**
+     * Services a request to let a logged in event host create a new event.
+     * 
+     * @param eventHost the logged in event host
+     * @param request the request body
+     * @return a CreateEventResponse on success
+     */
     public CreateEventResponse createEvent(EventHost eventHost, CreateEventRequest request)
     {
         if (eventHost == null)
@@ -72,6 +79,12 @@ public class EventService
         }
     }
 
+    /**
+     * Helper method used when creating a new event.
+     * @param eventHost the logged in event host
+     * @param request the request body
+     * @return a new Event entity
+     */
     private Event buildNewEvent(EventHost eventHost, CreateEventRequest request)
     {
         Event newEvent = new Event.Builder()
@@ -116,8 +129,8 @@ public class EventService
     }
 
     /**
-     * Generates a fresh key pair for constructing an EventSigningKey.
-     * @return a KeyPair
+     * Helper method that generates a fresh key pair for constructing an EventSigningKey.
+     * @return a new KeyPair
      * @throws RuntimeException if key pair generation fails
      */
     private KeyPair generateKeyPair()
@@ -154,6 +167,12 @@ public class EventService
             .build();
     }
 
+    /**
+     * Services a request to retrieve info on an event identified by its public ID.
+     * 
+     * @param publicId the event's public ID
+     * @return a GetEventByPublicIdResponse on success
+     */
     public GetEventByPublicIdResponse getEventByPublicId(String publicId)
     {
         if (publicId == null)
@@ -187,6 +206,7 @@ public class EventService
             foundEvent.getDescription(),
             foundEvent.getStartDateTime(),
             foundEvent.getEndDateTime(),
+            foundEvent.getEventType(),
             foundEvent.getMaxAttendees(),
             foundEventAddress.getAddressLine1(),
             foundEventAddress.getAddressLine2(),
@@ -199,6 +219,13 @@ public class EventService
         );
     }
 
+    /**
+     * Services a request to retrieve multiple events created by the logged in event host.
+     * 
+     * @param eventHost the logged in event host
+     * @param count number of events to retrieve
+     * @return a GetEventsResponse on success
+     */
     public GetEventsResponse getEvents(EventHost eventHost, Long count)
     {
         if (count == null || count < 1)
@@ -230,6 +257,7 @@ public class EventService
                             event.getDescription(),
                             event.getStartDateTime(),
                             event.getEndDateTime(),
+                            event.getEventType(),
                             event.getMaxAttendees(),
                             address.getAddressLine1(),
                             address.getAddressLine2(),
@@ -263,6 +291,14 @@ public class EventService
         );
     }
 
+    /**
+     * Services a request to delete an event created by the logged in event host.
+     * Note that an event should only be deletable by the event host who created the event.
+     * 
+     * @param eventHost the logged in event host
+     * @param publicId the event's public ID
+     * @return a DeleteEventByPublicIdResponse on success
+     */
     public DeleteEventByPublicIdResponse deleteEventByPublicId(EventHost eventHost, String publicId)
     {
         if (publicId == null)
