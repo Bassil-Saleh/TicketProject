@@ -70,22 +70,12 @@ public class EventController
      * Handles a request to retrieve info on a single event based on its public ID.
      * 
      * @param publicId the event's public ID
-     * @param servletRequest the HTTP Servlet request
      * @return a GetEventByPublicIdResponse on success
      */
     @GetMapping(ApiPaths.Events.BY_PUBLIC_ID)
     @ResponseStatus(HttpStatus.OK)
-    public GetEventByPublicIdResponse getEventByPublicId
-    (
-        @PathVariable String publicId,
-        HttpServletRequest servletRequest
-    )
+    public GetEventByPublicIdResponse getEventByPublicId(@PathVariable String publicId)
     {
-        EventHost eventHost = (EventHost) servletRequest.getAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_EVENT_HOST_ATTRIBUTE);
-        if (eventHost == null)
-        {
-            throw new UnauthorizedException("Authentication required");
-        }
         return eventService.getEventByPublicId(publicId);
     }
 
