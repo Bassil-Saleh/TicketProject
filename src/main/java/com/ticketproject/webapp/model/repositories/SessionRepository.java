@@ -19,12 +19,20 @@ public interface SessionRepository extends JpaRepository<Session, Long>
 {
     /**
      * Find a Session entity by its token hash.
+     * 
      * @param hash the token hash to search for
      * @return an Optional containing the Session if found, empty otherwise
      */
     @Query("SELECT s FROM Session s JOIN FETCH s.eventHost WHERE s.tokenHash = :hash")
     Optional<Session> findByTokenHash(@Param("hash") byte[] hash);
 
+    /**
+     * Find and retrieve a list of all active Session
+     * entities associated with a specified EventHost.
+     * 
+     * @param eventHost an EventHost entity
+     * @return a List of Session entities
+     */
     @Query("SELECT s FROM Session s WHERE s.eventHost = :eventHost AND s.revoked IS NULL AND s.expires >= CURRENT_TIMESTAMP")
     List<Session> findAllActiveSessionsByEventHost(@Param("eventHost") EventHost eventHost);
 }

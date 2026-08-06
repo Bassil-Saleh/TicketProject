@@ -15,6 +15,12 @@ import java.util.Optional;
 @Repository
 public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Long>
 {
+    /**
+     * Find and retrieve a PasswordResetToken with a specified token hash.
+     * 
+     * @param hash a token hash
+     * @return an Optional<PasswordResetToken>
+     */
     @Query("SELECT t FROM PasswordResetToken t JOIN FETCH t.eventHost WHERE t.tokenHash = :hash")
     Optional<PasswordResetToken> findByTokenHash(@Param("hash") byte[] hash);
 }
