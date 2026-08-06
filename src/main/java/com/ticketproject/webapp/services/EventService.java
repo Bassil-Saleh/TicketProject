@@ -2,8 +2,10 @@ package com.ticketproject.webapp.services;
 
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.dtos.requests.CreateEventRequest;
+import com.ticketproject.webapp.dtos.requests.EditEventAddressByPublicIdRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventResponse;
 import com.ticketproject.webapp.dtos.responses.DeleteEventByPublicIdResponse;
+import com.ticketproject.webapp.dtos.responses.EditEventAddressByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventsResponse;
 import com.ticketproject.webapp.exceptions.InvalidRequestException;
@@ -15,6 +17,7 @@ import com.ticketproject.webapp.model.entities.EventAddress;
 import com.ticketproject.webapp.model.entities.EventSigningKey;
 import com.ticketproject.webapp.model.enums.EventStatus;
 import com.ticketproject.webapp.model.enums.RegistrationStatus;
+import com.ticketproject.webapp.model.repositories.EventAddressRepository;
 import com.ticketproject.webapp.model.repositories.EventRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -26,6 +29,7 @@ import java.security.InvalidParameterException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.Optional;
 import java.util.List;
@@ -39,11 +43,13 @@ import java.util.List;
 @Transactional
 public class EventService
 {
+    private final EventAddressRepository eventAddressRepository;
     private final EventRepository eventRepository;
 
-    public EventService (EventRepository eventRepository)
+    public EventService (EventRepository eventRepository, EventAddressRepository eventAddressRepository)
     {
         this.eventRepository = eventRepository;
+        this.eventAddressRepository = eventAddressRepository;
     }
 
     /**
@@ -301,6 +307,11 @@ public class EventService
      */
     public DeleteEventByPublicIdResponse deleteEventByPublicId(EventHost eventHost, String publicId)
     {
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+
         if (publicId == null)
         {
             throw new InvalidRequestException("Event public id cannot be null.");
@@ -332,5 +343,69 @@ public class EventService
         eventRepository.delete(foundEvent);
 
         return new DeleteEventByPublicIdResponse("Event deleted.");
+    }
+
+    public EditEventAddressByPublicIdResponse editEventAddressByPublicId(EventHost eventHost, EditEventAddressByPublicIdRequest request)
+    {
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+
+        if (request.publicId() == null)
+        {
+            throw new InvalidRequestException("Event public id cannot be null.");
+        }
+
+        if (request.publicId().length() > AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH)
+        {
+            throw new InvalidRequestException
+            (
+                "Event public id cannot be longer than " +
+                AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH +
+                " characters."
+            );
+        }
+
+        Optional<Event> event = eventRepository.findByPublicId(request.publicId());
+        if (event.isEmpty())
+        {
+            throw new EntityNotFoundException("Could not find an event with the provided public id.");
+        }
+
+        Event foundEvent = event.get();
+
+        if (Long.compare(foundEvent.getEventHost().getId(), eventHost.getId()) != 0)
+        {
+            throw new InvalidCredentialsException("Only the event host who created the event can edit it.");
+        }
+
+        EventAddress foundEventAddress = foundEvent.getEventAddress();
+        foundEventAddress.setAddressLine1(request.addressLine1());
+        foundEventAddress.setAddressLine2(request.addressLine2());
+        foundEventAddress.setCity(request.city());
+        foundEventAddress.setCountry(request.country());
+        foundEventAddress.setState(request.state());
+        foundEventAddress.setPostalCode(request.postalCode());
+
+        try
+        {
+            foundEventAddress.setLatitude(request.latitude());
+            foundEventAddress.setLongitude(request.longitude());
+        }
+        catch (IllegalArgumentException e)
+        {
+            throw new InvalidRequestException("Invalid request - Invalid scale/precision for latitude/longitude coordinates.");
+        }
+        LocalDateTime updatedAt = LocalDateTime.now();
+
+        foundEventAddress.setLastUpdated(updatedAt);
+        foundEvent.setEventAddress(foundEventAddress);
+        foundEvent.setLastUpdated(updatedAt);
+
+        foundEventAddress = eventAddressRepository.save(foundEventAddress);
+        foundEvent = eventRepository.save(foundEvent);
+
+        return new EditEventAddressByPublicIdResponse("Event address updated.");
     }
 }
