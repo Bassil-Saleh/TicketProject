@@ -926,11 +926,6 @@ public final class AppConstants
                 {
                     throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
                 }
-                public static final int ADDRESS_LINE_LENGTH = 255;
-                public static final int CITY_LENGTH = 100;
-                public static final int STATE_LENGTH = 100;
-                public static final int POSTAL_CODE_LENGTH = 20;
-                public static final int COUNTRY_LENGTH = 100;
             }
         }
     }

@@ -22,18 +22,18 @@ public record EditEventAddressByPublicIdRequest
     @NotBlank(message = "Event 1st address line cannot be blank")
     @Size
     (
-        max = AppConstants.DTO.EventAddresses.Sizes.ADDRESS_LINE_LENGTH,
+        max = AppConstants.Database.EventAddresses.Sizes.ADDRESS_LINE_LENGTH,
         message = "Event address line cannot be longer than " +
-        AppConstants.DTO.EventAddresses.Sizes.ADDRESS_LINE_LENGTH +
+        AppConstants.Database.EventAddresses.Sizes.ADDRESS_LINE_LENGTH +
         " characters"
     )
     String addressLine1,
 
     @Size
     (
-        max = AppConstants.DTO.EventAddresses.Sizes.ADDRESS_LINE_LENGTH,
+        max = AppConstants.Database.EventAddresses.Sizes.ADDRESS_LINE_LENGTH,
         message = "Event address line cannot be longer than " +
-        AppConstants.DTO.EventAddresses.Sizes.ADDRESS_LINE_LENGTH +
+        AppConstants.Database.EventAddresses.Sizes.ADDRESS_LINE_LENGTH +
         " characters"
     )
     String addressLine2,
@@ -41,9 +41,9 @@ public record EditEventAddressByPublicIdRequest
     @NotBlank(message = "Event city cannot be blank")
     @Size
     (
-        max = AppConstants.DTO.EventAddresses.Sizes.CITY_LENGTH,
+        max = AppConstants.Database.EventAddresses.Sizes.CITY_LENGTH,
         message = "Event city cannot be longer than " +
-        AppConstants.DTO.EventAddresses.Sizes.CITY_LENGTH +
+        AppConstants.Database.EventAddresses.Sizes.CITY_LENGTH +
         " characters"
     )
     String city,
@@ -51,9 +51,9 @@ public record EditEventAddressByPublicIdRequest
     @NotBlank(message = "Event state cannot be blank")
     @Size
     (
-        max = AppConstants.DTO.EventAddresses.Sizes.STATE_LENGTH,
+        max = AppConstants.Database.EventAddresses.Sizes.STATE_LENGTH,
         message = "Event state cannot be longer than " +
-        AppConstants.DTO.EventAddresses.Sizes.STATE_LENGTH +
+        AppConstants.Database.EventAddresses.Sizes.STATE_LENGTH +
         " characters"
     )
     String state,
@@ -61,9 +61,9 @@ public record EditEventAddressByPublicIdRequest
     @NotBlank(message = "Event postal code cannot be blank")
     @Size
     (
-        max = AppConstants.DTO.EventAddresses.Sizes.POSTAL_CODE_LENGTH,
+        max = AppConstants.Database.EventAddresses.Sizes.POSTAL_CODE_LENGTH,
         message = "Event postal code cannot be longer than " +
-        AppConstants.DTO.EventAddresses.Sizes.POSTAL_CODE_LENGTH +
+        AppConstants.Database.EventAddresses.Sizes.POSTAL_CODE_LENGTH +
         " characters"
     )
     String postalCode,
@@ -71,9 +71,9 @@ public record EditEventAddressByPublicIdRequest
     @NotBlank(message = "Event country cannot be blank")
     @Size
     (
-        max = AppConstants.DTO.EventAddresses.Sizes.COUNTRY_LENGTH,
+        max = AppConstants.Database.EventAddresses.Sizes.COUNTRY_LENGTH,
         message = "Event country cannot be longer than " +
-        AppConstants.DTO.EventAddresses.Sizes.COUNTRY_LENGTH +
+        AppConstants.Database.EventAddresses.Sizes.COUNTRY_LENGTH +
         " characters"
     )
     String country,
