@@ -4,11 +4,7 @@ import com.ticketproject.webapp.constants.ApiPaths;
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.dtos.responses.GetEventByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventsResponse;
-import com.ticketproject.webapp.dtos.responses.DeleteEventByPublicIdResponse;
-import com.ticketproject.webapp.dtos.responses.EditEventAddressByPublicIdResponse;
-import com.ticketproject.webapp.dtos.responses.EditEventDatesByPublicIdResponse;
-import com.ticketproject.webapp.dtos.responses.EditEventDescriptionByPublicIdResponse;
-import com.ticketproject.webapp.dtos.responses.EditEventNameByPublicIdResponse;
+import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 import com.ticketproject.webapp.exceptions.InvalidRequestException;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.dtos.requests.CreateEventRequest;
@@ -132,7 +128,7 @@ public class EventController
      */
     @DeleteMapping(ApiPaths.Events.BY_PUBLIC_ID)
     @ResponseStatus(HttpStatus.OK)
-    public DeleteEventByPublicIdResponse deleteEventByPublicId
+    public SingleMessageResponse deleteEventByPublicId
     (
         @PathVariable String publicId,
         HttpServletRequest servletRequest
@@ -148,7 +144,7 @@ public class EventController
 
     @PatchMapping(ApiPaths.Events.ADDRESS)
     @ResponseStatus(HttpStatus.OK)
-    public EditEventAddressByPublicIdResponse editEventAddressByPublicId
+    public SingleMessageResponse editEventAddressByPublicId
     (
         @Valid
         @RequestBody EditEventAddressByPublicIdRequest request,
@@ -165,7 +161,7 @@ public class EventController
 
     @PatchMapping(ApiPaths.Events.NAME)
     @ResponseStatus(HttpStatus.OK)
-    public EditEventNameByPublicIdResponse editEventNameByPublicId
+    public SingleMessageResponse editEventNameByPublicId
     (
         @Valid
         @RequestBody EditEventNameByPublicIdRequest request,
@@ -182,7 +178,7 @@ public class EventController
 
     @PatchMapping(ApiPaths.Events.DESCRIPTION)
     @ResponseStatus(HttpStatus.OK)
-    public EditEventDescriptionByPublicIdResponse editEventDescriptionByPublicId
+    public SingleMessageResponse editEventDescriptionByPublicId
     (
         @Valid
         @RequestBody EditEventDescriptionByPublicIdRequest request,
@@ -199,7 +195,7 @@ public class EventController
 
     @PatchMapping(ApiPaths.Events.DATES)
     @ResponseStatus(HttpStatus.OK)
-    public EditEventDatesByPublicIdResponse editEventDatesByPublicId
+    public SingleMessageResponse editEventDatesByPublicId
     (
         @Valid
         @RequestBody EditEventDatesByPublicIdRequest request,

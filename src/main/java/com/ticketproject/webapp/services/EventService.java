@@ -7,13 +7,9 @@ import com.ticketproject.webapp.dtos.requests.EditEventDatesByPublicIdRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventDescriptionByPublicIdRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventNameByPublicIdRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventResponse;
-import com.ticketproject.webapp.dtos.responses.DeleteEventByPublicIdResponse;
-import com.ticketproject.webapp.dtos.responses.EditEventAddressByPublicIdResponse;
-import com.ticketproject.webapp.dtos.responses.EditEventDatesByPublicIdResponse;
-import com.ticketproject.webapp.dtos.responses.EditEventDescriptionByPublicIdResponse;
-import com.ticketproject.webapp.dtos.responses.EditEventNameByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventsResponse;
+import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 import com.ticketproject.webapp.exceptions.InvalidRequestException;
 import com.ticketproject.webapp.exceptions.EventAlreadyPublishedException;
 import com.ticketproject.webapp.exceptions.InvalidCredentialsException;
@@ -334,7 +330,7 @@ public class EventService
      * @param publicId the event's public ID
      * @return a DeleteEventByPublicIdResponse on success
      */
-    public DeleteEventByPublicIdResponse deleteEventByPublicId(EventHost eventHost, String publicId)
+    public SingleMessageResponse deleteEventByPublicId(EventHost eventHost, String publicId)
     {
         if (eventHost == null)
         {
@@ -371,10 +367,10 @@ public class EventService
 
         eventRepository.delete(foundEvent);
 
-        return new DeleteEventByPublicIdResponse("Event deleted.");
+        return new SingleMessageResponse("Event deleted.");
     }
 
-    public EditEventAddressByPublicIdResponse editEventAddressByPublicId(EventHost eventHost, EditEventAddressByPublicIdRequest request)
+    public SingleMessageResponse editEventAddressByPublicId(EventHost eventHost, EditEventAddressByPublicIdRequest request)
     {
         if (eventHost == null)
         {
@@ -435,10 +431,10 @@ public class EventService
         foundEventAddress = eventAddressRepository.save(foundEventAddress);
         foundEvent = eventRepository.save(foundEvent);
 
-        return new EditEventAddressByPublicIdResponse("Event address updated.");
+        return new SingleMessageResponse("Event address updated.");
     }
 
-    public EditEventNameByPublicIdResponse editEventNameByPublicId(EventHost eventHost, EditEventNameByPublicIdRequest request)
+    public SingleMessageResponse editEventNameByPublicId(EventHost eventHost, EditEventNameByPublicIdRequest request)
     {
         if (eventHost == null)
         {
@@ -477,10 +473,10 @@ public class EventService
         foundEvent.setLastUpdated(LocalDateTime.now());
         foundEvent = eventRepository.save(foundEvent);
 
-        return new EditEventNameByPublicIdResponse("Event name changed.");
+        return new SingleMessageResponse("Event name changed.");
     }
 
-    public EditEventDescriptionByPublicIdResponse editEventDescriptionByPublicId(EventHost eventHost, EditEventDescriptionByPublicIdRequest request)
+    public SingleMessageResponse editEventDescriptionByPublicId(EventHost eventHost, EditEventDescriptionByPublicIdRequest request)
     {
         if (eventHost == null)
         {
@@ -519,10 +515,10 @@ public class EventService
         foundEvent.setLastUpdated(LocalDateTime.now());
         foundEvent = eventRepository.save(foundEvent);
 
-        return new EditEventDescriptionByPublicIdResponse("Event description changed.");
+        return new SingleMessageResponse("Event description changed.");
     }
 
-    public EditEventDatesByPublicIdResponse editEventDatesByPublicId(EventHost eventHost, EditEventDatesByPublicIdRequest request)
+    public SingleMessageResponse editEventDatesByPublicId(EventHost eventHost, EditEventDatesByPublicIdRequest request)
     {
         if (eventHost == null)
         {
@@ -588,6 +584,6 @@ public class EventService
         foundEvent.setLastUpdated(LocalDateTime.now());
         foundEvent = eventRepository.save(foundEvent);
 
-        return new EditEventDatesByPublicIdResponse("Event dates updated.");
+        return new SingleMessageResponse("Event dates updated.");
     }
 }
