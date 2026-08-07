@@ -336,4 +336,28 @@ public class GlobalExceptionHandler
         );
         return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.NOT_FOUND);
     }
+
+    /**
+     * Handles EventAlreadyPublishedException by returning a 409 Conflict response.
+     * @param ex      the exception that was thrown
+     * @param request the HTTP servlet request
+     * @return a ResponseEntity containing the error response and a 409 status
+     */
+    @ExceptionHandler(EventAlreadyPublishedException.class)
+    public ResponseEntity<ErrorResponse> handleEventAlreadyPublished
+    (
+        EventAlreadyPublishedException ex,
+        HttpServletRequest request
+    )
+    {
+        ErrorResponse errorResponse = new ErrorResponse
+        (
+            Instant.now(),
+            HttpStatus.CONFLICT.value(),
+            HttpStatus.CONFLICT.getReasonPhrase(),
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.CONFLICT);
+    }
 }

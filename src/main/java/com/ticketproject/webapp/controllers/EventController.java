@@ -6,12 +6,14 @@ import com.ticketproject.webapp.dtos.responses.GetEventByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventsResponse;
 import com.ticketproject.webapp.dtos.responses.DeleteEventByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.EditEventAddressByPublicIdResponse;
+import com.ticketproject.webapp.dtos.responses.EditEventDatesByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.EditEventDescriptionByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.EditEventNameByPublicIdResponse;
 import com.ticketproject.webapp.exceptions.InvalidRequestException;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.dtos.requests.CreateEventRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventAddressByPublicIdRequest;
+import com.ticketproject.webapp.dtos.requests.EditEventDatesByPublicIdRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventDescriptionByPublicIdRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventNameByPublicIdRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventResponse;
@@ -193,5 +195,22 @@ public class EventController
             throw new UnauthorizedException("Authentication required");
         }
         return eventService.editEventDescriptionByPublicId(eventHost, request);
+    }
+
+    @PatchMapping(ApiPaths.Events.DATES)
+    @ResponseStatus(HttpStatus.OK)
+    public EditEventDatesByPublicIdResponse editEventDatesByPublicId
+    (
+        @Valid
+        @RequestBody EditEventDatesByPublicIdRequest request,
+        HttpServletRequest servletRequest
+    )
+    {
+        EventHost eventHost = (EventHost) servletRequest.getAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_EVENT_HOST_ATTRIBUTE);
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+        return eventService.editEventDatesByPublicId(eventHost, request);
     }
 }

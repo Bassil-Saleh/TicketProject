@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Future;
 
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
@@ -52,9 +53,11 @@ public record CreateEventRequest
     )
     String description,
 
+    @Future(message = "Event start date and time must be in the future")
     @NotNull(message = "Event start date and time cannot be null")
     LocalDateTime startDateTime,
 
+    @Future(message = "Event end date and time must be in the future")
     @NotNull(message = "Event end date and time cannot be null")
     LocalDateTime endDateTime,
 

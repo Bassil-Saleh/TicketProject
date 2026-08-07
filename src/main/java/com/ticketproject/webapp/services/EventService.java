@@ -3,16 +3,19 @@ package com.ticketproject.webapp.services;
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.dtos.requests.CreateEventRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventAddressByPublicIdRequest;
+import com.ticketproject.webapp.dtos.requests.EditEventDatesByPublicIdRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventDescriptionByPublicIdRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventNameByPublicIdRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventResponse;
 import com.ticketproject.webapp.dtos.responses.DeleteEventByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.EditEventAddressByPublicIdResponse;
+import com.ticketproject.webapp.dtos.responses.EditEventDatesByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.EditEventDescriptionByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.EditEventNameByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventsResponse;
 import com.ticketproject.webapp.exceptions.InvalidRequestException;
+import com.ticketproject.webapp.exceptions.EventAlreadyPublishedException;
 import com.ticketproject.webapp.exceptions.InvalidCredentialsException;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.model.entities.EventHost;
@@ -33,6 +36,7 @@ import java.security.InvalidParameterException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.Optional;
@@ -495,5 +499,74 @@ public class EventService
         foundEvent = eventRepository.save(foundEvent);
 
         return new EditEventDescriptionByPublicIdResponse("Event description changed.");
+    }
+
+    public EditEventDatesByPublicIdResponse editEventDatesByPublicId(EventHost eventHost, EditEventDatesByPublicIdRequest request)
+    {
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+
+        if (request.publicId() == null)
+        {
+            throw new InvalidRequestException("Event public id cannot be null.");
+        }
+
+        if (request.publicId().length() > AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH)
+        {
+            throw new InvalidRequestException
+            (
+                "Event public id cannot be longer than " +
+                AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH +
+                " characters."
+            );
+        }
+
+        Optional<Event> event = eventRepository.findByPublicId(request.publicId());
+        if (event.isEmpty())
+        {
+            throw new EntityNotFoundException("Could not find an event with the provided public id.");
+        }
+
+        Event foundEvent = event.get();
+
+        if (Long.compare(foundEvent.getEventHost().getId(), eventHost.getId()) != 0)
+        {
+            throw new InvalidCredentialsException("Only the event host who created the event can edit it.");
+        }
+
+        if (foundEvent.getEventStatus() == EventStatus.PUBLISHED)
+        {
+            throw new EventAlreadyPublishedException("Event dates cannot be changed because the event is already published.");
+        }
+
+        if (request.startDateTime().isEqual(request.endDateTime()))
+        {
+            throw new InvalidRequestException("Event start date/time cannot be the same as the event end date/time.");
+        }
+
+        if (request.startDateTime().isAfter(request.endDateTime()))
+        {
+            throw new InvalidRequestException("Event start date/time cannot come after the event end date/time.");
+        }
+
+        Duration eventDuration = Duration.between(request.startDateTime(), request.endDateTime());
+        if (eventDuration.toMinutes() < AppConstants.DTO.Events.Sizes.MIN_EVENT_DURATION_MINUTES)
+        {
+            throw new InvalidRequestException
+            (
+                "Event duration must be at least " +
+                AppConstants.DTO.Events.Sizes.MIN_EVENT_DURATION_MINUTES +
+                " minutes long."
+            );
+        }
+
+        foundEvent.setStartDateTime(request.startDateTime());
+        foundEvent.setEndDateTime(request.endDateTime());
+        foundEvent.setLastUpdated(LocalDateTime.now());
+        foundEvent = eventRepository.save(foundEvent);
+
+        return new EditEventDatesByPublicIdResponse("Event dates updated.");
     }
 }
