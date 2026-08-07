@@ -705,6 +705,10 @@ public final class AppConstants
                 public static final int TOKEN_HASH_LENGTH = 64;
                 public static final int IP_ADDRESS_LENGTH = 45;
                 public static final int USER_AGENT_LENGTH = 512;
+                /**
+                 * The login session duration (AKA the expiration duration for JWTs)
+                 * in hours.
+                 */
                 public static final int LOGIN_SESSION_DURATION_HOURS = 6;
             }
 
@@ -952,12 +956,6 @@ public final class AppConstants
          * The signing algorithm used for JWT digital signatures.
          */
         public static final String SIGNING_ALGORITHM = "HmacSHA256";
-
-        /**
-         * The expiration duration for JWTs in hours.
-         * Matches the login session duration.
-         */
-        public static final int EXPIRATION_HOURS = AppConstants.Database.Sessions.Sizes.LOGIN_SESSION_DURATION_HOURS;
 
         public static final class Filter
         {
