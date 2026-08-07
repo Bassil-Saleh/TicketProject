@@ -108,12 +108,12 @@ public class EventService
         }
 
         Duration eventDuration = Duration.between(request.startDateTime(), request.endDateTime());
-        if (eventDuration.toMinutes() < AppConstants.DTO.Events.Sizes.MIN_EVENT_DURATION_MINUTES)
+        if (eventDuration.toMinutes() < AppConstants.Database.Events.Sizes.MIN_EVENT_DURATION_MINUTES)
         {
             throw new InvalidRequestException
             (
                 "Event duration must be at least " +
-                AppConstants.DTO.Events.Sizes.MIN_EVENT_DURATION_MINUTES +
+                AppConstants.Database.Events.Sizes.MIN_EVENT_DURATION_MINUTES +
                 " minutes long."
             );
         }
@@ -569,12 +569,12 @@ public class EventService
         }
 
         Duration eventDuration = Duration.between(request.startDateTime(), request.endDateTime());
-        if (eventDuration.toMinutes() < AppConstants.DTO.Events.Sizes.MIN_EVENT_DURATION_MINUTES)
+        if (eventDuration.toMinutes() < AppConstants.Database.Events.Sizes.MIN_EVENT_DURATION_MINUTES)
         {
             throw new InvalidRequestException
             (
                 "Event duration must be at least " +
-                AppConstants.DTO.Events.Sizes.MIN_EVENT_DURATION_MINUTES +
+                AppConstants.Database.Events.Sizes.MIN_EVENT_DURATION_MINUTES +
                 " minutes long."
             );
         }

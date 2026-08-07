@@ -526,7 +526,10 @@ public final class AppConstants
                 }
 
                 public static final int PUBLIC_ID_LENGTH = 36;
+                public static final int MIN_EVENT_DURATION_MINUTES = 30;
                 public static final int NAME_LENGTH = 255;
+                public static final int MIN_ATTENDEES = 1;
+                public static final int DESCRIPTION_LENGTH = 5000;
                 public static final int ADDRESS_LINE_LENGTH = 255;
                 public static final int CITY_LENGTH = 100;
                 public static final int STATE_LENGTH = 100;
@@ -903,12 +906,7 @@ public final class AppConstants
                 {
                     throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
                 }
-                public static final int NAME_LENGTH = 255;
-                public static final int DESCRIPTION_LENGTH = 5000;
-                public static final int MIN_ATTENDEES = 1;
                 public static final int MAX_GET_EVENTS_COUNT = 500;
-                public static final int PUBLIC_ID_LENGTH = AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH;
-                public static final int MIN_EVENT_DURATION_MINUTES = 30;
             }
         }
 

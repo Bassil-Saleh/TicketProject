@@ -36,9 +36,9 @@ public record CreateEventRequest
     @NotBlank(message = "Event name cannot be blank")
     @Size
     (
-        max = AppConstants.DTO.Events.Sizes.NAME_LENGTH,
+        max = AppConstants.Database.Events.Sizes.NAME_LENGTH,
         message = "Event name cannot be longer than " +
-        AppConstants.DTO.Events.Sizes.NAME_LENGTH +
+        AppConstants.Database.Events.Sizes.NAME_LENGTH +
         " characters"
     )
     String name,
@@ -46,9 +46,9 @@ public record CreateEventRequest
     @NotBlank(message = "Event description cannot be blank")
     @Size
     (
-        max = AppConstants.DTO.Events.Sizes.DESCRIPTION_LENGTH,
+        max = AppConstants.Database.Events.Sizes.DESCRIPTION_LENGTH,
         message = "Event description cannot be longer than " +
-        AppConstants.DTO.Events.Sizes.DESCRIPTION_LENGTH +
+        AppConstants.Database.Events.Sizes.DESCRIPTION_LENGTH +
         " characters"
     )
     String description,
@@ -66,7 +66,7 @@ public record CreateEventRequest
 
     @Min
     (
-        value = AppConstants.DTO.Events.Sizes.MIN_ATTENDEES,
+        value = AppConstants.Database.Events.Sizes.MIN_ATTENDEES,
         message = "Max # of attendees cannot be less than 1"
     )
     Integer maxAttendees,

@@ -10,9 +10,9 @@ public record EditEventDescriptionByPublicIdRequest
     @NotBlank(message = "Event public id cannot be blank")
     @Size
     (
-        max = AppConstants.DTO.Events.Sizes.PUBLIC_ID_LENGTH,
+        max = AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH,
         message = "Event public id length cannot be longer than " +
-        AppConstants.DTO.Events.Sizes.PUBLIC_ID_LENGTH +
+        AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH +
         " characters"
     )
     String publicId,
@@ -20,9 +20,9 @@ public record EditEventDescriptionByPublicIdRequest
     @NotBlank(message = "Event description cannot be blank")
     @Size
     (
-        max = AppConstants.DTO.Events.Sizes.DESCRIPTION_LENGTH,
+        max = AppConstants.Database.Events.Sizes.DESCRIPTION_LENGTH,
         message = "Event description cannot be longer than " +
-        AppConstants.DTO.Events.Sizes.DESCRIPTION_LENGTH +
+        AppConstants.Database.Events.Sizes.DESCRIPTION_LENGTH +
         " characters"
     )
     String description

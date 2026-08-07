@@ -250,7 +250,7 @@ public class EventRepositoryTest
             event.setStartDateTime(null);
 
             assertThatThrownBy(() -> eventRepository.saveAndFlush(event))
-                .isInstanceOf(DataIntegrityViolationException.class);
+                .isInstanceOf(InvalidDataAccessApiUsageException.class);
         }
 
         @Test
@@ -261,7 +261,7 @@ public class EventRepositoryTest
             event.setEndDateTime(null);
 
             assertThatThrownBy(() -> eventRepository.saveAndFlush(event))
-                .isInstanceOf(DataIntegrityViolationException.class);
+                .isInstanceOf(InvalidDataAccessApiUsageException.class);
         }
 
         @Test
@@ -399,7 +399,7 @@ public class EventRepositoryTest
             saved.setStartDateTime(null);
 
             assertThatThrownBy(() -> eventRepository.saveAndFlush(saved))
-                .isInstanceOf(DataIntegrityViolationException.class);
+                .isInstanceOf(InvalidDataAccessApiUsageException.class);
         }
 
         @Test
@@ -412,7 +412,7 @@ public class EventRepositoryTest
             saved.setEndDateTime(null);
 
             assertThatThrownBy(() -> eventRepository.saveAndFlush(saved))
-                .isInstanceOf(DataIntegrityViolationException.class);
+                .isInstanceOf(InvalidDataAccessApiUsageException.class);
         }
 
         @Test

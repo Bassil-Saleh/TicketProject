@@ -6,6 +6,7 @@ import com.ticketproject.webapp.model.enums.EventStatus;
 import com.ticketproject.webapp.model.enums.EventType;
 
 import jakarta.persistence.*;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -243,6 +244,7 @@ public class Event
         Integer maxAttendees
     )
     {
+        validateDates(startDateTime, endDateTime);
         this.publicId = publicId;
         this.eventHost = eventHost;
         this.name = name;
@@ -301,12 +303,39 @@ public class Event
      */
     @PrePersist
     @PreUpdate
-    private void validateMandatoryAssociations()
+    private void validateMandatoryAssociationsAndConstraints()
     {
         if (this.eventAddress == null)
             throw new IllegalStateException("EventAddress must not be null before persisting Event");
         if (this.signingKey == null)
             throw new IllegalStateException("EventSigningKey must not be null before persisting Event");
+        validateDates(this.startDateTime, this.endDateTime);
+    }
+
+    private void validateDates(LocalDateTime startDateTime, LocalDateTime endDateTime)
+    {
+        if (startDateTime == null || endDateTime == null)
+        {
+            throw new IllegalStateException("Event start/end date/time cannot be null.");
+        }
+        if (startDateTime.isEqual(endDateTime))
+        {
+            throw new IllegalStateException("Event start date/time cannot be the same as the event end date/time.");
+        }
+        if (startDateTime.isAfter(endDateTime))
+        {
+            throw new IllegalStateException("Event start date/time cannot come after the event end date/time.");
+        }
+        Duration eventDuration = Duration.between(startDateTime, endDateTime);
+        if (eventDuration.toMinutes() < AppConstants.Database.Events.Sizes.MIN_EVENT_DURATION_MINUTES)
+        {
+            throw new IllegalStateException
+            (
+                "Event duration must be at least " +
+                AppConstants.Database.Events.Sizes.MIN_EVENT_DURATION_MINUTES +
+                " minutes long"
+            );
+        }
     }
 
     // ************************************************
