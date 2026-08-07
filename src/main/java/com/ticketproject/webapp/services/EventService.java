@@ -170,7 +170,7 @@ public class EventService
         {
             KeyPairGenerator generator = KeyPairGenerator
                 .getInstance(AppConstants.Crypto.PUBLIC_PRIVATE_KEY_ALGORITHM);
-            generator.initialize(AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+            generator.initialize(AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_PROD);
             return generator.generateKeyPair();
         }
         catch (NoSuchAlgorithmException e)
