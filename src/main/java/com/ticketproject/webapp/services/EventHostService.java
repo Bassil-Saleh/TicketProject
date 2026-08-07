@@ -60,7 +60,7 @@ public class EventHostService
     /**
      * Service a request to create a new event host account.
      * @param request request containing info to create a new event host account
-     * @return a CreateEventHostResponse on success, an ErrorResponse on failure
+     * @return a SingleMessageResponse on success
      * @throws EventHostEmailAlreadyExistsException if the request contains
      * an email address already used by a preexisting event host account
      * @throws EventHostUnderageException if the request contains a date of birth
@@ -122,7 +122,7 @@ public class EventHostService
     /**
      * Service a request to verify an event host account.
      * @param verificationToken the verification token from the email link
-     * @return a VerifyEventHostResponse on success, an ErrorResponse on failure
+     * @return a SingleMessageResponse on success
      * @throws EventHostToVerifyNotFoundException if no existing event host account
      * using the verification token was found
      * @throws EventHostVerificationPeriodExpiredException if the verification token
@@ -172,7 +172,7 @@ public class EventHostService
      * Service a request to get an event host account's profile info.
      * 
      * @param eventHost the authenticated EventHost
-     * @return a GetEventHostProfileResponse on success, an ErrorResponse on failure
+     * @return a GetEventHostProfileResponse on success
      * @throws UnauthorizedException if eventHost is null (implying that the 
      * JWT authentication filter could not authenticate an EventHost)
      */
@@ -196,7 +196,7 @@ public class EventHostService
      * Service a request to edit an event host's full name.
      * @param eventHost the authenticated EventHost
      * @param request the request body
-     * @return an EditEventHostNameResponse on success, an ErrorResponse on failure
+     * @return a SingleMessageResponse on success
      * @throws UnauthorizedException if eventHost is null (implying that the 
      * JWT authentication filter could not authenticate an EventHost)
      */
@@ -220,7 +220,7 @@ public class EventHostService
      * Service a reques to change an event host's password.
      * @param eventHost the authenticated EventHost
      * @param request the request body
-     * @return an EditEventHostPasswordResponse on success
+     * @return a SingleMessageResponse on success
      * @throws UnauthorizedException if eventHost is null (implying that the 
      * JWT authentication filter could not authenticate an EventHost)
      */
@@ -241,7 +241,7 @@ public class EventHostService
      * Services a request to change an event host's email address.
      * @param eventHost the authenticated EventHost
      * @param request the request body
-     * @return an EditEventHostEmailResponse on success
+     * @return a SingleMessageResponse on success
      * @throws UnauthorizedException if eventHost is null (implying that the 
      * JWT authentication filter could not authenticate an EventHost)
      * @throws EditEventHostEmailResponse if the new email address is
@@ -274,7 +274,7 @@ public class EventHostService
     /**
      * Services a request to delete an event host's account.
      * @param eventHost the authenticated EventHost
-     * @return a DeleteEventHostResponse on success
+     * @return a SingleMessageResponse on success
      * @throws UnauthorizedException if eventHost is null (implying that the 
      * JWT authentication filter could not authenticate an EventHost)
      * @throws PendingEventsExistException if there exists at least one event

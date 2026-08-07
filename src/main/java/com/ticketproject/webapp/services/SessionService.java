@@ -132,7 +132,7 @@ public class SessionService
      * and then marking all active sessions under their account as revoked.
      * 
      * @param eventHost the event host (authenticated by JwtAuthenticationFilter)
-     * @return a LogoutAllDevicesSessionResponse containing a message of the request's result
+     * @return a SingleMessageResponse containing a message of the request's result
      * @throws UnauthorizedException if eventHost is null (which can occur if
      * JwtAuthenticationFilter determines that no proper authentication was
      * included in the request)
@@ -164,7 +164,7 @@ public class SessionService
      * Handle a request to log out of a session by marking
      * the authenticated session as revoked.
      * @param session the session (authenticated by JwtAuthenticationFilter)
-     * @return a LogoutSessionResponse containing a message of the request's result
+     * @return a SingleMessageResponse containing a message of the request's result
      * @throws UnauthorizedException if session is null (which can occur if
      * JwtAuthenticationFilter determines that no proper authentication was
      * included in the request)

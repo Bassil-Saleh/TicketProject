@@ -51,7 +51,7 @@ public class PasswordResetTokenService
      * specified in the request.
      * 
      * @param request the request body
-     * @return a CreatePasswordResetTokenResponse on success
+     * @return a SingleMessageResponse on success
      * @throws EmailSendFailedException if the email cannot be sent for whatever reason
      */
     public SingleMessageResponse createPasswordResetToken(CreatePasswordResetTokenRequest request)
@@ -88,7 +88,7 @@ public class PasswordResetTokenService
      * Services a request to use a password reset token.
      * 
      * @param request the request body
-     * @return a UsePasswordResetTokenResponse on success
+     * @return a SingleMessageResponse on success
      * @throws InvalidCredentialsException if no account is found
      * with the password reset token provided in the request
      */

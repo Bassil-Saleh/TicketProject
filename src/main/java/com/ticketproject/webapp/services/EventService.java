@@ -328,7 +328,7 @@ public class EventService
      * 
      * @param eventHost the logged in event host
      * @param publicId the event's public ID
-     * @return a DeleteEventByPublicIdResponse on success
+     * @return a SingleMessageResponse on success
      */
     public SingleMessageResponse deleteEventByPublicId(EventHost eventHost, String publicId)
     {
