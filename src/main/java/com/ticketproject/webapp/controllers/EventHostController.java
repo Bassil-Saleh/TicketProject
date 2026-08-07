@@ -4,13 +4,8 @@ import com.ticketproject.webapp.dtos.requests.CreateEventHostRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventHostEmailRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventHostNameRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventHostPasswordRequest;
-import com.ticketproject.webapp.dtos.responses.CreateEventHostResponse;
-import com.ticketproject.webapp.dtos.responses.DeleteEventHostResponse;
-import com.ticketproject.webapp.dtos.responses.EditEventHostEmailResponse;
+import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventHostProfileResponse;
-import com.ticketproject.webapp.dtos.responses.VerifyEventHostResponse;
-import com.ticketproject.webapp.dtos.responses.EditEventHostNameResponse;
-import com.ticketproject.webapp.dtos.responses.EditEventHostPasswordResponse;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.services.EventHostService;
 import com.ticketproject.webapp.constants.ApiPaths;
@@ -53,7 +48,7 @@ public class EventHostController
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CreateEventHostResponse createEventHost
+    public SingleMessageResponse createEventHost
     (
         @Valid
         @RequestBody CreateEventHostRequest request
@@ -70,7 +65,7 @@ public class EventHostController
      */
     @GetMapping(ApiPaths.EventHosts.VERIFICATION)
     @ResponseStatus(HttpStatus.OK)
-    public VerifyEventHostResponse verifyEventHost
+    public SingleMessageResponse verifyEventHost
     (
         @RequestParam("token") String verificationToken
     )
@@ -104,7 +99,7 @@ public class EventHostController
      * @return an EditEventHostNameResponse describing the request's result
      */
     @PatchMapping(ApiPaths.EventHosts.FULL_NAME)
-    public EditEventHostNameResponse editEventHostName
+    public SingleMessageResponse editEventHostName
     (
         @Valid
         @RequestBody
@@ -127,7 +122,7 @@ public class EventHostController
      * @return an EditEventHostPasswordResponse describing the request's result
      */
     @PatchMapping(ApiPaths.EventHosts.PASSWORD)
-    public EditEventHostPasswordResponse editEventHostPassword
+    public SingleMessageResponse editEventHostPassword
     (
         @Valid
         @RequestBody
@@ -150,7 +145,7 @@ public class EventHostController
      * @return an EditEventHostEmailResponse describing the request's result
      */
     @PatchMapping(ApiPaths.EventHosts.EMAIL)
-    public EditEventHostEmailResponse editEventHostEmail
+    public SingleMessageResponse editEventHostEmail
     (
         @Valid
         @RequestBody
@@ -173,7 +168,7 @@ public class EventHostController
      * @return an DeleteEventHostResponse describing the request's result
      */
     @DeleteMapping
-    public DeleteEventHostResponse deleteEventHost(HttpServletRequest request)
+    public SingleMessageResponse deleteEventHost(HttpServletRequest request)
     {
         EventHost eventHost = (EventHost) request.getAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_EVENT_HOST_ATTRIBUTE);
         if (eventHost == null)

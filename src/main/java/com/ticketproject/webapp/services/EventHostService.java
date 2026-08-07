@@ -5,13 +5,8 @@ import com.ticketproject.webapp.dtos.requests.CreateEventHostRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventHostEmailRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventHostNameRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventHostPasswordRequest;
-import com.ticketproject.webapp.dtos.responses.CreateEventHostResponse;
-import com.ticketproject.webapp.dtos.responses.DeleteEventHostResponse;
-import com.ticketproject.webapp.dtos.responses.EditEventHostNameResponse;
-import com.ticketproject.webapp.dtos.responses.EditEventHostPasswordResponse;
-import com.ticketproject.webapp.dtos.responses.EditEventHostEmailResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventHostProfileResponse;
-import com.ticketproject.webapp.dtos.responses.VerifyEventHostResponse;
+import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 import com.ticketproject.webapp.exceptions.EventHostEmailAlreadyExistsException;
 import com.ticketproject.webapp.exceptions.EventHostToVerifyNotFoundException;
 import com.ticketproject.webapp.exceptions.EventHostUnderageException;
@@ -71,7 +66,7 @@ public class EventHostService
      * @throws EventHostUnderageException if the request contains a date of birth
      * less than 18 years old
      */
-    public CreateEventHostResponse createEventHost(CreateEventHostRequest request)
+    public SingleMessageResponse createEventHost(CreateEventHostRequest request)
     {
         // Check if there already exists an event host account
         // using that same email address.
@@ -121,7 +116,7 @@ public class EventHostService
             ".";
 
         // Return a response to the user.
-        return new CreateEventHostResponse(responseMessage);
+        return new SingleMessageResponse(responseMessage);
     }
 
     /**
@@ -135,7 +130,7 @@ public class EventHostService
      * @throws EventHostInactiveException if the event host account associated
      * with the verification token is currently inactive
      */
-    public VerifyEventHostResponse verifyEventHost(String verificationToken)
+    public SingleMessageResponse verifyEventHost(String verificationToken)
     {
         // Hash the verification token and search for an EventHost with a matching verification token hash.
         byte[] hashedVerificationToken = hashingService.hashToken(verificationToken);
@@ -162,7 +157,7 @@ public class EventHostService
         // Check whether the account is already verified.
         if (eventHostToVerify.isVerified())
         {
-            return new VerifyEventHostResponse("Your account has already been verified.");
+            return new SingleMessageResponse("Your account has already been verified.");
         }
 
         // Mark the account as verified.
@@ -170,7 +165,7 @@ public class EventHostService
         eventHostToVerify.setLastUpdated(LocalDateTime.now());
         eventHostRepository.save(eventHostToVerify);
 
-        return new VerifyEventHostResponse("Your account has been successfully verified.");
+        return new SingleMessageResponse("Your account has been successfully verified.");
     }
 
     /**
@@ -205,7 +200,7 @@ public class EventHostService
      * @throws UnauthorizedException if eventHost is null (implying that the 
      * JWT authentication filter could not authenticate an EventHost)
      */
-    public EditEventHostNameResponse editEventHostName(EventHost eventHost, EditEventHostNameRequest request)
+    public SingleMessageResponse editEventHostName(EventHost eventHost, EditEventHostNameRequest request)
     {
         if (eventHost == null)
         {
@@ -218,7 +213,7 @@ public class EventHostService
         eventHost.setLastUpdated(LocalDateTime.now());
         eventHostRepository.save(eventHost);
 
-        return new EditEventHostNameResponse("Your name has been updated.");
+        return new SingleMessageResponse("Your name has been updated.");
     }
 
     /**
@@ -229,7 +224,7 @@ public class EventHostService
      * @throws UnauthorizedException if eventHost is null (implying that the 
      * JWT authentication filter could not authenticate an EventHost)
      */
-    public EditEventHostPasswordResponse editEventHostPassword(EventHost eventHost, EditEventHostPasswordRequest request)
+    public SingleMessageResponse editEventHostPassword(EventHost eventHost, EditEventHostPasswordRequest request)
     {
         if (eventHost == null)
         {
@@ -239,7 +234,7 @@ public class EventHostService
         eventHost.setPassword(request.password());
         eventHostRepository.save(eventHost);
 
-        return new EditEventHostPasswordResponse("Your password has been updated.");
+        return new SingleMessageResponse("Your password has been updated.");
     }
 
     /**
@@ -252,7 +247,7 @@ public class EventHostService
      * @throws EditEventHostEmailResponse if the new email address is
      * already in use by a different, preexisting event host account
      */
-    public EditEventHostEmailResponse editEventHostEmail(EventHost eventHost, EditEventHostEmailRequest request)
+    public SingleMessageResponse editEventHostEmail(EventHost eventHost, EditEventHostEmailRequest request)
     {
         if (eventHost == null)
         {
@@ -262,7 +257,7 @@ public class EventHostService
         byte[] newEmailBlindIndex = blindIndexService.computeIndex(request.email());
         if (Arrays.equals(eventHost.getEmailBlindIndex(), newEmailBlindIndex))
         {
-            return new EditEventHostEmailResponse("The provided email address is the same as your current email address.");
+            return new SingleMessageResponse("The provided email address is the same as your current email address.");
         }
 
         if (eventHostRepository.existsByEmailIndex(newEmailBlindIndex))
@@ -273,7 +268,7 @@ public class EventHostService
         eventHost.setEmail(request.email());
         eventHostRepository.save(eventHost);
 
-        return new EditEventHostEmailResponse("Your email address has been updated.");
+        return new SingleMessageResponse("Your email address has been updated.");
     }
 
     /**
@@ -285,7 +280,7 @@ public class EventHostService
      * @throws PendingEventsExistException if there exists at least one event
      * under the event host's account which has not ended yet
      */
-    public DeleteEventHostResponse deleteEventHost(EventHost eventHost)
+    public SingleMessageResponse deleteEventHost(EventHost eventHost)
     {
         if (eventHost == null)
         {
@@ -299,6 +294,6 @@ public class EventHostService
         }
 
         eventHostRepository.delete(eventHost);
-        return new DeleteEventHostResponse("Your account has been successfully deleted.");
+        return new SingleMessageResponse("Your account has been successfully deleted.");
     }
 }
