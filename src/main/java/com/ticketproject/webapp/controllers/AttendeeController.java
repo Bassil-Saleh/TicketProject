@@ -1,0 +1,29 @@
+package com.ticketproject.webapp.controllers;
+
+import com.ticketproject.webapp.constants.ApiPaths;
+import com.ticketproject.webapp.dtos.requests.CreatePublicEventRegistrationRequest;
+import com.ticketproject.webapp.services.AttendeeService;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.PostMapping;
+
+/**
+ * AttendeeController is a REST controller that routes requests
+ * concerning Attendee entities to different API routes.
+ */
+@RestController
+@RequestMapping(ApiPaths.BASE + ApiPaths.Attendees.ROOT)
+public class AttendeeController
+{
+    private final AttendeeService attendeeService;
+
+    public AttendeeController(AttendeeService attendeeService)
+    {
+        this.attendeeService = attendeeService;
+    }
+}

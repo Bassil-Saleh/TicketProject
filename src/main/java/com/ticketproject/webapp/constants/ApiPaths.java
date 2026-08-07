@@ -89,4 +89,20 @@ public final class ApiPaths
         public static final String DATES = "/dates";
         public static final String MAX_ATTENDEES = "/max-attendees";
     }
+
+    public static final class Attendees
+    {
+        /**
+         * Private constructor. Not meant to be used.
+         * @throws UnsupportedOperationException
+         */
+        private Attendees()
+        {
+            throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+        }
+
+        public static final String ROOT = "/attendees";
+        public static final String REGISTRATION = "/registration";
+        public static final String INVITATION = "/invitation";
+    }
 }
