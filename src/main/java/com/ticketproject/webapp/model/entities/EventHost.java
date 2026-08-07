@@ -259,6 +259,7 @@ public class EventHost
         String plaintextPassword
     )
     {
+        validateEmail(email);
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
@@ -369,12 +370,19 @@ public class EventHost
     public void setBlockedRegistrations(Set<BlockedRegistration> blockedRegistrations) { this.blockedRegistrations = blockedRegistrations; }
     public void setTicketScans(Set<TicketScan> ticketScans)                            { this.ticketScans = ticketScans; }
     public void setSessions(Set<Session> sessions)                                     { this.sessions = sessions; }
+
+    @PrePersist
+    @PreUpdate
+    private void syncAndValidateConstraints()
+    {
+        validateEmail(this.email);
+        syncBlindIndex();
+    }
+
     /**
      * To handle edge cases where JPA loads a partially-constructed
      * entity or when someone uses reflection.
      */
-    @PrePersist
-    @PreUpdate
     private void syncBlindIndex()
     {
         if (this.email != null)
@@ -386,6 +394,18 @@ public class EventHost
             {
                 this.emailBlindIndex = computed;
             }
+        }
+    }
+
+    private void validateEmail(String email)
+    {
+        if (email == null)
+        {
+            throw new IllegalStateException("Email address cannot be null.");
+        }
+        if (!email.matches(AppConstants.Database.EventHosts.Definitions.EMAIL_ADDRESS_REGEX))
+        {
+            throw new IllegalStateException("Must be a valid email address.");
         }
     }
 

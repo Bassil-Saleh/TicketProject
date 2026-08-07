@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.test.annotation.DirtiesContext;
@@ -133,10 +134,10 @@ class EventHostRepositoryTest
         }
 
         @Test
-        @DisplayName("Normalized email lookup: whitespace and case")
+        @DisplayName("Normalized email lookup: case sensitivity")
         void blindIndexIsNormalized()
         {
-            EventHost host = createHost("   CaRoL@eXaMpLe.cOm    ");
+            EventHost host = createHost("CaRoL@eXaMpLe.cOm");
             eventHostRepository.save(host);
 
             // Should match since normalization strips trailing & leading whitespace
@@ -265,7 +266,7 @@ class EventHostRepositoryTest
             host.setEmail(null);
 
             assertThatThrownBy(() -> eventHostRepository.saveAndFlush(host))
-                .isInstanceOf(DataIntegrityViolationException.class);
+                .isInstanceOf(InvalidDataAccessApiUsageException.class);
         }
 
         @Test
@@ -330,7 +331,7 @@ class EventHostRepositoryTest
             saved.setEmail(null);
 
             assertThatThrownBy(() -> eventHostRepository.saveAndFlush(saved))
-                .isInstanceOf(DataIntegrityViolationException.class);
+                .isInstanceOf(InvalidDataAccessApiUsageException.class);
         }
 
         @Test

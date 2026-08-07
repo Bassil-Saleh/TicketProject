@@ -459,6 +459,7 @@ public final class AppConstants
                 public static final String COLUMN_EMAIL_BLIND_INDEX = "VARBINARY(32)";
                 public static final String COLUMN_PASSWORD_HASH = "VARCHAR(255)";
                 public static final String COLUMN_VERIFICATION_KEY_HASH = "VARBINARY(32)";
+                public static final String EMAIL_ADDRESS_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
             }
         }
 
@@ -849,8 +850,6 @@ public final class AppConstants
                 {
                     throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
                 }
-
-                public static final String EMAIL_ADDRESS_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
             }
         }
 
