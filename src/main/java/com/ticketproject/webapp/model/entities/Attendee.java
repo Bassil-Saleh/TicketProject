@@ -46,7 +46,7 @@ public class Attendee
     (
         name = AppConstants.Database.Attendees.TableNames.COLUMN_FIRST_NAME,
         nullable = false,
-        length = AppConstants.Database.Attendees.Sizes.NAME_LENGTH
+        length = AppConstants.Database.Attendees.Sizes.MAX_NAME_LENGTH
     )
     private String firstName;
 
@@ -56,7 +56,7 @@ public class Attendee
     @Column
     (
         name = AppConstants.Database.Attendees.TableNames.COLUMN_MIDDLE_NAME,
-        length = AppConstants.Database.Attendees.Sizes.NAME_LENGTH
+        length = AppConstants.Database.Attendees.Sizes.MAX_NAME_LENGTH
     )
     private String middleName;
 
@@ -67,7 +67,7 @@ public class Attendee
     (
         name = AppConstants.Database.Attendees.TableNames.COLUMN_LAST_NAME,
         nullable = false,
-        length = AppConstants.Database.Attendees.Sizes.NAME_LENGTH
+        length = AppConstants.Database.Attendees.Sizes.MAX_NAME_LENGTH
     )
     private String lastName;
 

@@ -24,6 +24,7 @@ public final class AppConstants
      */
     public static final class Database
     {
+
         /**
          * Private constructor. Not meant to be used.
          * @throws UnsupportedOperationException
@@ -184,8 +185,8 @@ public final class AppConstants
                     throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
                 }
 
-                public static final int NAME_LENGTH = 100;
-                public static final int EMAIL_LENGTH = 254;
+                public static final int MAX_NAME_LENGTH = AppConstants.Database.EventHosts.Sizes.MAX_NAME_LENGTH;
+                public static final int MAX_EMAIL_LENGTH = AppConstants.Database.EventHosts.Sizes.MAX_EMAIL_LENGTH;
             }
 
             public static final class Definitions
@@ -786,6 +787,7 @@ public final class AppConstants
      */
     public static final class Crypto
     {
+
         /**
          * Private constructor. Not meant to be used.
          * @throws UnsupportedOperationException
@@ -812,6 +814,7 @@ public final class AppConstants
 
     public static final class DTO
     {
+
         /**
          * Private constructor. Not meant to be used.
          * @throws UnsupportedOperationException
@@ -938,6 +941,7 @@ public final class AppConstants
      */
     public static final class Jwt
     {
+
         /**
          * Private constructor. Not meant to be used.
          * @throws UnsupportedOperationException
