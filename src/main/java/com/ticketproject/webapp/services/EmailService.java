@@ -25,12 +25,6 @@ import java.util.Map;
 @Service
 public class EmailService
 {
-    private static final String FROM_ADDRESS = "noreply@ticketproject.local";
-    private static final String FROM_NAME = "TicketProject";
-    private static final String PASSWORD_RESET_EMAIL_SUBJECT = "TicketProject Account Password Reset Request";
-    private static final String VERIFICATION_EMAIL_TEMPLATE = "email/verification-email";
-    private static final String VERIFICATION_EMAIL_SUBJECT = "Verify Your TicketProject Account";
-
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
 
@@ -65,9 +59,13 @@ public class EmailService
             // Create and send an email containing the password reset token.
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(FROM_ADDRESS, FROM_NAME);
+            helper.setFrom
+            (
+                AppConstants.Email.FROM_ADDRESS,
+                AppConstants.Project.PROJECT_NAME
+            );
             helper.setTo(toEmail);
-            helper.setSubject(PASSWORD_RESET_EMAIL_SUBJECT);
+            helper.setSubject(AppConstants.Email.Subjects.PASSWORD_RESET_EMAIL);
             helper.setText(messageBody, false);
 
             mailSender.send(message);
@@ -105,14 +103,19 @@ public class EmailService
             context.setVariables(variables);
 
             // Render the email HTML using the Thymeleaf template.
-            String htmlContent = templateEngine.process(VERIFICATION_EMAIL_TEMPLATE, context);
+            String htmlContent = templateEngine
+                .process(AppConstants.Email.Templates.VERIFICATION_EMAIL, context);
 
             // Create and send the email.
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(FROM_ADDRESS, FROM_NAME);
+            helper.setFrom
+            (
+                AppConstants.Email.FROM_ADDRESS,
+                AppConstants.Project.PROJECT_NAME
+            );
             helper.setTo(toEmail);
-            helper.setSubject(VERIFICATION_EMAIL_SUBJECT);
+            helper.setSubject(AppConstants.Email.Subjects.VERIFICATION_EMAIL);
             helper.setText(htmlContent, true);
 
             mailSender.send(message);

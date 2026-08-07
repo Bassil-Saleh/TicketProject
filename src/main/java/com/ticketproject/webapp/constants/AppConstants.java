@@ -985,4 +985,65 @@ public final class AppConstants
             public static final String BEARER_PREFIX = "Bearer ";
         }
     }
+
+    public static final class Email
+    {
+
+        /**
+         * Private constructor. Not meant to be used.
+         * @throws UnsupportedOperationException
+         */
+        private Email()
+        {
+            throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+        }
+
+        public static final String FROM_ADDRESS = "noreply@ticketproject.local";
+
+        public static final class Subjects
+        {
+
+            /**
+             * Private constructor. Not meant to be used.
+             * @throws UnsupportedOperationException
+             */
+            private Subjects()
+            {
+                throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+            }
+
+            public static final String PASSWORD_RESET_EMAIL = AppConstants.Project.PROJECT_NAME + " Account Password Reset Request";
+            public static final String VERIFICATION_EMAIL = "Verify Your " + AppConstants.Project.PROJECT_NAME + " Account";
+        }
+
+        public static final class Templates
+        {
+
+            /**
+             * Private constructor. Not meant to be used.
+             * @throws UnsupportedOperationException
+             */
+            private Templates()
+            {
+                throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+            }
+
+            public static final String VERIFICATION_EMAIL = "email/verification-email";
+        }
+    }
+
+    public static final class Project
+    {
+
+        /**
+         * Private constructor. Not meant to be used.
+         * @throws UnsupportedOperationException
+         */
+        private Project()
+        {
+            throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+        }
+
+        public static final String PROJECT_NAME = "TicketProject";
+    }
 }
