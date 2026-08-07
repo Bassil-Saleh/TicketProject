@@ -25,6 +25,10 @@ openssl rand -base64 32
 # Add this line to the top of the file
 spring.application.name=webapp
 
+# If you're running this application locally,
+# you can set this to http://localhost:8080
+app.config.base-url=base_url_to_your_machine
+
 # Add your MariaDB database name, username and password
 spring.datasource.url=jdbc:mariadb://localhost:3306/your_database_name
 spring.datasource.username=your_username

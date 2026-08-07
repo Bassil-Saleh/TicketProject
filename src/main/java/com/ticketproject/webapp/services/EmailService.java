@@ -136,9 +136,8 @@ public class EmailService
      */
     private String buildVerificationUrl(String rawToken)
     {
-        // Construct the base URL (assuming localhost:8080 for local development).
-        // In production, this would be configured via application properties.
-        String baseUrl = "http://localhost:8080";
+        // Construct the verification URL (using the base URL from application.properties).
+        String baseUrl = "${app.config.base-url}";
         String path = ApiPaths.BASE + ApiPaths.EventHosts.ROOT + ApiPaths.EventHosts.VERIFICATION;
         return baseUrl + path + "?token=" + rawToken;
     }
