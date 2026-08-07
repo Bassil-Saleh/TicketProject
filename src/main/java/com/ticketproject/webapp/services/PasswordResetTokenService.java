@@ -8,8 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ticketproject.webapp.dtos.requests.CreatePasswordResetTokenRequest;
 import com.ticketproject.webapp.dtos.requests.UsePasswordResetTokenRequest;
-import com.ticketproject.webapp.dtos.responses.CreatePasswordResetTokenResponse;
-import com.ticketproject.webapp.dtos.responses.UsePasswordResetTokenResponse;
+import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 import com.ticketproject.webapp.exceptions.InvalidCredentialsException;
 import com.ticketproject.webapp.model.repositories.PasswordResetTokenRepository;
 import com.ticketproject.webapp.model.entities.PasswordResetToken;
@@ -55,7 +54,7 @@ public class PasswordResetTokenService
      * @return a CreatePasswordResetTokenResponse on success
      * @throws EmailSendFailedException if the email cannot be sent for whatever reason
      */
-    public CreatePasswordResetTokenResponse createPasswordResetToken(CreatePasswordResetTokenRequest request)
+    public SingleMessageResponse createPasswordResetToken(CreatePasswordResetTokenRequest request)
     {
         // Check if there exists an event host account with the provided email address.
         byte[] emailBlindIndex = blindIndexService.computeIndex(request.email());
@@ -63,7 +62,7 @@ public class PasswordResetTokenService
 
         if (foundEventHost.isEmpty())
         {
-            return new CreatePasswordResetTokenResponse
+            return new SingleMessageResponse
             ("If an account with the provided email address exists, a password reset token will be sent to that address.");
         }
 
@@ -81,7 +80,7 @@ public class PasswordResetTokenService
         // At this point, the email should have been sent successfully.
         passwordResetToken = passwordResetTokenRepository.save(passwordResetToken);
 
-        return new CreatePasswordResetTokenResponse
+        return new SingleMessageResponse
         ("If an account with the provided email address exists, a password reset token will be sent to that address.");
     }
 
@@ -93,7 +92,7 @@ public class PasswordResetTokenService
      * @throws InvalidCredentialsException if no account is found
      * with the password reset token provided in the request
      */
-    public UsePasswordResetTokenResponse usePasswordResetToken(UsePasswordResetTokenRequest request)
+    public SingleMessageResponse usePasswordResetToken(UsePasswordResetTokenRequest request)
     {
         byte[] tokenHash = hashingService.hashToken(request.passwordResetToken());
         Optional<PasswordResetToken> passwordResetToken = passwordResetTokenRepository.findByTokenHash(tokenHash);
@@ -114,6 +113,6 @@ public class PasswordResetTokenService
         foundToken = passwordResetTokenRepository.save(foundToken);
         foundEventHost = eventHostRepository.save(foundEventHost);
 
-        return new UsePasswordResetTokenResponse("Your password has been reset.");
+        return new SingleMessageResponse("Your password has been reset.");
     }
 }

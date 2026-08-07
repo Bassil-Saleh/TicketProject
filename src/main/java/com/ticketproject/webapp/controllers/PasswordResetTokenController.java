@@ -3,8 +3,7 @@ package com.ticketproject.webapp.controllers;
 import com.ticketproject.webapp.constants.ApiPaths;
 import com.ticketproject.webapp.dtos.requests.CreatePasswordResetTokenRequest;
 import com.ticketproject.webapp.dtos.requests.UsePasswordResetTokenRequest;
-import com.ticketproject.webapp.dtos.responses.CreatePasswordResetTokenResponse;
-import com.ticketproject.webapp.dtos.responses.UsePasswordResetTokenResponse;
+import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 import com.ticketproject.webapp.services.PasswordResetTokenService;
 
 import jakarta.validation.Valid;
@@ -40,7 +39,7 @@ public class PasswordResetTokenController
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CreatePasswordResetTokenResponse createPasswordResetToken
+    public SingleMessageResponse createPasswordResetToken
     (
         @Valid
         @RequestBody CreatePasswordResetTokenRequest request
@@ -57,7 +56,7 @@ public class PasswordResetTokenController
      */
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
-    public UsePasswordResetTokenResponse usePasswordResetToken
+    public SingleMessageResponse usePasswordResetToken
     (
         @Valid
         @RequestBody UsePasswordResetTokenRequest request
