@@ -101,6 +101,27 @@ public class EventService
      */
     private Event buildNewEvent(EventHost eventHost, CreateEventRequest request)
     {
+        if (request.startDateTime().isEqual(request.endDateTime()))
+        {
+            throw new InvalidRequestException("Event start date/time cannot be the same as the event end date/time.");
+        }
+
+        if (request.startDateTime().isAfter(request.endDateTime()))
+        {
+            throw new InvalidRequestException("Event start date/time cannot come after the event end date/time.");
+        }
+
+        Duration eventDuration = Duration.between(request.startDateTime(), request.endDateTime());
+        if (eventDuration.toMinutes() < AppConstants.DTO.Events.Sizes.MIN_EVENT_DURATION_MINUTES)
+        {
+            throw new InvalidRequestException
+            (
+                "Event duration must be at least " +
+                AppConstants.DTO.Events.Sizes.MIN_EVENT_DURATION_MINUTES +
+                " minutes long."
+            );
+        }
+
         Event newEvent = new Event.Builder()
             .name(request.name())
             .description(request.description())
