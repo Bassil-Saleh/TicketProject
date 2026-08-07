@@ -2,8 +2,7 @@ package com.ticketproject.webapp.controllers;
 
 import com.ticketproject.webapp.dtos.requests.LoginSessionRequest;
 import com.ticketproject.webapp.dtos.responses.LoginSessionResponse;
-import com.ticketproject.webapp.dtos.responses.LogoutAllDevicesSessionResponse;
-import com.ticketproject.webapp.dtos.responses.LogoutSessionResponse;
+import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 import com.ticketproject.webapp.services.SessionService;
 import com.ticketproject.webapp.constants.ApiPaths;
 import com.ticketproject.webapp.constants.AppConstants;
@@ -64,7 +63,7 @@ public class SessionController
      */
     @PatchMapping(ApiPaths.Sessions.LOGOUT_ALL_DEVICES)
     @ResponseStatus(HttpStatus.OK)
-    public LogoutAllDevicesSessionResponse logoutAllDevices(HttpServletRequest request)
+    public SingleMessageResponse logoutAllDevices(HttpServletRequest request)
     {
         EventHost eventHost = (EventHost) request.getAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_EVENT_HOST_ATTRIBUTE);
         if (eventHost == null)
@@ -81,7 +80,7 @@ public class SessionController
      */
     @PatchMapping(ApiPaths.Sessions.LOGOUT)
     @ResponseStatus(HttpStatus.OK)
-    public LogoutSessionResponse logout(HttpServletRequest request)
+    public SingleMessageResponse logout(HttpServletRequest request)
     {
         Session session = (Session) request.getAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_SESSION_ATTRIBUTE);
         if (session == null)

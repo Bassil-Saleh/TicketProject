@@ -2,8 +2,7 @@ package com.ticketproject.webapp.services;
 
 import com.ticketproject.webapp.dtos.requests.LoginSessionRequest;
 import com.ticketproject.webapp.dtos.responses.LoginSessionResponse;
-import com.ticketproject.webapp.dtos.responses.LogoutAllDevicesSessionResponse;
-import com.ticketproject.webapp.dtos.responses.LogoutSessionResponse;
+import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 import com.ticketproject.webapp.exceptions.AccountNotVerifiedException;
 import com.ticketproject.webapp.exceptions.EventHostInactiveException;
 import com.ticketproject.webapp.exceptions.InvalidCredentialsException;
@@ -138,7 +137,7 @@ public class SessionService
      * JwtAuthenticationFilter determines that no proper authentication was
      * included in the request)
      */
-    public LogoutAllDevicesSessionResponse logoutAllDevices(EventHost eventHost)
+    public SingleMessageResponse logoutAllDevices(EventHost eventHost)
     {
         if (eventHost == null)
         {
@@ -158,7 +157,7 @@ public class SessionService
             .toList();
         sessionRepository.saveAll(revokedSessions);
 
-        return new LogoutAllDevicesSessionResponse("You have been logged out from all of your devices.");
+        return new SingleMessageResponse("You have been logged out from all of your devices.");
     }
 
     /**
@@ -170,7 +169,7 @@ public class SessionService
      * JwtAuthenticationFilter determines that no proper authentication was
      * included in the request)
      */
-    public LogoutSessionResponse logout(Session session)
+    public SingleMessageResponse logout(Session session)
     {
         if (session == null)
         {
@@ -180,6 +179,6 @@ public class SessionService
         session.setRevoked(LocalDateTime.now());
         sessionRepository.save(session);
 
-        return new LogoutSessionResponse("You have been logged out.");
+        return new SingleMessageResponse("You have been logged out.");
     }
 }
