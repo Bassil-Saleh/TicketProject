@@ -101,7 +101,7 @@ public class EmailService
             Context context = new Context();
             Map<String, Object> variables = new HashMap<>();
             variables.put("verificationUrl", verificationUrl);
-            variables.put("expirationHours", AppConstants.DTO.EventHosts.Sizes.VERIFICATION_LINK_DURATION_HOURS);
+            variables.put("expirationHours", AppConstants.Database.EventHosts.Sizes.VERIFICATION_DURATION_HOURS);
             context.setVariables(variables);
 
             // Render the email HTML using the Thymeleaf template.

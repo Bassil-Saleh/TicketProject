@@ -110,9 +110,9 @@ public class EventHostService
             "An account verification link has been sent to your email address. " +
             "Please click it to verify your account. " +
             "The link expires in " +
-            AppConstants.DTO.EventHosts.Sizes.VERIFICATION_LINK_DURATION_HOURS +
+            AppConstants.Database.EventHosts.Sizes.VERIFICATION_DURATION_HOURS +
             " hour" + 
-            (AppConstants.DTO.EventHosts.Sizes.VERIFICATION_LINK_DURATION_HOURS > 1 ? "s" : "") +
+            (AppConstants.Database.EventHosts.Sizes.VERIFICATION_DURATION_HOURS > 1 ? "s" : "") +
             ".";
 
         // Return a response to the user.

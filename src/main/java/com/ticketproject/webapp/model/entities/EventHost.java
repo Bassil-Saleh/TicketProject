@@ -52,7 +52,7 @@ public class EventHost
     (
         name = AppConstants.Database.EventHosts.TableNames.COLUMN_FIRST_NAME,
         nullable = false,
-        length = AppConstants.Database.EventHosts.Sizes.NAME_LENGTH
+        length = AppConstants.Database.EventHosts.Sizes.MAX_NAME_LENGTH
     )
     private String firstName;
 
@@ -62,7 +62,7 @@ public class EventHost
     @Column
     (
         name = AppConstants.Database.EventHosts.TableNames.COLUMN_MIDDLE_NAME,
-        length = AppConstants.Database.EventHosts.Sizes.NAME_LENGTH
+        length = AppConstants.Database.EventHosts.Sizes.MAX_NAME_LENGTH
     )
     private String middleName;
 
@@ -73,7 +73,7 @@ public class EventHost
     (
         name = AppConstants.Database.EventHosts.TableNames.COLUMN_LAST_NAME,
         nullable = false,
-        length = AppConstants.Database.EventHosts.Sizes.NAME_LENGTH
+        length = AppConstants.Database.EventHosts.Sizes.MAX_NAME_LENGTH
     )
     private String lastName;
 

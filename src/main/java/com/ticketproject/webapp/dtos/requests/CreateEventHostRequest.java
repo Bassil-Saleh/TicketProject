@@ -25,22 +25,22 @@ public record CreateEventHostRequest
     @NotBlank(message = "First name is required")
     @Size
     (
-        max = AppConstants.DTO.EventHosts.Sizes.MAX_NAME_LENGTH,
-        message = "First name must not exceed " + AppConstants.DTO.EventHosts.Sizes.MAX_NAME_LENGTH + " characters"
+        max = AppConstants.Database.EventHosts.Sizes.MAX_NAME_LENGTH,
+        message = "First name must not exceed " + AppConstants.Database.EventHosts.Sizes.MAX_NAME_LENGTH + " characters"
     )
     String firstName,
 
     @Size
     (
-        max = AppConstants.DTO.EventHosts.Sizes.MAX_NAME_LENGTH,
-        message = "Middle name must not exceed " + AppConstants.DTO.EventHosts.Sizes.MAX_NAME_LENGTH + " characters"
+        max = AppConstants.Database.EventHosts.Sizes.MAX_NAME_LENGTH,
+        message = "Middle name must not exceed " + AppConstants.Database.EventHosts.Sizes.MAX_NAME_LENGTH + " characters"
     )
     String middleName,
 
     @Size
     (
-        max = AppConstants.DTO.EventHosts.Sizes.MAX_NAME_LENGTH,
-        message = "Last name must not exceed " + AppConstants.DTO.EventHosts.Sizes.MAX_NAME_LENGTH + " characters"
+        max = AppConstants.Database.EventHosts.Sizes.MAX_NAME_LENGTH,
+        message = "Last name must not exceed " + AppConstants.Database.EventHosts.Sizes.MAX_NAME_LENGTH + " characters"
     )
     @NotBlank(message = "Last name is required")
     String lastName,
@@ -56,20 +56,20 @@ public record CreateEventHostRequest
     )
     @Size
     (
-        max = AppConstants.DTO.EventHosts.Sizes.MAX_EMAIL_LENGTH,
-        message = "Email address must not exceed " + AppConstants.DTO.EventHosts.Sizes.MAX_EMAIL_LENGTH + " characters"
+        max = AppConstants.Database.EventHosts.Sizes.MAX_EMAIL_LENGTH,
+        message = "Email address must not exceed " + AppConstants.Database.EventHosts.Sizes.MAX_EMAIL_LENGTH + " characters"
     )
     String email,
 
     @NotBlank(message = "Password is required")
     @Size
     (
-        min = AppConstants.DTO.EventHosts.Sizes.MIN_PASSWORD_LENGTH,
-        max = AppConstants.DTO.EventHosts.Sizes.MAX_PASSWORD_LENGTH,
+        min = AppConstants.Database.EventHosts.Sizes.MIN_PASSWORD_LENGTH,
+        max = AppConstants.Database.EventHosts.Sizes.MAX_PASSWORD_LENGTH,
         message = "Password must be between " +
-        AppConstants.DTO.EventHosts.Sizes.MIN_PASSWORD_LENGTH +
+        AppConstants.Database.EventHosts.Sizes.MIN_PASSWORD_LENGTH +
         " and " +
-        AppConstants.DTO.EventHosts.Sizes.MAX_PASSWORD_LENGTH +
+        AppConstants.Database.EventHosts.Sizes.MAX_PASSWORD_LENGTH +
         " characters long"
     )
     String password,
