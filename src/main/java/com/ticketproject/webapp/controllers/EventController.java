@@ -124,7 +124,7 @@ public class EventController
      * 
      * @param publicId the event's public ID
      * @param servletRequest the HTTP Servlet request
-     * @return a DeleteEventByPublicIdResponse on success
+     * @return a SingleMessageResponse on success
      */
     @DeleteMapping(ApiPaths.Events.BY_PUBLIC_ID)
     @ResponseStatus(HttpStatus.OK)

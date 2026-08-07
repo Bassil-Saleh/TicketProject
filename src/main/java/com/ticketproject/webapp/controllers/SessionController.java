@@ -59,7 +59,7 @@ public class SessionController
     /**
      * Handles a request to log out an event host account from all devices.
      * @param request an HttpServletRequest containing a JWT
-     * @return a LogoutAllDevicesSessionResponse after performing the logout
+     * @return a SingleMessageResponse after performing the logout
      */
     @PatchMapping(ApiPaths.Sessions.LOGOUT_ALL_DEVICES)
     @ResponseStatus(HttpStatus.OK)
@@ -76,7 +76,7 @@ public class SessionController
     /**
      * Handles a request to log out an event host account from the given session.
      * @param request an HttpServletRequest containing a JWT
-     * @return a LogoutSessionResponse after performing the logout
+     * @return a SingleMessageResponse after performing the logout
      */
     @PatchMapping(ApiPaths.Sessions.LOGOUT)
     @ResponseStatus(HttpStatus.OK)

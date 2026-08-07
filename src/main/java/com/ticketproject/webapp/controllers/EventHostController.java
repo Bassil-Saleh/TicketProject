@@ -44,7 +44,7 @@ public class EventHostController
     /**
      * Handles a request to create a new EventHost.
      * @param request a CreateEventHostRequest from the client
-     * @return a CreateEventHostResponse indicating the result of the request
+     * @return a SingleMessageResponse indicating the result of the request
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -61,7 +61,7 @@ public class EventHostController
      * Handles a request to verify a new EventHost.
      * This endpoint is accessed via a clickable link in the verification email.
      * @param verificationToken the verification token from the email link
-     * @return a VerifyEventHostResponse indicating the result of the request
+     * @return a SingleMessageResponse indicating the result of the request
      */
     @GetMapping(ApiPaths.EventHosts.VERIFICATION)
     @ResponseStatus(HttpStatus.OK)
@@ -96,7 +96,7 @@ public class EventHostController
      * @param request the request body
      * @param servletRequest an HttpServletRequest from the client
      * containing a JWT in the Authorization header
-     * @return an EditEventHostNameResponse describing the request's result
+     * @return a SingleMessageResponse describing the request's result
      */
     @PatchMapping(ApiPaths.EventHosts.FULL_NAME)
     public SingleMessageResponse editEventHostName
@@ -119,7 +119,7 @@ public class EventHostController
      * Handles a request to change the password of the logged in EventHost.
      * @param request the request body
      * @param servletRequest an HttpServletRequest from the client
-     * @return an EditEventHostPasswordResponse describing the request's result
+     * @return a SingleMessageResponse describing the request's result
      */
     @PatchMapping(ApiPaths.EventHosts.PASSWORD)
     public SingleMessageResponse editEventHostPassword
@@ -142,7 +142,7 @@ public class EventHostController
      * Handles a request to change the email address of the logged in EventHost.
      * @param request the request body
      * @param servletRequest an HttpServletRequest from the client
-     * @return an EditEventHostEmailResponse describing the request's result
+     * @return a SingleMessageResponse describing the request's result
      */
     @PatchMapping(ApiPaths.EventHosts.EMAIL)
     public SingleMessageResponse editEventHostEmail
@@ -165,7 +165,7 @@ public class EventHostController
      * Handles a reques to delete the logged in event host's account
      * (which should also delete any other data related to said account).
      * @param request the HttpServletRequest from the client
-     * @return an DeleteEventHostResponse describing the request's result
+     * @return a SingleMessageResponse describing the request's result
      */
     @DeleteMapping
     public SingleMessageResponse deleteEventHost(HttpServletRequest request)

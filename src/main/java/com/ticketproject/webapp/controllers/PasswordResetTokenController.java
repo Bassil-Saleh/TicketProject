@@ -35,7 +35,7 @@ public class PasswordResetTokenController
      * Handles a request to reset the password of an event host account.
      * 
      * @param request the request body
-     * @return a CreatePasswordResetTokenResponse on success
+     * @return a SingleMessageResponse on success
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -52,7 +52,7 @@ public class PasswordResetTokenController
      * Handles a request to use a password reset token.
      * 
      * @param request the request body
-     * @return a UsePasswordResetTokenResponse on success
+     * @return a SingleMessageResponse on success
      */
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
