@@ -18,23 +18,23 @@ public record EditEventHostNameRequest
     @NotBlank(message = "First name is required")
     @Size
     (
-        max = AppConstants.DTO.EventHosts.Sizes.MAX_NAME_LENGTH,
-        message = "First name must not exceed " + AppConstants.DTO.EventHosts.Sizes.MAX_NAME_LENGTH + " characters"
+        max = AppConstants.Database.EventHosts.Sizes.MAX_NAME_LENGTH,
+        message = "First name must not exceed " + AppConstants.Database.EventHosts.Sizes.MAX_NAME_LENGTH + " characters"
     )
     String firstName,
 
     @Size
     (
-        max = AppConstants.DTO.EventHosts.Sizes.MAX_NAME_LENGTH,
-        message = "Middle name must not exceed " + AppConstants.DTO.EventHosts.Sizes.MAX_NAME_LENGTH + " characters"
+        max = AppConstants.Database.EventHosts.Sizes.MAX_NAME_LENGTH,
+        message = "Middle name must not exceed " + AppConstants.Database.EventHosts.Sizes.MAX_NAME_LENGTH + " characters"
     )
     String middleName,
 
     @NotBlank(message = "Last name is required")
     @Size
     (
-        max = AppConstants.DTO.EventHosts.Sizes.MAX_NAME_LENGTH,
-        message = "Last name must not exceed " + AppConstants.DTO.EventHosts.Sizes.MAX_NAME_LENGTH + " characters"
+        max = AppConstants.Database.EventHosts.Sizes.MAX_NAME_LENGTH,
+        message = "Last name must not exceed " + AppConstants.Database.EventHosts.Sizes.MAX_NAME_LENGTH + " characters"
     )
     String lastName
 )

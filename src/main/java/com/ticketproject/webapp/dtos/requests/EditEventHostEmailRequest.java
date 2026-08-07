@@ -25,8 +25,8 @@ public record EditEventHostEmailRequest
     )
     @Size
     (
-        max = AppConstants.DTO.EventHosts.Sizes.MAX_EMAIL_LENGTH,
-        message = "Email address must not exceed " + AppConstants.DTO.EventHosts.Sizes.MAX_EMAIL_LENGTH + " characters"
+        max = AppConstants.Database.EventHosts.Sizes.MAX_EMAIL_LENGTH,
+        message = "Email address must not exceed " + AppConstants.Database.EventHosts.Sizes.MAX_EMAIL_LENGTH + " characters"
     )
     String email
 )

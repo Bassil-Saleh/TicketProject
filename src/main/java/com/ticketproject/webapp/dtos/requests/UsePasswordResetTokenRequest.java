@@ -17,9 +17,9 @@ public record UsePasswordResetTokenRequest
     @NotBlank(message = "Password reset token is required")
     @Size
     (
-        max = AppConstants.DTO.PasswordResetTokens.Sizes.MAX_PASSWORD_RESET_TOKEN_LENGTH,
+        max = AppConstants.Database.PasswordResetTokens.Sizes.MAX_PASSWORD_RESET_TOKEN_LENGTH,
         message = "Password reset token cannot be longer than " +
-        AppConstants.DTO.PasswordResetTokens.Sizes.MAX_PASSWORD_RESET_TOKEN_LENGTH +
+        AppConstants.Database.PasswordResetTokens.Sizes.MAX_PASSWORD_RESET_TOKEN_LENGTH +
         " characters long"
     )
     String passwordResetToken,
@@ -27,12 +27,12 @@ public record UsePasswordResetTokenRequest
     @NotBlank(message = "New password is required")
     @Size
     (
-        min = AppConstants.DTO.EventHosts.Sizes.MIN_PASSWORD_LENGTH,
-        max = AppConstants.DTO.EventHosts.Sizes.MAX_PASSWORD_LENGTH,
+        min = AppConstants.Database.EventHosts.Sizes.MIN_PASSWORD_LENGTH,
+        max = AppConstants.Database.EventHosts.Sizes.MAX_PASSWORD_LENGTH,
         message = "New password must be between " +
-        AppConstants.DTO.EventHosts.Sizes.MIN_PASSWORD_LENGTH +
+        AppConstants.Database.EventHosts.Sizes.MIN_PASSWORD_LENGTH +
         " and " +
-        AppConstants.DTO.EventHosts.Sizes.MAX_PASSWORD_LENGTH +
+        AppConstants.Database.EventHosts.Sizes.MAX_PASSWORD_LENGTH +
         " characters long"
     )
     String password

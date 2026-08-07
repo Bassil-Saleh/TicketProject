@@ -108,7 +108,7 @@ public final class AppConstants
                 {
                     throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
                 }
-
+                public static final int MAX_PASSWORD_RESET_TOKEN_LENGTH = 2 * AppConstants.Crypto.RANDOM_TOKEN_LENGTH_BYTES;
                 public static final int TOKEN_LENGTH = 36;
                 public static final int TOKEN_DURATION_HOURS = 1;
             }
@@ -878,7 +878,6 @@ public final class AppConstants
                     throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
                 }
 
-                public static final int MAX_PASSWORD_RESET_TOKEN_LENGTH = 2 * AppConstants.Crypto.RANDOM_TOKEN_LENGTH_BYTES;
             }
         }
 
