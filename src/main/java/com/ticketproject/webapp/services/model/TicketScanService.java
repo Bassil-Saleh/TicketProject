@@ -16,8 +16,12 @@ import com.ticketproject.webapp.dtos.requests.ScanTicketRequest;
 import com.ticketproject.webapp.dtos.responses.GetScannedTicketsByEventHostResponse;
 import com.ticketproject.webapp.dtos.responses.ScannedTicketInfo;
 import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
+import com.ticketproject.webapp.exceptions.EventEndedException;
 import com.ticketproject.webapp.exceptions.InvalidRequestException;
 import com.ticketproject.webapp.exceptions.InvalidSignatureException;
+import com.ticketproject.webapp.exceptions.SigningKeyNotFoundException;
+import com.ticketproject.webapp.exceptions.TicketAlreadyScannedException;
+import com.ticketproject.webapp.exceptions.TicketScanFailedException;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.model.entities.Event;
 import com.ticketproject.webapp.model.entities.EventHost;
@@ -85,20 +89,20 @@ public class TicketScanService
 
         if (foundTicket.isPresent())
         {
-            throw new RuntimeException("The ticket has already been scanned.");
+            throw new TicketAlreadyScannedException("The ticket has already been scanned.");
         }
 
         Event foundEvent = foundTicket.getEvent();
 
         if (foundEvent.getEndDateTime().isBefore(LocalDateTime.now()))
         {
-            throw new RuntimeException("The event which this ticket is for has already ended.");
+            throw new EventEndedException("The event which this ticket is for has already ended.");
         }
 
         Optional<EventSigningKey> signingKeys = eventSigningKeyRepository.findByEventId(foundEvent.getId());
         if (signingKeys.isEmpty())
         {
-            throw new RuntimeException("Could not verify scanned ticket. Please try again later.");
+            throw new SigningKeyNotFoundException("Could not verify scanned ticket. Please try again later.");
         }
 
         EventSigningKey foundSigningKeys = signingKeys.get();
@@ -129,7 +133,7 @@ public class TicketScanService
         }
         catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e)
         {
-            throw new RuntimeException("Could not scan ticket");
+            throw new TicketScanFailedException("Could not scan ticket");
         }
         catch (InvalidSignatureException e)
         {
