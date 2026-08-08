@@ -3,8 +3,8 @@ package com.ticketproject.webapp.config;
 import com.ticketproject.webapp.constants.ApiPaths;
 import com.ticketproject.webapp.filters.JwtAuthenticationFilter;
 import com.ticketproject.webapp.model.repositories.SessionRepository;
-import com.ticketproject.webapp.services.HashingService;
-import com.ticketproject.webapp.services.JwtService;
+import com.ticketproject.webapp.services.database.HashingService;
+import com.ticketproject.webapp.services.jwt.JwtService;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;

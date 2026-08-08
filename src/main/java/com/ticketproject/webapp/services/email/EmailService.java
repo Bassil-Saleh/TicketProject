@@ -1,4 +1,4 @@
-package com.ticketproject.webapp.services;
+package com.ticketproject.webapp.services.email;
 
 import com.ticketproject.webapp.constants.ApiPaths;
 import com.ticketproject.webapp.constants.AppConstants;

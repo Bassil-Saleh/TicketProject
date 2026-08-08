@@ -4,8 +4,8 @@ import com.ticketproject.webapp.bridges.SpringContextBridge;
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.converters.EncryptedLocalDateConverter;
 import com.ticketproject.webapp.converters.EncryptedStringConverter;
-import com.ticketproject.webapp.services.BlindIndexService;
-import com.ticketproject.webapp.services.HashingService;
+import com.ticketproject.webapp.services.database.BlindIndexService;
+import com.ticketproject.webapp.services.database.HashingService;
 
 import jakarta.persistence.*;
 

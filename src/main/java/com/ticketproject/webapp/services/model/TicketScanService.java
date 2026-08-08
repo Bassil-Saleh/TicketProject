@@ -1,4 +1,4 @@
-package com.ticketproject.webapp.services;
+package com.ticketproject.webapp.services.model;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;

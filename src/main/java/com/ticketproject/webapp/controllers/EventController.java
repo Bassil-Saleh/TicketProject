@@ -14,7 +14,7 @@ import com.ticketproject.webapp.dtos.requests.EditEventDescriptionByPublicIdRequ
 import com.ticketproject.webapp.dtos.requests.EditEventNameByPublicIdRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventResponse;
 import com.ticketproject.webapp.model.entities.EventHost;
-import com.ticketproject.webapp.services.EventService;
+import com.ticketproject.webapp.services.model.EventService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;

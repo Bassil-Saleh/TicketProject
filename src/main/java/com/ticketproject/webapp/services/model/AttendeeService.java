@@ -1,4 +1,4 @@
-package com.ticketproject.webapp.services;
+package com.ticketproject.webapp.services.model;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +15,7 @@ import com.ticketproject.webapp.model.enums.RegistrationStatus;
 import com.ticketproject.webapp.model.repositories.AttendeeRepository;
 import com.ticketproject.webapp.model.repositories.EventRepository;
 import com.ticketproject.webapp.model.repositories.TicketRepository;
+import com.ticketproject.webapp.services.database.BlindIndexService;
 
 import jakarta.persistence.EntityNotFoundException;
 

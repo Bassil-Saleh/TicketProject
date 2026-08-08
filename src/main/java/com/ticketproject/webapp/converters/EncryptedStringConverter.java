@@ -5,7 +5,7 @@ import java.security.GeneralSecurityException;
 import javax.crypto.AEADBadTagException;
 
 import com.ticketproject.webapp.bridges.SpringContextBridge;
-import com.ticketproject.webapp.services.CryptoService;
+import com.ticketproject.webapp.services.database.CryptoService;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

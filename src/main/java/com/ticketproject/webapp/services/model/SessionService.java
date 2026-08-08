@@ -1,4 +1,4 @@
-package com.ticketproject.webapp.services;
+package com.ticketproject.webapp.services.model;
 
 import com.ticketproject.webapp.dtos.requests.LoginSessionRequest;
 import com.ticketproject.webapp.dtos.responses.LoginSessionResponse;
@@ -12,6 +12,9 @@ import com.ticketproject.webapp.model.entities.Session;
 import com.ticketproject.webapp.model.enums.ClientType;
 import com.ticketproject.webapp.model.repositories.EventHostRepository;
 import com.ticketproject.webapp.model.repositories.SessionRepository;
+import com.ticketproject.webapp.services.database.BlindIndexService;
+import com.ticketproject.webapp.services.database.HashingService;
+import com.ticketproject.webapp.services.jwt.JwtService;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

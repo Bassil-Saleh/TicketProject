@@ -35,9 +35,10 @@ import com.ticketproject.webapp.model.enums.EventStatus;
 import com.ticketproject.webapp.model.enums.EventType;
 import com.ticketproject.webapp.model.enums.InvitationStatus;
 import com.ticketproject.webapp.model.enums.RegistrationStatus;
-import com.ticketproject.webapp.services.BlindIndexService;
-import com.ticketproject.webapp.services.CryptoService;
-import com.ticketproject.webapp.services.HashingService;
+import com.ticketproject.webapp.services.database.BlindIndexService;
+import com.ticketproject.webapp.services.database.CryptoService;
+import com.ticketproject.webapp.services.database.HashingService;
+
 import org.springframework.test.annotation.DirtiesContext;
 
 import static org.assertj.core.api.Assertions.assertThat;

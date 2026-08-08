@@ -4,7 +4,7 @@ import com.ticketproject.webapp.constants.ApiPaths;
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.model.entities.EventHost;
-import com.ticketproject.webapp.services.TicketScanService;
+import com.ticketproject.webapp.services.model.TicketScanService;
 import com.ticketproject.webapp.dtos.requests.ScanTicketRequest;
 import com.ticketproject.webapp.dtos.responses.GetScannedTicketsByEventHostResponse;
 import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;

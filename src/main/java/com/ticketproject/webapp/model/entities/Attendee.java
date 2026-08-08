@@ -3,7 +3,7 @@ package com.ticketproject.webapp.model.entities;
 import com.ticketproject.webapp.bridges.SpringContextBridge;
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.converters.EncryptedStringConverter;
-import com.ticketproject.webapp.services.BlindIndexService;
+import com.ticketproject.webapp.services.database.BlindIndexService;
 
 import jakarta.persistence.*;
 

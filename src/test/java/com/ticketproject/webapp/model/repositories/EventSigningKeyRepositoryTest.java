@@ -33,9 +33,9 @@ import com.ticketproject.webapp.model.entities.EventSigningKey;
 import com.ticketproject.webapp.model.enums.EventStatus;
 import com.ticketproject.webapp.model.enums.EventType;
 import com.ticketproject.webapp.model.enums.RegistrationStatus;
-import com.ticketproject.webapp.services.BlindIndexService;
-import com.ticketproject.webapp.services.CryptoService;
-import com.ticketproject.webapp.services.HashingService;
+import com.ticketproject.webapp.services.database.BlindIndexService;
+import com.ticketproject.webapp.services.database.CryptoService;
+import com.ticketproject.webapp.services.database.HashingService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

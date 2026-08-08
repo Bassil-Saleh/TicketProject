@@ -4,8 +4,8 @@ import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.model.entities.EventHost;
 import com.ticketproject.webapp.model.entities.Session;
 import com.ticketproject.webapp.model.repositories.SessionRepository;
-import com.ticketproject.webapp.services.HashingService;
-import com.ticketproject.webapp.services.JwtService;
+import com.ticketproject.webapp.services.database.HashingService;
+import com.ticketproject.webapp.services.jwt.JwtService;
 
 import io.jsonwebtoken.JwtException;
 

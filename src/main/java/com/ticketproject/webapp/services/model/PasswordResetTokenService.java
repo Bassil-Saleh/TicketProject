@@ -1,4 +1,4 @@
-package com.ticketproject.webapp.services;
+package com.ticketproject.webapp.services.model;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -11,6 +11,9 @@ import com.ticketproject.webapp.dtos.requests.UsePasswordResetTokenRequest;
 import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 import com.ticketproject.webapp.exceptions.InvalidCredentialsException;
 import com.ticketproject.webapp.model.repositories.PasswordResetTokenRepository;
+import com.ticketproject.webapp.services.database.BlindIndexService;
+import com.ticketproject.webapp.services.database.HashingService;
+import com.ticketproject.webapp.services.email.EmailService;
 import com.ticketproject.webapp.model.entities.PasswordResetToken;
 import com.ticketproject.webapp.model.entities.EventHost;
 import com.ticketproject.webapp.model.repositories.EventHostRepository;

@@ -1,4 +1,4 @@
-package com.ticketproject.webapp.services;
+package com.ticketproject.webapp.services.model;
 
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.dtos.requests.CreateEventHostRequest;
@@ -18,6 +18,10 @@ import com.ticketproject.webapp.model.entities.EventHost;
 import com.ticketproject.webapp.model.repositories.EventHostRepository;
 
 import com.ticketproject.webapp.model.repositories.EventRepository;
+import com.ticketproject.webapp.services.database.BlindIndexService;
+import com.ticketproject.webapp.services.database.HashingService;
+import com.ticketproject.webapp.services.email.EmailService;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;

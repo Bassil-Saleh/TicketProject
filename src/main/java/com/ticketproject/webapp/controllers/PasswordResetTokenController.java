@@ -4,7 +4,7 @@ import com.ticketproject.webapp.constants.ApiPaths;
 import com.ticketproject.webapp.dtos.requests.CreatePasswordResetTokenRequest;
 import com.ticketproject.webapp.dtos.requests.UsePasswordResetTokenRequest;
 import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
-import com.ticketproject.webapp.services.PasswordResetTokenService;
+import com.ticketproject.webapp.services.model.PasswordResetTokenService;
 
 import jakarta.validation.Valid;
 

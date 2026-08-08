@@ -1,7 +1,7 @@
 package com.ticketproject.webapp.converters;
 
 import com.ticketproject.webapp.bridges.SpringContextBridge;
-import com.ticketproject.webapp.services.CryptoService;
+import com.ticketproject.webapp.services.database.CryptoService;
 
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;

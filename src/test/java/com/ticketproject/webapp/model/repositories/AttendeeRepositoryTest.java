@@ -23,9 +23,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import com.ticketproject.webapp.bridges.SpringContextBridge;
 import com.ticketproject.webapp.model.entities.Attendee;
-import com.ticketproject.webapp.services.BlindIndexService;
-import com.ticketproject.webapp.services.CryptoService;
-import com.ticketproject.webapp.services.HashingService;
+import com.ticketproject.webapp.services.database.BlindIndexService;
+import com.ticketproject.webapp.services.database.CryptoService;
+import com.ticketproject.webapp.services.database.HashingService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

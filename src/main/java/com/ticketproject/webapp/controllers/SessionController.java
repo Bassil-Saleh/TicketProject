@@ -3,11 +3,11 @@ package com.ticketproject.webapp.controllers;
 import com.ticketproject.webapp.dtos.requests.LoginSessionRequest;
 import com.ticketproject.webapp.dtos.responses.LoginSessionResponse;
 import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
-import com.ticketproject.webapp.services.SessionService;
 import com.ticketproject.webapp.constants.ApiPaths;
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.model.entities.EventHost;
 import com.ticketproject.webapp.model.entities.Session;
+import com.ticketproject.webapp.services.model.SessionService;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 
 import jakarta.servlet.http.HttpServletRequest;

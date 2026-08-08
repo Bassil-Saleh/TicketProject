@@ -1,4 +1,4 @@
-package com.ticketproject.webapp.services;
+package com.ticketproject.webapp.services.database;
 
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.model.entities.EventSigningKey;

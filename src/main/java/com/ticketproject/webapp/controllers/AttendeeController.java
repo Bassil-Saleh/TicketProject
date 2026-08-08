@@ -3,7 +3,7 @@ package com.ticketproject.webapp.controllers;
 import com.ticketproject.webapp.constants.ApiPaths;
 import com.ticketproject.webapp.dtos.requests.CreatePublicEventRegistrationRequest;
 import com.ticketproject.webapp.dtos.responses.CreatePublicEventRegistrationResponse;
-import com.ticketproject.webapp.services.AttendeeService;
+import com.ticketproject.webapp.services.model.AttendeeService;
 
 import jakarta.validation.Valid;
 

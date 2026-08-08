@@ -1,4 +1,4 @@
-package com.ticketproject.webapp.services;
+package com.ticketproject.webapp.services.jwt;
 
 import com.ticketproject.webapp.constants.AppConstants;
 

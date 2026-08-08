@@ -7,10 +7,10 @@ import com.ticketproject.webapp.dtos.requests.EditEventHostPasswordRequest;
 import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventHostProfileResponse;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
-import com.ticketproject.webapp.services.EventHostService;
 import com.ticketproject.webapp.constants.ApiPaths;
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.model.entities.EventHost;
+import com.ticketproject.webapp.services.model.EventHostService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
