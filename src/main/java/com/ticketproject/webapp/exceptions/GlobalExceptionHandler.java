@@ -112,7 +112,7 @@ public class GlobalExceptionHandler
     @ExceptionHandler(EventHostVerificationPeriodExpiredException.class)
     public ResponseEntity<ErrorResponse> handleEventHostVerificationPeriodExpired
     (
-        EventHostToVerifyNotFoundException ex,
+        EventHostVerificationPeriodExpiredException ex,
         HttpServletRequest request
     )
     {
@@ -138,7 +138,7 @@ public class GlobalExceptionHandler
     @ExceptionHandler(EventHostInactiveException.class)
     public ResponseEntity<ErrorResponse> handleEventHostInactive
     (
-        EventHostToVerifyNotFoundException ex,
+        EventHostInactiveException ex,
         HttpServletRequest request
     )
     {
@@ -359,5 +359,197 @@ public class GlobalExceptionHandler
             request.getRequestURI()
         );
         return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    /**
+     * Handles EventRegistrationException by returning a 400 Bad Request response.
+     * @param ex      the exception that was thrown
+     * @param request the HTTP servlet request
+     * @return a ResponseEntity containing the error response and a 400 status
+     */
+    @ExceptionHandler(EventRegistrationException.class)
+    public ResponseEntity<ErrorResponse> handleEventRegistration
+    (
+        EventRegistrationException ex,
+        HttpServletRequest request
+    )
+    {
+        ErrorResponse errorResponse = new ErrorResponse
+        (
+            Instant.now(),
+            HttpStatus.BAD_REQUEST.value(),
+            HttpStatus.BAD_REQUEST.getReasonPhrase(),
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handles InvalidSignatureException by returning a 400 Bad Request response.
+     * @param ex      the exception that was thrown
+     * @param request the HTTP servlet request
+     * @return a ResponseEntity containing the error response and a 400 status
+     */
+    @ExceptionHandler(InvalidSignatureException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidSignature
+    (
+        InvalidSignatureException ex,
+        HttpServletRequest request
+    )
+    {
+        ErrorResponse errorResponse = new ErrorResponse
+        (
+            Instant.now(),
+            HttpStatus.BAD_REQUEST.value(),
+            HttpStatus.BAD_REQUEST.getReasonPhrase(),
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handles PendingEventsExistException by returning a 409 Conflict response.
+     * @param ex      the exception that was thrown
+     * @param request the HTTP servlet request
+     * @return a ResponseEntity containing the error response and a 409 status
+     */
+    @ExceptionHandler(PendingEventsExistException.class)
+    public ResponseEntity<ErrorResponse> handlePendingEventsExist
+    (
+        PendingEventsExistException ex,
+        HttpServletRequest request
+    )
+    {
+        ErrorResponse errorResponse = new ErrorResponse
+        (
+            Instant.now(),
+            HttpStatus.CONFLICT.value(),
+            HttpStatus.CONFLICT.getReasonPhrase(),
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    /**
+     * Handles TicketAlreadyScannedException by returning a 409 Conflict response.
+     * @param ex      the exception that was thrown
+     * @param request the HTTP servlet request
+     * @return a ResponseEntity containing the error response and a 409 status
+     */
+    @ExceptionHandler(TicketAlreadyScannedException.class)
+    public ResponseEntity<ErrorResponse> handleTicketAlreadyScanned
+    (
+        TicketAlreadyScannedException ex,
+        HttpServletRequest request
+    )
+    {
+        ErrorResponse errorResponse = new ErrorResponse
+        (
+            Instant.now(),
+            HttpStatus.CONFLICT.value(),
+            HttpStatus.CONFLICT.getReasonPhrase(),
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    /**
+     * Handles EventEndedException by returning a 400 Bad Request response.
+     * @param ex      the exception that was thrown
+     * @param request the HTTP servlet request
+     * @return a ResponseEntity containing the error response and a 400 status
+     */
+    @ExceptionHandler(EventEndedException.class)
+    public ResponseEntity<ErrorResponse> handleEventEnded
+    (
+        EventEndedException ex,
+        HttpServletRequest request
+    )
+    {
+        ErrorResponse errorResponse = new ErrorResponse
+        (
+            Instant.now(),
+            HttpStatus.BAD_REQUEST.value(),
+            HttpStatus.BAD_REQUEST.getReasonPhrase(),
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handles SigningKeyNotFoundException by returning a 500 Internal Server Error response.
+     * @param ex      the exception that was thrown
+     * @param request the HTTP servlet request
+     * @return a ResponseEntity containing the error response and a 500 status
+     */
+    @ExceptionHandler(SigningKeyNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleSigningKeyNotFound
+    (
+        SigningKeyNotFoundException ex,
+        HttpServletRequest request
+    )
+    {
+        ErrorResponse errorResponse = new ErrorResponse
+        (
+            Instant.now(),
+            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+            HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * Handles TicketScanFailedException by returning a 500 Internal Server Error response.
+     * @param ex      the exception that was thrown
+     * @param request the HTTP servlet request
+     * @return a ResponseEntity containing the error response and a 500 status
+     */
+    @ExceptionHandler(TicketScanFailedException.class)
+    public ResponseEntity<ErrorResponse> handleTicketScanFailed
+    (
+        TicketScanFailedException ex,
+        HttpServletRequest request
+    )
+    {
+        ErrorResponse errorResponse = new ErrorResponse
+        (
+            Instant.now(),
+            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+            HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * Handles TicketGenerationException by returning a 500 Internal Server Error response.
+     * @param ex      the exception that was thrown
+     * @param request the HTTP servlet request
+     * @return a ResponseEntity containing the error response and a 500 status
+     */
+    @ExceptionHandler(TicketGenerationException.class)
+    public ResponseEntity<ErrorResponse> handleTicketGeneration
+    (
+        TicketGenerationException ex,
+        HttpServletRequest request
+    )
+    {
+        ErrorResponse errorResponse = new ErrorResponse
+        (
+            Instant.now(),
+            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+            HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
