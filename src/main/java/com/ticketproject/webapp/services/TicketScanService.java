@@ -6,12 +6,15 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.dtos.requests.ScanTicketRequest;
+import com.ticketproject.webapp.dtos.responses.GetScannedTicketsByEventHostResponse;
+import com.ticketproject.webapp.dtos.responses.ScannedTicketInfo;
 import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 import com.ticketproject.webapp.exceptions.InvalidRequestException;
 import com.ticketproject.webapp.exceptions.InvalidSignatureException;
@@ -126,5 +129,38 @@ public class TicketScanService
         {
             throw new InvalidSignatureException("Signature of scanned ticket is invalid or forged.");
         }
+    }
+
+    public GetScannedTicketsByEventHostResponse getScannedTicketsByEventHost(EventHost eventHost)
+    {
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+
+        List<TicketScan> scannedTickets = ticketScanRepository.findAllByEventHostId(eventHost.getId());
+
+        List<ScannedTicketInfo> scannedTicketInfo = scannedTickets
+            .stream()
+            .map
+            (ticket ->
+            {
+                ScannedTicketInfo record = new ScannedTicketInfo
+                (
+                    ticket.getScannedAt(),
+                    ticket.getTicket().getAttendee().getFirstName(),
+                    ticket.getTicket().getAttendee().getMiddleName(),
+                    ticket.getTicket().getAttendee().getLastName(),
+                    ticket.getTicket().getAttendee().getEmail(),
+                    ticket.getTicket().getEvent().getName(),
+                    ticket.getTicket().getEvent().getDescription(),
+                    ticket.getTicket().getEvent().getStartDateTime(),
+                    ticket.getTicket().getEvent().getEndDateTime()
+                );
+                return record;
+            })
+            .toList();
+
+        return new GetScannedTicketsByEventHostResponse(scannedTicketInfo);
     }
 }
