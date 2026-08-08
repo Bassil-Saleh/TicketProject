@@ -1,6 +1,8 @@
 package com.ticketproject.webapp.services;
 
 import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.model.entities.EventSigningKey;
+import com.ticketproject.webapp.model.entities.Event;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -9,6 +11,10 @@ import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.InvalidParameterException;
 import java.util.Base64;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -259,5 +265,44 @@ public class CryptoService
         if (ciphertext == null)
             return null;
         return new BigDecimal(decryptString(ciphertext));
+    }
+
+    /**
+     * Helper method that generates a fresh key pair for constructing an EventSigningKey.
+     * @return a new KeyPair
+     * @throws RuntimeException if key pair generation fails
+     */
+    public static KeyPair generateKeyPair(int keySize)
+    {
+        try
+        {
+            KeyPairGenerator generator = KeyPairGenerator
+                .getInstance(AppConstants.Crypto.PUBLIC_PRIVATE_KEY_ALGORITHM);
+            generator.initialize(keySize);
+            return generator.generateKeyPair();
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            throw new RuntimeException("Cannot generate keypair - algorithm not supported", e);
+        }
+        catch (InvalidParameterException e)
+        {
+            throw new RuntimeException("Cannot generate keypair - key size not supported", e);
+        }
+    }
+
+    /**
+     * Helper method to create a valid EventSigningKey for a given event.
+     * @param event the event to associate the signing key with
+     * @return a new EventSigningKey entity (not yet persisted)
+     */
+    public static EventSigningKey createSigningKey(Event event, int keySize)
+    {
+        KeyPair keyPair = CryptoService.generateKeyPair(keySize);
+        return new EventSigningKey.Builder()
+            .event(event)
+            .privateKey(keyPair.getPrivate())
+            .publicKey(keyPair.getPublic())
+            .build();
     }
 }
