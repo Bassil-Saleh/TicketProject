@@ -1,6 +1,7 @@
 package com.ticketproject.webapp.services.model;
 
 import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.exceptions.TicketGenerationException;
 import com.ticketproject.webapp.model.entities.Event;
 
 import java.nio.charset.StandardCharsets;
@@ -66,15 +67,15 @@ public class TicketService
         }
         catch (NoSuchAlgorithmException e)
         {
-            throw new RuntimeException("Cannot generate ticket - signature algorithm not supported");
+            throw new TicketGenerationException("Cannot generate ticket - signature algorithm not supported");
         }
         catch (InvalidKeyException e)
         {
-            throw new RuntimeException("Cannot generate ticket - invalid private key");
+            throw new TicketGenerationException("Cannot generate ticket - invalid private key");
         }
         catch (SignatureException e)
         {
-            throw new RuntimeException("Cannot generate ticket - signature generator not initialized properly");
+            throw new TicketGenerationException("Cannot generate ticket - signature generator not initialized properly");
         }
     }
 }
