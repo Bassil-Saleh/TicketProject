@@ -61,6 +61,7 @@ public class TicketService
                 .invitationStatus(InvitationStatus.PENDING)
                 .build();
             
+            signedTicket.setPresent(false);
             return signedTicket;
         }
         catch (NoSuchAlgorithmException e)

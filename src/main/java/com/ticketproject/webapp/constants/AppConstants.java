@@ -803,7 +803,9 @@ public final class AppConstants
         public static final String PUBLIC_PRIVATE_KEY_ALGORITHM = "RSA";
         public static final String TICKET_SIGNATURE_ALGORITHM = "SHA256withRSA";
         public static final String TICKET_PAYLOAD_DECODED_SEPARATOR = "|";
+        public static final String TICKET_PAYLOAD_DECODED_SEPARATOR_REGEX = "\\|";
         public static final String TICKET_PAYLOAD_ENCODED_SEPARATOR = ".";
+        public static final String TICKET_PAYLOAD_ENCODED_SEPARATOR_REGEX = "\\.";
         public static final int PUBLIC_PRIVATE_KEY_SIZE_PROD = 4096;
         public static final int PUBLIC_PRIVATE_KEY_SIZE_TEST = 1024;
         public static final int GCM_IV_LENGTH_BYTES = 12;

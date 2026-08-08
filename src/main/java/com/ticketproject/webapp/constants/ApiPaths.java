@@ -105,4 +105,18 @@ public final class ApiPaths
         public static final String REGISTRATION = "/registration";
         public static final String INVITATION = "/invitation";
     }
+
+    public static final class TicketScans
+    {
+        /**
+         * Private constructor. Not meant to be used.
+         * @throws UnsupportedOperationException
+         */
+        private TicketScans()
+        {
+            throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+        }
+
+        public static final String ROOT = "/ticket-scans";
+    }
 }

@@ -7,6 +7,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * TicketRepository is used to perform CRUD operations with Ticket entities.
  */
@@ -22,4 +24,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>
         @Param("eventId")
         Long eventId
     );
+
+    @Query("SELECT t FROM Ticket t JOIN FETCH t.event WHERE t.tokenIdentifier = :tokenIdentifier LIMIT 1")
+    Optional<Ticket> findByTokenIdentifier(@Param("tokenIdentifier") String tokenIdentifier);
 }
