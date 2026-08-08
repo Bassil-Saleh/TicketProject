@@ -31,10 +31,10 @@ public class GlobalExceptionHandler
      * @param request the HTTP servlet request
      * @return a ResponseEntity containing the error response and a 409 status
      */
-    @ExceptionHandler(EventHostEmailAlreadyExistsException.class)
+    @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleEmailAlreadyExists
     (
-        EventHostEmailAlreadyExistsException ex,
+        EmailAlreadyExistsException ex,
         HttpServletRequest request
     )
     {

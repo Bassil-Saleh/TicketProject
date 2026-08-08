@@ -7,6 +7,7 @@ import com.ticketproject.webapp.exceptions.EmailSendFailedException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -27,16 +28,23 @@ public class EmailService
 {
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
+    private final String baseUrl;
 
     /**
      * Constructs a new EmailService with the required dependencies.
      * @param mailSender the mail sender for sending emails
      * @param templateEngine the Thymeleaf template engine for rendering email templates
      */
-    public EmailService(JavaMailSender mailSender, SpringTemplateEngine templateEngine)
+    public EmailService
+    (
+        JavaMailSender mailSender,
+        SpringTemplateEngine templateEngine,
+        @Value("${app.config.base-url}") String baseUrl
+    )
     {
         this.mailSender = mailSender;
         this.templateEngine = templateEngine;
+        this.baseUrl = baseUrl;
     }
 
     /**
@@ -137,7 +145,6 @@ public class EmailService
     private String buildVerificationUrl(String rawToken)
     {
         // Construct the verification URL (using the base URL from application.properties).
-        String baseUrl = "${app.config.base-url}";
         String path = ApiPaths.BASE + ApiPaths.EventHosts.ROOT + ApiPaths.EventHosts.VERIFICATION;
         return baseUrl + path + "?token=" + rawToken;
     }

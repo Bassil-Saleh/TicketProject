@@ -7,7 +7,7 @@ import com.ticketproject.webapp.dtos.requests.EditEventHostNameRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventHostPasswordRequest;
 import com.ticketproject.webapp.dtos.responses.GetEventHostProfileResponse;
 import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
-import com.ticketproject.webapp.exceptions.EventHostEmailAlreadyExistsException;
+import com.ticketproject.webapp.exceptions.EmailAlreadyExistsException;
 import com.ticketproject.webapp.exceptions.EventHostToVerifyNotFoundException;
 import com.ticketproject.webapp.exceptions.EventHostUnderageException;
 import com.ticketproject.webapp.exceptions.EventHostVerificationPeriodExpiredException;
@@ -61,7 +61,7 @@ public class EventHostService
      * Service a request to create a new event host account.
      * @param request request containing info to create a new event host account
      * @return a SingleMessageResponse on success
-     * @throws EventHostEmailAlreadyExistsException if the request contains
+     * @throws EmailAlreadyExistsException if the request contains
      * an email address already used by a preexisting event host account
      * @throws EventHostUnderageException if the request contains a date of birth
      * less than 18 years old
@@ -73,7 +73,7 @@ public class EventHostService
         byte[] emailBlinxIndex = blindIndexService.computeIndex(request.email());
         if (eventHostRepository.existsByEmailIndex(emailBlinxIndex))
         {
-            throw new EventHostEmailAlreadyExistsException("An account with the provided email address already exists");
+            throw new EmailAlreadyExistsException("An account with the provided email address already exists");
         }
 
         // Check that the user is at least 18 years old before
@@ -262,7 +262,7 @@ public class EventHostService
 
         if (eventHostRepository.existsByEmailIndex(newEmailBlindIndex))
         {
-            throw new EventHostEmailAlreadyExistsException("The provided email address is already in use by a different account.");
+            throw new EmailAlreadyExistsException("The provided email address is already in use by a different account.");
         }
 
         eventHost.setEmail(request.email());

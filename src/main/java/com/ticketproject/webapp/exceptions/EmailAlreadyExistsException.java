@@ -5,7 +5,7 @@ package com.ticketproject.webapp.exceptions;
  * to create an EventHost account using an email address that is already
  * associated with an existing account.
  */
-public class EventHostEmailAlreadyExistsException extends RuntimeException
+public class EmailAlreadyExistsException extends RuntimeException
 {
     /**
      * Constructs a new EventHostEmailAlreadyExistsException with the
@@ -13,7 +13,7 @@ public class EventHostEmailAlreadyExistsException extends RuntimeException
      *
      * @param message the detail message
      */
-    public EventHostEmailAlreadyExistsException(String message)
+    public EmailAlreadyExistsException(String message)
     {
         super(message);
     }
