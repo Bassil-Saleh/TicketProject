@@ -1,9 +1,5 @@
 package com.ticketproject.webapp.model.repositories;
 
-import java.security.InvalidParameterException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -124,7 +120,7 @@ public class EventRepositoryTest
             .maxAttendees(100)
             .build();
         
-        EventSigningKey signingKey = createSigningKey(event);
+        EventSigningKey signingKey = CryptoService.createSigningKey(event, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
         
         event.setEventAddress(address);
         event.setRegistrationStatus(RegistrationStatus.OPEN);
@@ -132,44 +128,6 @@ public class EventRepositoryTest
         event.setSigningKey(signingKey);
 
         return event;
-    }
-
-    /**
-     * Generates a fresh key pair for testing.
-     * @return a KeyPair
-     * @throws RuntimeException if key pair generation fails
-     */
-    private KeyPair generateKeyPair()
-    {
-        try
-        {
-            KeyPairGenerator generator = KeyPairGenerator
-                .getInstance(AppConstants.Crypto.PUBLIC_PRIVATE_KEY_ALGORITHM);
-            generator.initialize(AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
-            return generator.generateKeyPair();
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            throw new RuntimeException("Cannot generate keypair - algorithm not supported", e);
-        }
-        catch (InvalidParameterException e)
-        {
-            throw new RuntimeException("Cannot generate keypair - key size not supported", e);
-        }
-    }
-    /**
-     * Helper method to create a valid EventSigningKey for a given event.
-     * @param event the event to associate the signing key with
-     * @return a new EventSigningKey entity (not yet persisted)
-     */
-    private EventSigningKey createSigningKey(Event event)
-    {
-        KeyPair keyPair = generateKeyPair();
-        return new EventSigningKey.Builder()
-            .event(event)
-            .privateKey(keyPair.getPrivate())
-            .publicKey(keyPair.getPublic())
-            .build();
     }
 
     @Nested
@@ -467,7 +425,7 @@ public class EventRepositoryTest
             Event event = createEvent(UUID.randomUUID().toString());
             Event saved = eventRepository.saveAndFlush(event);
 
-            EventSigningKey newKey = createSigningKey(saved);
+            EventSigningKey newKey = CryptoService.createSigningKey(saved, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
             saved.setSigningKey(newKey);
 
             // Since saved is not a final variable, I can't use it in a lambda,

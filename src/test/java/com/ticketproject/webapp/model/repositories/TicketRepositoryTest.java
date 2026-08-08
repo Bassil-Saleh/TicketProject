@@ -4,10 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.InvalidParameterException;
 import java.sql.SQLException;
 import java.sql.Connection;
 import javax.sql.DataSource;
@@ -123,51 +119,13 @@ class TicketRepositoryTest
             .maxAttendees(500)
             .build();
 
-        EventSigningKey signingKey = createSigningKey(event);
+        EventSigningKey signingKey = CryptoService.createSigningKey(event, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
 
         event.setSigningKey(signingKey);
         event.setEventAddress(address);
         event.setRegistrationStatus(RegistrationStatus.OPEN);
         event.setEventStatus(EventStatus.PUBLISHED);
         savedEvent = eventRepository.saveAndFlush(event);
-    }
-
-    /**
-     * Generates a fresh key pair for testing.
-     * @return a KeyPair
-     * @throws RuntimeException if key pair generation fails
-     */
-    private KeyPair generateKeyPair()
-    {
-        try
-        {
-            KeyPairGenerator generator = KeyPairGenerator
-                .getInstance(AppConstants.Crypto.PUBLIC_PRIVATE_KEY_ALGORITHM);
-            generator.initialize(AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
-            return generator.generateKeyPair();
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            throw new RuntimeException("Cannot generate keypair - algorithm not supported", e);
-        }
-        catch (InvalidParameterException e)
-        {
-            throw new RuntimeException("Cannot generate keypair - key size not supported", e);
-        }
-    }
-    /**
-     * Helper method to create a valid EventSigningKey for a given event.
-     * @param event the event to associate the signing key with
-     * @return a new EventSigningKey entity (not yet persisted)
-     */
-    private EventSigningKey createSigningKey(Event event)
-    {
-        KeyPair keyPair = generateKeyPair();
-        return new EventSigningKey.Builder()
-            .event(event)
-            .privateKey(keyPair.getPrivate())
-            .publicKey(keyPair.getPublic())
-            .build();
     }
 
     /**
