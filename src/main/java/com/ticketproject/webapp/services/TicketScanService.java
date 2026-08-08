@@ -89,6 +89,12 @@ public class TicketScanService
         }
 
         Event foundEvent = foundTicket.getEvent();
+
+        if (foundEvent.getEndDateTime().isBefore(LocalDateTime.now()))
+        {
+            throw new RuntimeException("The event which this ticket is for has already ended.");
+        }
+
         Optional<EventSigningKey> signingKeys = eventSigningKeyRepository.findByEventId(foundEvent.getId());
         if (signingKeys.isEmpty())
         {
