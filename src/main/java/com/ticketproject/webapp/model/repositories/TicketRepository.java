@@ -27,4 +27,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>
 
     @Query("SELECT t FROM Ticket t JOIN FETCH t.event WHERE t.tokenIdentifier = :tokenIdentifier LIMIT 1")
     Optional<Ticket> findByTokenIdentifier(@Param("tokenIdentifier") String tokenIdentifier);
+
+    @Query("SELECT COUNT(t) FROM Ticket t WHERE t.event.id = :eventId")
+    long getRegistrationCountByEventId(@Param("eventId") Long eventId);
 }

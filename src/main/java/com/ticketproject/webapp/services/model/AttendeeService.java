@@ -72,21 +72,26 @@ public class AttendeeService
             throw new EventRegistrationException("This is not a public event.");
         }
 
-        if (foundEvent.getRegistrationStatus() == RegistrationStatus.CLOSED)
-        {
-            throw new EventRegistrationException("The registration period for this event is already closed.");
-        }
-
-        if (foundEvent.getStartDateTime().isBefore(LocalDateTime.now()))
-        {
-            throw new EventRegistrationException("Cannot register after the event has already begun.");
-        }
-
         byte[] emailBlindIndex = blindIndexService.computeIndex(request.email());
 
         if (ticketRepository.attendeeRegistrationExistsByEventId(emailBlindIndex, foundEvent.getId()))
         {
             throw new EmailAlreadyExistsException("A registration with the same email address already exists for this event.");
+        }
+
+        if (foundEvent.getRegistrationStatus() == RegistrationStatus.CLOSED)
+        {
+            throw new EventRegistrationException("The registration period for this event is already closed.");
+        }
+
+        if (foundEvent.getMaxAttendees() != null && ticketRepository.getRegistrationCountByEventId(foundEvent.getId()) >= foundEvent.getMaxAttendees())
+        {
+            throw new EventRegistrationException("The event is currently at maximum capacity, so no further registrations are possible.");
+        }
+
+        if (foundEvent.getStartDateTime().isBefore(LocalDateTime.now()))
+        {
+            throw new EventRegistrationException("Cannot register after the event has already begun.");
         }
 
         Ticket signedTicket = ticketService.createSignedTicket(foundEvent);
