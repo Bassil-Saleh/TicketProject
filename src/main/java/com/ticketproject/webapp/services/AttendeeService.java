@@ -10,6 +10,7 @@ import com.ticketproject.webapp.exceptions.EventRegistrationException;
 import com.ticketproject.webapp.model.entities.Attendee;
 import com.ticketproject.webapp.model.entities.Event;
 import com.ticketproject.webapp.model.entities.Ticket;
+import com.ticketproject.webapp.model.enums.EventType;
 import com.ticketproject.webapp.model.enums.RegistrationStatus;
 import com.ticketproject.webapp.model.repositories.AttendeeRepository;
 import com.ticketproject.webapp.model.repositories.EventRepository;
@@ -64,6 +65,11 @@ public class AttendeeService
         }
 
         Event foundEvent = event.get();
+
+        if (foundEvent.getEventType() != EventType.PUBLIC)
+        {
+            throw new EventRegistrationException("This is not a public event.");
+        }
 
         if (foundEvent.getRegistrationStatus() == RegistrationStatus.CLOSED)
         {
