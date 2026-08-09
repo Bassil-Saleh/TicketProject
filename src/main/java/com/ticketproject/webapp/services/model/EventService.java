@@ -149,7 +149,7 @@ public class EventService
             throw new InvalidRequestException("Invalid scale/precision for latitude/longitude coordinates.");
         }
 
-        EventSigningKey signingKey = CryptoService.createSigningKey(newEvent, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_PROD);
+        EventSigningKey signingKey = CryptoService.createSigningKey(newEvent);
         newEvent.setSigningKey(signingKey);
         newEvent.setEventAddress(address);
 
