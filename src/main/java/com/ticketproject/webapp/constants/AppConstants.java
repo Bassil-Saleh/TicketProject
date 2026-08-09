@@ -362,7 +362,7 @@ public final class AppConstants
                 {
                     throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
                 }
-                public static final int PUBLIC_TOKEN_LENGTH = 4096;
+                public static final int PUBLIC_TOKEN_LENGTH = 512;
                 public static final int TOKEN_IDENTIFIER_LENGTH = 36;
             }
         }
@@ -770,8 +770,8 @@ public final class AppConstants
                     throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
                 }
 
-                public static final String COLUMN_PRIVATE_KEY = "VARBINARY(4096)";
-                public static final String COLUMN_PUBLIC_KEY = "VARBINARY(4096)";
+                public static final String COLUMN_PRIVATE_KEY = "VARBINARY(256)";
+                public static final String COLUMN_PUBLIC_KEY = "VARBINARY(256)";
             }
         }
     }
@@ -800,14 +800,12 @@ public final class AppConstants
         public static final String ENCRYPTION_ALGORITHM = "AES/GCM/NoPadding";
         public static final String SECRET_KEY_ALGORITHM = "AES";
         public static final String HASH_ALGORITHM = "SHA-256";
-        public static final String PUBLIC_PRIVATE_KEY_ALGORITHM = "RSA";
-        public static final String TICKET_SIGNATURE_ALGORITHM = "SHA256withRSA";
+        public static final String PUBLIC_PRIVATE_KEY_ALGORITHM = "Ed25519";
+        public static final String TICKET_SIGNATURE_ALGORITHM = "Ed25519";
         public static final String TICKET_PAYLOAD_DECODED_SEPARATOR = "|";
         public static final String TICKET_PAYLOAD_DECODED_SEPARATOR_REGEX = "\\|";
         public static final String TICKET_PAYLOAD_ENCODED_SEPARATOR = ".";
         public static final String TICKET_PAYLOAD_ENCODED_SEPARATOR_REGEX = "\\.";
-        public static final int PUBLIC_PRIVATE_KEY_SIZE_PROD = 4096;
-        public static final int PUBLIC_PRIVATE_KEY_SIZE_TEST = 1024;
         public static final int GCM_IV_LENGTH_BYTES = 12;
         public static final int GCM_TAG_LENGTH_BITS = 128;
         public static final int HASH_LENGTH_BYTES = 32;
