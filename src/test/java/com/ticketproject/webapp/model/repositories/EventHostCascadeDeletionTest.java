@@ -16,7 +16,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.annotation.DirtiesContext;
 
 import com.ticketproject.webapp.bridges.SpringContextBridge;
-import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.model.entities.AddressBookContact;
 import com.ticketproject.webapp.model.entities.Attendee;
 import com.ticketproject.webapp.model.entities.BlockedRegistration;
@@ -145,7 +144,7 @@ public class EventHostCascadeDeletionTest
             .build();
 
         // 5. Create EventSigningKey (will be cascaded via Event)
-        EventSigningKey signingKey = CryptoService.createSigningKey(event, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+        EventSigningKey signingKey = CryptoService.createSigningKey(event);
 
         event.setEventAddress(address);
         event.setSigningKey(signingKey);

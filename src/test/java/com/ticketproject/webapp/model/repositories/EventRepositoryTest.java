@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import com.ticketproject.webapp.bridges.SpringContextBridge;
-import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.model.entities.Event;
 import com.ticketproject.webapp.model.entities.EventAddress;
 import com.ticketproject.webapp.model.entities.EventHost;
@@ -121,7 +120,7 @@ public class EventRepositoryTest
             .maxAttendees(100)
             .build();
         
-        EventSigningKey signingKey = CryptoService.createSigningKey(event, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+        EventSigningKey signingKey = CryptoService.createSigningKey(event);
         
         event.setEventAddress(address);
         event.setRegistrationStatus(RegistrationStatus.OPEN);
@@ -426,7 +425,7 @@ public class EventRepositoryTest
             Event event = createEvent(UUID.randomUUID().toString());
             Event saved = eventRepository.saveAndFlush(event);
 
-            EventSigningKey newKey = CryptoService.createSigningKey(saved, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+            EventSigningKey newKey = CryptoService.createSigningKey(saved);
             saved.setSigningKey(newKey);
 
             // Since saved is not a final variable, I can't use it in a lambda,

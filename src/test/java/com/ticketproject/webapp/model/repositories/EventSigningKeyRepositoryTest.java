@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import com.ticketproject.webapp.bridges.SpringContextBridge;
-import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.model.entities.Event;
 import com.ticketproject.webapp.model.entities.EventAddress;
 import com.ticketproject.webapp.model.entities.EventHost;
@@ -133,7 +132,7 @@ public class EventSigningKeyRepositoryTest
         @DisplayName("Saving signing key with null event violates NOT NULL constraint")
         void nullEventThrowsException()
         {
-            EventSigningKey key1 = CryptoService.createSigningKey(event1, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+            EventSigningKey key1 = CryptoService.createSigningKey(event1);
             event1.setSigningKey(key1);
             key1.setEvent(null);
 
@@ -145,7 +144,7 @@ public class EventSigningKeyRepositoryTest
         @DisplayName("Saving signing key with null privateKey violates NOT NULL constraint")
         void nullPrivateKeyThrowsException()
         {
-            EventSigningKey key1 = CryptoService.createSigningKey(event1, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+            EventSigningKey key1 = CryptoService.createSigningKey(event1);
             event1.setSigningKey(key1);
             key1.setPrivateKey(null);
 
@@ -157,7 +156,7 @@ public class EventSigningKeyRepositoryTest
         @DisplayName("Saving signing key with null publicKey violates NOT NULL constraint")
         void nullPublicKeyThrowsException()
         {
-            EventSigningKey key1 = CryptoService.createSigningKey(event1, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+            EventSigningKey key1 = CryptoService.createSigningKey(event1);
             event1.setSigningKey(key1);
             key1.setPublicKey(null);
 
@@ -169,7 +168,7 @@ public class EventSigningKeyRepositoryTest
         @DisplayName("Updating signing key with null event violates NOT NULL constraint")
         void updateNullEventThrowsException()
         {
-            EventSigningKey key1 = CryptoService.createSigningKey(event1, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+            EventSigningKey key1 = CryptoService.createSigningKey(event1);
             event1.setSigningKey(key1);
 
             Event saved1 = eventRepository.saveAndFlush(event1);
@@ -187,7 +186,7 @@ public class EventSigningKeyRepositoryTest
         @DisplayName("Updating signing key with null privateKey violates NOT NULL constraint")
         void updateNullPrivateKeyThrowsException()
         {
-            EventSigningKey key1 = CryptoService.createSigningKey(event1, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+            EventSigningKey key1 = CryptoService.createSigningKey(event1);
             event1.setSigningKey(key1);
 
             Event saved1 = eventRepository.saveAndFlush(event1);
@@ -205,7 +204,7 @@ public class EventSigningKeyRepositoryTest
         @DisplayName("Updating signing key with null publicKey violates NOT NULL constraint")
         void updateNullPublicKeyThrowsException()
         {
-            EventSigningKey key1 = CryptoService.createSigningKey(event1, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+            EventSigningKey key1 = CryptoService.createSigningKey(event1);
             event1.setSigningKey(key1);
 
             Event saved1 = eventRepository.saveAndFlush(event1);
@@ -223,14 +222,14 @@ public class EventSigningKeyRepositoryTest
         @DisplayName("Duplicate event_id violates unique constraint (one-to-one)")
         void duplicateEventIdThrowsException()
         {
-            EventSigningKey key1 = CryptoService.createSigningKey(event1, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+            EventSigningKey key1 = CryptoService.createSigningKey(event1);
             event1.setSigningKey(key1);
             eventRepository.saveAndFlush(event1);
 
             Event event2 = createEvent();
             // Try to create a second signing key for the same event (savedEvent).
             // This should fail because event_id has a UNIQUE constraint.
-            EventSigningKey key2 = CryptoService.createSigningKey(event1, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+            EventSigningKey key2 = CryptoService.createSigningKey(event1);
             event2.setSigningKey(key2);
 
             assertThatThrownBy(() -> eventRepository.saveAndFlush(event2))
@@ -246,7 +245,7 @@ public class EventSigningKeyRepositoryTest
         @DisplayName("Signing key references valid event after save")
         void signingKeyReferencesValidEvent()
         {
-            EventSigningKey key1 = CryptoService.createSigningKey(event1, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+            EventSigningKey key1 = CryptoService.createSigningKey(event1);
             event1.setSigningKey(key1);
             Event saved1 = eventRepository.saveAndFlush(event1);
 
@@ -263,7 +262,7 @@ public class EventSigningKeyRepositoryTest
         @DisplayName("Private and public keys survive round-trip")
         void keysSurviveRoundTrip()
         {
-            EventSigningKey key1 = CryptoService.createSigningKey(event1, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+            EventSigningKey key1 = CryptoService.createSigningKey(event1);
             event1.setSigningKey(key1);
 
             Event saved1 = eventRepository.saveAndFlush(event1);
@@ -282,7 +281,7 @@ public class EventSigningKeyRepositoryTest
         @DisplayName("Created timestamp is set upon creation")
         void createdTimestampIsSetAndNotUpdatable()
         {
-            EventSigningKey key1 = CryptoService.createSigningKey(event1, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+            EventSigningKey key1 = CryptoService.createSigningKey(event1);
             event1.setSigningKey(key1);
             Event saved1 = eventRepository.saveAndFlush(event1);
 
@@ -323,7 +322,7 @@ public class EventSigningKeyRepositoryTest
             assertThatThrownBy(() -> txTemplate.execute(status ->
             {
                 Event event = createEvent();
-                EventSigningKey key = CryptoService.createSigningKey(event, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+                EventSigningKey key = CryptoService.createSigningKey(event);
                 key.setEvent(null);
                 eventRepository.saveAndFlush(event);
                 return null;
@@ -346,7 +345,7 @@ public class EventSigningKeyRepositoryTest
             assertThatThrownBy(() -> txTemplate.execute(status ->
             {
                 Event event = createEvent();
-                EventSigningKey key = CryptoService.createSigningKey(event, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+                EventSigningKey key = CryptoService.createSigningKey(event);
                 event.setSigningKey(key);
                 Event saved = eventRepository.saveAndFlush(event);
 
@@ -356,7 +355,7 @@ public class EventSigningKeyRepositoryTest
                 assertThat(saved.getSigningKey().getId()).isNotNull();
 
                 Event anotherEvent = createEvent();
-                EventSigningKey anotherKey = CryptoService.createSigningKey(anotherEvent, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+                EventSigningKey anotherKey = CryptoService.createSigningKey(anotherEvent);
                 // Force a NOT NULL violation.
                 anotherKey.setPrivateKey(null);
                 anotherEvent.setSigningKey(anotherKey);
@@ -383,7 +382,7 @@ public class EventSigningKeyRepositoryTest
             Long signingKeyId = txTemplate.execute(status ->
             {
                 Event event = createEvent();
-                EventSigningKey key = CryptoService.createSigningKey(event, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+                EventSigningKey key = CryptoService.createSigningKey(event);
                 event.setSigningKey(key);
                 Event saved = eventRepository.saveAndFlush(event);
 
@@ -410,7 +409,7 @@ public class EventSigningKeyRepositoryTest
             Long signingKeyId = txTemplate.execute(status ->
             {
                 Event event = createEvent();
-                EventSigningKey key = CryptoService.createSigningKey(event, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+                EventSigningKey key = CryptoService.createSigningKey(event);
                 event.setSigningKey(key);
                 Event saved = eventRepository.saveAndFlush(event);
 
@@ -433,7 +432,7 @@ public class EventSigningKeyRepositoryTest
             Long signingKeyId = txTemplate.execute(status ->
             {
                 Event event = createEvent();
-                EventSigningKey key = CryptoService.createSigningKey(event, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+                EventSigningKey key = CryptoService.createSigningKey(event);
                 event.setSigningKey(key);
                 Event saved = eventRepository.saveAndFlush(event);
 

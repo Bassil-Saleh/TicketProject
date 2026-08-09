@@ -25,7 +25,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 
 import com.ticketproject.webapp.bridges.SpringContextBridge;
-import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.model.entities.Attendee;
 import com.ticketproject.webapp.model.entities.BlockedRegistration;
 import com.ticketproject.webapp.model.entities.Event;
@@ -124,7 +123,7 @@ class BlockedRegistrationRepositoryTest
             .maxAttendees(200)
             .build();
 
-        EventSigningKey signingKey = CryptoService.createSigningKey(event, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+        EventSigningKey signingKey = CryptoService.createSigningKey(event);
 
         event.setEventAddress(address);
         event.setRegistrationStatus(RegistrationStatus.OPEN);
@@ -340,7 +339,7 @@ class BlockedRegistrationRepositoryTest
                 .maxAttendees(100)
                 .build();
 
-            EventSigningKey signingKey2 = CryptoService.createSigningKey(event2, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+            EventSigningKey signingKey2 = CryptoService.createSigningKey(event2);
 
             event2.setEventAddress(address2);
             event2.setRegistrationStatus(RegistrationStatus.OPEN);

@@ -24,7 +24,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 
 import com.ticketproject.webapp.bridges.SpringContextBridge;
-import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.model.entities.Attendee;
 import com.ticketproject.webapp.model.entities.Event;
 import com.ticketproject.webapp.model.entities.EventAddress;
@@ -120,7 +119,7 @@ class TicketRepositoryTest
             .maxAttendees(500)
             .build();
 
-        EventSigningKey signingKey = CryptoService.createSigningKey(event, AppConstants.Crypto.PUBLIC_PRIVATE_KEY_SIZE_TEST);
+        EventSigningKey signingKey = CryptoService.createSigningKey(event);
 
         event.setSigningKey(signingKey);
         event.setEventAddress(address);
