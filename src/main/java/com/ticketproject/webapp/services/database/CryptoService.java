@@ -29,6 +29,10 @@ import java.security.SecureRandom;
 /**
  * CryptoService is used to encrypt and decrypt
  * database table fields with sensitive information.
+ * 
+ * CryptoService also includes static methods to generate
+ * EventSigningKey entities used to create digital signatures
+ * for Ticket entities.
  */
 @Component
 public class CryptoService
