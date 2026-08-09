@@ -1018,6 +1018,7 @@ public final class AppConstants
 
             public static final String PASSWORD_RESET_EMAIL = AppConstants.Project.PROJECT_NAME + " Account Password Reset Request";
             public static final String VERIFICATION_EMAIL = "Verify Your " + AppConstants.Project.PROJECT_NAME + " Account";
+            public static final String TICKET_EMAIL = "Your " + AppConstants.Project.PROJECT_NAME + " Event Ticket";
         }
 
         public static final class Templates
@@ -1034,6 +1035,7 @@ public final class AppConstants
 
             public static final String VERIFICATION_EMAIL = "email/verification-email";
             public static final String PASSWORD_RESET_EMAIL = "email/password-reset-email";
+            public static final String TICKET_EMAIL = "email/ticket-email";
         }
     }
 
