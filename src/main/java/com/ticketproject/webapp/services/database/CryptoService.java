@@ -14,7 +14,6 @@ import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
-import java.security.InvalidParameterException;
 import java.util.Base64;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -276,22 +275,17 @@ public class CryptoService
      * @return a new KeyPair
      * @throws RuntimeException if key pair generation fails
      */
-    public static KeyPair generateKeyPair(int keySize)
+    public static KeyPair generateKeyPair()
     {
         try
         {
             KeyPairGenerator generator = KeyPairGenerator
                 .getInstance(AppConstants.Crypto.PUBLIC_PRIVATE_KEY_ALGORITHM);
-            generator.initialize(keySize);
             return generator.generateKeyPair();
         }
         catch (NoSuchAlgorithmException e)
         {
             throw new RuntimeException("Cannot generate keypair - algorithm not supported", e);
-        }
-        catch (InvalidParameterException e)
-        {
-            throw new RuntimeException("Cannot generate keypair - key size not supported", e);
         }
     }
 
@@ -300,9 +294,9 @@ public class CryptoService
      * @param event the event to associate the signing key with
      * @return a new EventSigningKey entity (not yet persisted)
      */
-    public static EventSigningKey createSigningKey(Event event, int keySize)
+    public static EventSigningKey createSigningKey(Event event)
     {
-        KeyPair keyPair = CryptoService.generateKeyPair(keySize);
+        KeyPair keyPair = CryptoService.generateKeyPair();
         return new EventSigningKey.Builder()
             .event(event)
             .privateKey(keyPair.getPrivate())
