@@ -1002,6 +1002,7 @@ public final class AppConstants
         }
 
         public static final String FROM_ADDRESS = "noreply@ticketproject.local";
+        public static final String CHARACTER_ENCODING = "UTF-8";
 
         public static final class Subjects
         {
@@ -1032,6 +1033,7 @@ public final class AppConstants
             }
 
             public static final String VERIFICATION_EMAIL = "email/verification-email";
+            public static final String PASSWORD_RESET_EMAIL = "email/password-reset-email";
         }
     }
 

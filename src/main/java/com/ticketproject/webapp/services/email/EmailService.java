@@ -57,16 +57,25 @@ public class EmailService
     {
         try
         {
-            String messageBody =
-                "Your password reset token is " +
-                rawToken +
-                "\nThe token expires in " +
-                AppConstants.Database.PasswordResetTokens.Sizes.TOKEN_DURATION_HOURS +
-                " hour" + 
-                (AppConstants.Database.PasswordResetTokens.Sizes.TOKEN_DURATION_HOURS > 1 ? "s." : ".");
-            // Create and send an email containing the password reset token.
+            // Prepare the Thymeleaf context with template variables.
+            Context context = new Context();
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("passwordResetToken", rawToken);
+            variables.put("expirationHours", AppConstants.Database.PasswordResetTokens.Sizes.TOKEN_DURATION_HOURS);
+            context.setVariables(variables);
+
+            // Render the email HTML using the Thymeleaf template.
+            String htmlContent = templateEngine
+                .process(AppConstants.Email.Templates.PASSWORD_RESET_EMAIL, context);
+
+            // Create and send the email.
             MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            MimeMessageHelper helper = new MimeMessageHelper
+            (
+                message,
+                true,
+                AppConstants.Email.CHARACTER_ENCODING
+            );
             helper.setFrom
             (
                 AppConstants.Email.FROM_ADDRESS,
@@ -74,7 +83,7 @@ public class EmailService
             );
             helper.setTo(toEmail);
             helper.setSubject(AppConstants.Email.Subjects.PASSWORD_RESET_EMAIL);
-            helper.setText(messageBody, false);
+            helper.setText(htmlContent, true);
 
             mailSender.send(message);
         }
@@ -116,7 +125,12 @@ public class EmailService
 
             // Create and send the email.
             MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            MimeMessageHelper helper = new MimeMessageHelper
+            (
+                message,
+                true,
+                AppConstants.Email.CHARACTER_ENCODING
+            );
             helper.setFrom
             (
                 AppConstants.Email.FROM_ADDRESS,
