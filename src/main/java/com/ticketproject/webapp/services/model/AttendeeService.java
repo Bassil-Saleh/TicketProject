@@ -9,6 +9,8 @@ import com.ticketproject.webapp.exceptions.EmailAlreadyExistsException;
 import com.ticketproject.webapp.exceptions.EventRegistrationException;
 import com.ticketproject.webapp.model.entities.Attendee;
 import com.ticketproject.webapp.model.entities.Event;
+import com.ticketproject.webapp.model.entities.EventAddress;
+import com.ticketproject.webapp.model.entities.EventHost;
 import com.ticketproject.webapp.model.entities.Ticket;
 import com.ticketproject.webapp.model.enums.EventType;
 import com.ticketproject.webapp.model.enums.RegistrationStatus;
@@ -16,6 +18,7 @@ import com.ticketproject.webapp.model.repositories.AttendeeRepository;
 import com.ticketproject.webapp.model.repositories.EventRepository;
 import com.ticketproject.webapp.model.repositories.TicketRepository;
 import com.ticketproject.webapp.services.database.BlindIndexService;
+import com.ticketproject.webapp.services.email.EmailService;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -36,6 +39,7 @@ public class AttendeeService
     private final TicketRepository ticketRepository;
     private final TicketService ticketService;
     private final BlindIndexService blindIndexService;
+    private final EmailService emailService;
 
     public AttendeeService
     (
@@ -43,7 +47,8 @@ public class AttendeeService
         EventRepository eventRepository,
         TicketRepository ticketRepository,
         TicketService ticketService,
-        BlindIndexService blindIndexService
+        BlindIndexService blindIndexService,
+        EmailService emailService
     )
     {
         this.attendeeRepository = attendeeRepository;
@@ -51,6 +56,7 @@ public class AttendeeService
         this.ticketRepository = ticketRepository;
         this.ticketService = ticketService;
         this.blindIndexService = blindIndexService;
+        this.emailService = emailService;
     }
 
     public CreatePublicEventRegistrationResponse createPublicEventRegistration
@@ -126,6 +132,26 @@ public class AttendeeService
             signedTicket = ticketRepository.save(signedTicket);
         }
 
-        return new CreatePublicEventRegistrationResponse(signedTicket.getPublicToken(), "Registration saved.");
+        // Send the ticket email with a QR code to the attendee.
+        // If the email fails to send, the @Transactional annotation
+        // will roll back the entire transaction (no DB persistence).
+        EventHost eventHost = foundEvent.getEventHost();
+        String eventHostName = eventHost.getFirstName() + " " + eventHost.getLastName();
+        EventAddress eventAddress = foundEvent.getEventAddress();
+
+        emailService.sendTicketEmail
+        (
+            request.email(),
+            signedTicket.getPublicToken(),
+            foundEvent.getName(),
+            foundEvent.getStartDateTime(),
+            foundEvent.getEndDateTime(),
+            eventHostName,
+            eventAddress.getCity(),
+            eventAddress.getState(),
+            eventAddress.getCountry()
+        );
+
+        return new CreatePublicEventRegistrationResponse("Registration completed. A ticket with a QR code has been sent to your email.");
     }
 }
