@@ -96,18 +96,35 @@ public class AttendeeService
 
         Ticket signedTicket = ticketService.createSignedTicket(foundEvent);
 
-        Attendee attendee = new Attendee.Builder()
-            .firstName(request.firstName())
-            .middleName(request.middleName())
-            .lastName(request.lastName())
-            .email(request.email())
-            .build();
-        
-        signedTicket.setEvent(foundEvent);
-        signedTicket.setAttendee(attendee);
+        // If the attendee isn't already in the database,
+        // create a new Attendee record for them,
+        // otherwise use a pre-existing Attendee record.
+        Optional<Attendee> attendee = attendeeRepository.findByEmailIndex(emailBlindIndex);
+        if (attendee.isEmpty())
+        {
+            Attendee newAttendee = new Attendee.Builder()
+                .firstName(request.firstName())
+                .middleName(request.middleName())
+                .lastName(request.lastName())
+                .email(request.email())
+                .build();
+            
+            signedTicket.setEvent(foundEvent);
+            signedTicket.setAttendee(newAttendee);
 
-        attendee = attendeeRepository.save(attendee);
-        signedTicket = ticketRepository.save(signedTicket);
+            newAttendee = attendeeRepository.save(newAttendee);
+            signedTicket = ticketRepository.save(signedTicket);
+        }
+        else
+        {
+            Attendee foundAttendee = attendee.get();
+
+            signedTicket.setEvent(foundEvent);
+            signedTicket.setAttendee(foundAttendee);
+
+            foundAttendee = attendeeRepository.save(foundAttendee);
+            signedTicket = ticketRepository.save(signedTicket);
+        }
 
         return new CreatePublicEventRegistrationResponse(signedTicket.getPublicToken(), "Registration saved.");
     }
