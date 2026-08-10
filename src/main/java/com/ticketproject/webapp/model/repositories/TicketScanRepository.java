@@ -15,6 +15,12 @@ import java.util.List;
 @Repository
 public interface TicketScanRepository extends JpaRepository<TicketScan, Long>
 {
+    /**
+     * Find and return all TicketScan entities associated with
+     * a given EventHost using the EventHost's ID.
+     * @param eventHostId the EventHost's ID
+     * @return a List<TicketScan>
+     */
     @Query("SELECT s FROM TicketScan s JOIN FETCH s.ticket WHERE s.scannedBy.id = :eventHostId")
     List<TicketScan> findAllByEventHostId(@Param("eventHostId") Long eventHostId);
 }

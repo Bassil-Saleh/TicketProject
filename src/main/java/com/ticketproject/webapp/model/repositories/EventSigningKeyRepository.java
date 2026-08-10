@@ -15,6 +15,12 @@ import java.util.Optional;
 @Repository
 public interface EventSigningKeyRepository extends JpaRepository<EventSigningKey, Long>
 {
+    /**
+     * Find and retrieve an EventSigningKey based on the id of the Event
+     * which the EventSigningKey is associated with.
+     * @param eventId the ID of an Event
+     * @return an Optional<EventSigningKey>
+     */
     @Query("SELECT k FROM EventSigningKey k WHERE k.event.id = :eventId LIMIT 1")
     Optional<EventSigningKey> findByEventId(@Param("eventId") Long eventId);
 }
