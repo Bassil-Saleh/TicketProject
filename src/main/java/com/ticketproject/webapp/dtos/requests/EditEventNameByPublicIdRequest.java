@@ -5,6 +5,13 @@ import com.ticketproject.webapp.constants.AppConstants;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+/**
+ * EditEventNameByPublicIdRequest specifies what a valid request
+ * to edit the name of an event identified by its public ID
+ * should look like.
+ * @param publicId the event's public ID
+ * @param name the event's new name
+ */
 public record EditEventNameByPublicIdRequest
 (
     @NotBlank(message = "Event public id cannot be blank")

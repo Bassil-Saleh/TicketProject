@@ -5,6 +5,13 @@ import com.ticketproject.webapp.constants.AppConstants;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+/**
+ * EditEventDescriptionByPublicIdRequest specifies what a
+ * valid request to edit the description of an event identified
+ * by its public ID should look like.
+ * @param publicId the event's public id
+ * @param description the event's new description
+ */
 public record EditEventDescriptionByPublicIdRequest
 (
     @NotBlank(message = "Event public id cannot be blank")

@@ -7,6 +7,19 @@ import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 
+/**
+ * EditEventAddressByPublicIdRequest specifies what a valid request to
+ * edit the address of an event identified by its public ID should look like.
+ * @param publicId the event's public ID
+ * @param addressLine1 the event's first address line
+ * @param addressLine2 the event's second address line
+ * @param city the event's city
+ * @param state the event's state
+ * @param postalCode the event's postal code
+ * @param country the event's country
+ * @param latitude the event's latitude (optional)
+ * @param longitude the event's longitude (optional)
+ */
 public record EditEventAddressByPublicIdRequest
 (
     @NotBlank(message = "Event public id cannot be blank")

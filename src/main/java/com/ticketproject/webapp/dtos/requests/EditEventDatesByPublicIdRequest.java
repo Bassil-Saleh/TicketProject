@@ -9,6 +9,14 @@ import jakarta.validation.constraints.Future;
 
 import java.time.LocalDateTime;
 
+/**
+ * EditEventDatesByPublicIdRequest specifies what a valid request
+ * to edit the start and end dates/times of an event identified
+ * by its public ID should look like.
+ * @param publicId the event's public id
+ * @param startDateTime the event's new start date and time
+ * @param endDateTime the event's new end date and time
+ */
 public record EditEventDatesByPublicIdRequest
 (
     @NotBlank(message = "Event public id cannot be blank")
