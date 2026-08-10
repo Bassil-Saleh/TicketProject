@@ -56,6 +56,12 @@ public class TicketScanService
         this.eventSigningKeyRepository = eventSigningKeyRepository;
     }
 
+    /**
+     * Services a request to let a logged in event host scan an attendee's ticket.
+     * @param eventHost the logged in event host
+     * @param request the request body
+     * @return a SingleMessageResponse on success
+     */
     public SingleMessageResponse scanTicket(EventHost eventHost, ScanTicketRequest request)
     {
         if (eventHost == null)
@@ -141,6 +147,12 @@ public class TicketScanService
         }
     }
 
+    /**
+     * Services a request to let a logged in event host
+     * retrieve info on a list of tickets they've scanned.
+     * @param eventHost the logged in event host
+     * @return a GetScannedTicketsByEventHostResponse on success
+     */
     public GetScannedTicketsByEventHostResponse getScannedTicketsByEventHost(EventHost eventHost)
     {
         if (eventHost == null)

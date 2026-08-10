@@ -59,6 +59,11 @@ public class AttendeeService
         this.emailService = emailService;
     }
 
+    /**
+     * Services a request to let an attendee register for a public event.
+     * @param request the request body
+     * @return a SingleMessageResponse on success
+     */
     public SingleMessageResponse createPublicEventRegistration
     (
         CreatePublicEventRegistrationRequest request

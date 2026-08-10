@@ -328,6 +328,13 @@ public class EventService
         return new SingleMessageResponse("Event deleted.");
     }
 
+    /**
+     * Services a request to let a logged in event host edit the address of an event they've created.
+     * 
+     * @param eventHost the logged in event host
+     * @param request the request body
+     * @return a SingleMessageResponse on success
+     */
     public SingleMessageResponse editEventAddressByPublicId(EventHost eventHost, EditEventAddressByPublicIdRequest request)
     {
         if (eventHost == null)
@@ -392,6 +399,13 @@ public class EventService
         return new SingleMessageResponse("Event address updated.");
     }
 
+    /**
+     * Services a request to let a logged in event host edit the name of an event they've created.
+     * 
+     * @param eventHost the logged in event host
+     * @param request the request body
+     * @return a SingleMessageResponse on success
+     */
     public SingleMessageResponse editEventNameByPublicId(EventHost eventHost, EditEventNameByPublicIdRequest request)
     {
         if (eventHost == null)
@@ -434,6 +448,13 @@ public class EventService
         return new SingleMessageResponse("Event name changed.");
     }
 
+    /**
+     * Services a request to let a logged in event host edit the description of an event they've created.
+     * 
+     * @param eventHost the logged in event host
+     * @param request the request body
+     * @return a SingleMessageResponse on success
+     */
     public SingleMessageResponse editEventDescriptionByPublicId(EventHost eventHost, EditEventDescriptionByPublicIdRequest request)
     {
         if (eventHost == null)
@@ -476,6 +497,13 @@ public class EventService
         return new SingleMessageResponse("Event description changed.");
     }
 
+    /**
+     * Services a request to let a logged in event host edit
+     * the start and end date/times of an event they've created.
+     * @param eventHost the logged in event host
+     * @param request the request body
+     * @return a SingleMessageResponse on success
+     */
     public SingleMessageResponse editEventDatesByPublicId(EventHost eventHost, EditEventDatesByPublicIdRequest request)
     {
         if (eventHost == null)
