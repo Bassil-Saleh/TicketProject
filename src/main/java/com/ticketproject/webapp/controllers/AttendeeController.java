@@ -30,6 +30,11 @@ public class AttendeeController
         this.attendeeService = attendeeService;
     }
 
+    /**
+     * Handles a request to let a user register for a public event.
+     * @param request the request body
+     * @return a CreatePublicEventRegistrationResponse on success
+     */
     @PostMapping(ApiPaths.Attendees.REGISTRATION)
     @ResponseStatus(HttpStatus.CREATED)
     public CreatePublicEventRegistrationResponse createPublicEventRegistration

@@ -142,6 +142,14 @@ public class EventController
         return eventService.deleteEventByPublicId(eventHost, publicId);
     }
 
+    /**
+     * Handles a request to let a logged in user change the address
+     * of an event identified by its public ID. Only the logged in user
+     * who created the event should be allowed to edit it.
+     * @param request the request body
+     * @param servletRequest the HTTP Servlet request
+     * @return a SingleMessageResponse on success
+     */
     @PatchMapping(ApiPaths.Events.ADDRESS)
     @ResponseStatus(HttpStatus.OK)
     public SingleMessageResponse editEventAddressByPublicId
@@ -159,6 +167,14 @@ public class EventController
         return eventService.editEventAddressByPublicId(eventHost, request);
     }
 
+    /**
+     * Handles a request to let a logged in user change the name
+     * of an event identified by its public ID. Only the logged in user
+     * who created the event should be allowed to edit it.
+     * @param request the request body
+     * @param servletRequest the HTTP Servlet request
+     * @return a SingleMessageResponse on success
+     */
     @PatchMapping(ApiPaths.Events.NAME)
     @ResponseStatus(HttpStatus.OK)
     public SingleMessageResponse editEventNameByPublicId
@@ -176,6 +192,14 @@ public class EventController
         return eventService.editEventNameByPublicId(eventHost, request);
     }
 
+    /**
+     * Handles a request to let a logged in user change the description
+     * of an event identified by its public ID. Only the logged in user
+     * who created the event should be allowed to edit it.
+     * @param request the request body
+     * @param servletRequest the HTTP Servlet request
+     * @return a SingleMessageResponse on success
+     */
     @PatchMapping(ApiPaths.Events.DESCRIPTION)
     @ResponseStatus(HttpStatus.OK)
     public SingleMessageResponse editEventDescriptionByPublicId
@@ -193,6 +217,15 @@ public class EventController
         return eventService.editEventDescriptionByPublicId(eventHost, request);
     }
 
+    /**
+     * Handles a request to let a logged in user change the
+     * start and end dates/times of an event identified by
+     * its public ID. Only the logged in user who created
+     * the event should be allowed to edit it.
+     * @param request the request body
+     * @param servletRequest the HTTP Servlet request
+     * @return a SingleMessageResponse on success
+     */
     @PatchMapping(ApiPaths.Events.DATES)
     @ResponseStatus(HttpStatus.OK)
     public SingleMessageResponse editEventDatesByPublicId

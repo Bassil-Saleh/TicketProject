@@ -31,6 +31,13 @@ public class TicketScanController
         this.ticketScanService = ticketScanService;
     }
 
+    /**
+     * Handles a request to let a logged in user scan
+     * an attendee's ticket for an event.
+     * @param request the request body
+     * @param servletRequest the HTTP Servlet request
+     * @return a SingleMessageResponse on success
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public SingleMessageResponse scanTicket
@@ -48,6 +55,12 @@ public class TicketScanController
         return ticketScanService.scanTicket(eventHost, request);
     }
 
+    /**
+     * Handles a request to let a logged in user retrieve a list of
+     * all attendee tickets which they have scanned.
+     * @param request the request body
+     * @return a GetScannedTicketsByEventHostResponse on success
+     */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public GetScannedTicketsByEventHostResponse getScannedTicketsByEventHost(HttpServletRequest request)

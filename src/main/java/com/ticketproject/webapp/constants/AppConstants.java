@@ -815,6 +815,10 @@ public final class AppConstants
         public static final String BLIND_INDEX_KEY_ALGORITHM = "HmacSHA256";
     }
 
+    /**
+     * The DTO inner class holds constants used in DTO definitions for
+     * requests and responses to/from API routes used throughout this application.
+     */
     public static final class DTO
     {
 
@@ -984,11 +988,24 @@ public final class AppConstants
              */
             public static final String AUTHENTICATED_SESSION_ATTRIBUTE = "authenticatedSession";
 
+            /**
+             * The label of the HTTP header which includes the JWT sent by client devices.
+             */
             public static final String AUTHORIZATION_HEADER = "Authorization";
+
+            /**
+             * The prefix that comes just before the JWT that gets embedded
+             * by client devices into the Authorization HTTP header of requests
+             * which they send to this application's API routes.
+             */
             public static final String BEARER_PREFIX = "Bearer ";
         }
     }
 
+    /**
+     * The Email inner class holds constants used by this
+     * application's services to send out emails to users.
+     */
     public static final class Email
     {
 
@@ -1039,6 +1056,10 @@ public final class AppConstants
         }
     }
 
+    /**
+     * The Project inner class holds constants related to describing the application,
+     * such as the public name of the application used when communicating to users.
+     */
     public static final class Project
     {
 
