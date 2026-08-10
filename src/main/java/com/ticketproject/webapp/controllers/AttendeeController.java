@@ -2,7 +2,7 @@ package com.ticketproject.webapp.controllers;
 
 import com.ticketproject.webapp.constants.ApiPaths;
 import com.ticketproject.webapp.dtos.requests.CreatePublicEventRegistrationRequest;
-import com.ticketproject.webapp.dtos.responses.CreatePublicEventRegistrationResponse;
+import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 import com.ticketproject.webapp.services.model.AttendeeService;
 
 import jakarta.validation.Valid;
@@ -33,11 +33,11 @@ public class AttendeeController
     /**
      * Handles a request to let a user register for a public event.
      * @param request the request body
-     * @return a CreatePublicEventRegistrationResponse on success
+     * @return a SingleMessageResponse on success
      */
     @PostMapping(ApiPaths.Attendees.REGISTRATION)
     @ResponseStatus(HttpStatus.CREATED)
-    public CreatePublicEventRegistrationResponse createPublicEventRegistration
+    public SingleMessageResponse createPublicEventRegistration
     (
         @Valid
         @RequestBody CreatePublicEventRegistrationRequest request

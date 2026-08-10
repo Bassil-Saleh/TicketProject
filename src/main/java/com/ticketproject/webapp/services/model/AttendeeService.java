@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ticketproject.webapp.dtos.requests.CreatePublicEventRegistrationRequest;
-import com.ticketproject.webapp.dtos.responses.CreatePublicEventRegistrationResponse;
+import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 import com.ticketproject.webapp.exceptions.EmailAlreadyExistsException;
 import com.ticketproject.webapp.exceptions.EventRegistrationException;
 import com.ticketproject.webapp.model.entities.Attendee;
@@ -59,7 +59,7 @@ public class AttendeeService
         this.emailService = emailService;
     }
 
-    public CreatePublicEventRegistrationResponse createPublicEventRegistration
+    public SingleMessageResponse createPublicEventRegistration
     (
         CreatePublicEventRegistrationRequest request
     )
@@ -152,6 +152,7 @@ public class AttendeeService
             eventAddress.getCountry()
         );
 
-        return new CreatePublicEventRegistrationResponse("Registration completed. A ticket with a QR code has been sent to your email.");
+        return new SingleMessageResponse
+        ("Registration completed. A ticket with a QR code has been sent to your email.");
     }
 }
