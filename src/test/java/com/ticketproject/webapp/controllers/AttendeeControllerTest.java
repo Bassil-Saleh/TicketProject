@@ -164,7 +164,7 @@ class AttendeeControllerTest
     {
         return """
             {
-                "eventPublicId": "%s",
+                "publicId": "%s",
                 "firstName": "%s",
                 "lastName": "%s",
                 "email": "%s"

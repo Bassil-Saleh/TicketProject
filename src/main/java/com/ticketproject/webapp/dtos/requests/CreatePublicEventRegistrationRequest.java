@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Size;
  * CreatePublicEventRegistrationRequest specifies what a valid request
  * to register for a public event should look like.
  * 
- * @param eventPublicId the event's public id
+ * @param publicId the event's public id
  * @param firstName the attendee's first name
  * @param middleName the attendee's middle name (optional)
  * @param lastName the attendee's last name
@@ -26,7 +26,7 @@ public record CreatePublicEventRegistrationRequest
         AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH +
         " characters"
     )
-    String eventPublicId,
+    String publicId,
 
     @NotBlank(message = "First name is required")
     @Size

@@ -69,7 +69,7 @@ public class AttendeeService
         CreatePublicEventRegistrationRequest request
     )
     {
-        Optional<Event> event = eventRepository.findByPublicId(request.eventPublicId());
+        Optional<Event> event = eventRepository.findByPublicId(request.publicId());
 
         if (event.isEmpty())
         {
