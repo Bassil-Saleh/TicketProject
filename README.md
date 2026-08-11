@@ -1,12 +1,5 @@
 # Ticket Project
 
-## Spring Boot Dependencies:
-
-- Spring Web
-- Thymeleaf
-- MariaDB Driver
-- Spring Data JPA
-
 ## Project Setup:
 
 1. Clone this Git repository to your local machine.
@@ -78,3 +71,17 @@ spring.mail.properties.mail.smtp.starttls.enable=true_or_false
 ```
 ./mvnw test
 ```
+
+## Project Dependencies:
+See the `pom.xml` file.
+
+## API Documentation:
+After starting the application, replace the word `server` in any of
+the below links with the server name or IP address of the machine
+which this application is running on (if you are running this application
+locally, then `server` would be replaced with `localhost`), then navigate
+to the link of your choice to view the API documentation in your desired format. 
+
+- Swagger UI: <http://server:8080/swagger-ui.html>
+- JSON Format: <http://server:8080/v3/api-docs>
+- YAML Format: <http://server:8080/v3/api-docs.yaml>
