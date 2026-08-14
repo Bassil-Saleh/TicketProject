@@ -2,6 +2,8 @@ package com.ticketproject.webapp.dtos.requests;
 
 import com.ticketproject.webapp.constants.AppConstants;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -11,8 +13,17 @@ import jakarta.validation.constraints.Size;
  * 
  * @param password the new password
  */
+@Schema(description = "Request body for editing the authenticated event host's password")
 public record EditEventHostPasswordRequest
 (
+    @Schema
+    (
+        description = "The new password for the event host account, must be between 12 and 128 characters",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        example = "NewSecureP@ssw0rd456",
+        minimum = "12",
+        maximum = "128"
+    )
     @NotBlank(message = "Password is required")
     @Size
     (
