@@ -12,6 +12,11 @@ import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.model.entities.EventHost;
 import com.ticketproject.webapp.services.model.EventHostService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
@@ -32,6 +37,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  */
 @RestController
 @RequestMapping(ApiPaths.BASE + ApiPaths.EventHosts.ROOT)
+@Tag(name = "Event Hosts", description = "Endpoints for creating, verifying, and managing event host accounts")
 public class EventHostController
 {
     private final EventHostService eventHostService;
@@ -46,6 +52,16 @@ public class EventHostController
      * @param request a CreateEventHostRequest from the client
      * @return a SingleMessageResponse indicating the result of the request
      */
+    @Operation
+    (
+        summary = "Create a new event host account",
+        description =
+            "Registers a new event host account with the provided personal " +
+            "details, email address, password, and date of birth. A " +
+            "verification email will be sent to the provided email address. " +
+            "This endpoint does not require authentication."
+    )
+    @SecurityRequirements
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public SingleMessageResponse createEventHost
@@ -63,10 +79,26 @@ public class EventHostController
      * @param verificationToken the verification token from the email link
      * @return a SingleMessageResponse indicating the result of the request
      */
+    @Operation
+    (
+        summary = "Verify a new event host account",
+        description =
+            "Verifies a newly created event host account using the " +
+            "verification token sent via email. This endpoint is typically " +
+            "accessed by clicking the link in the verification email. " +
+            "This endpoint does not require authentication."
+    )
+    @SecurityRequirements
     @GetMapping(ApiPaths.EventHosts.VERIFICATION)
     @ResponseStatus(HttpStatus.OK)
     public SingleMessageResponse verifyEventHost
     (
+        @Parameter
+        (
+            description = "The verification token received in the verification email",
+            required = true,
+            example = "abc123def456..."
+        )
         @RequestParam("token") String verificationToken
     )
     {
@@ -80,6 +112,14 @@ public class EventHostController
      * @return a GetEventHostProfileResponse containing profile info
      * on the logged in EventHost
      */
+    @Operation
+    (
+        summary = "Get the authenticated event host's profile",
+        description =
+            "Retrieves profile information for the authenticated event host, " +
+            "including their name, email address, and last login time. " +
+            "Requires authentication."
+    )
     @GetMapping(ApiPaths.EventHosts.PROFILE)
     public GetEventHostProfileResponse getEventHostProfile(HttpServletRequest request)
     {
@@ -98,6 +138,13 @@ public class EventHostController
      * containing a JWT in the Authorization header
      * @return a SingleMessageResponse describing the request's result
      */
+    @Operation
+    (
+        summary = "Edit the authenticated event host's name",
+        description =
+            "Updates the full name (first, middle, and last) of the " +
+            "authenticated event host. Requires authentication."
+    )
     @PatchMapping(ApiPaths.EventHosts.FULL_NAME)
     public SingleMessageResponse editEventHostName
     (
@@ -121,6 +168,14 @@ public class EventHostController
      * @param servletRequest an HttpServletRequest from the client
      * @return a SingleMessageResponse describing the request's result
      */
+    @Operation
+    (
+        summary = "Edit the authenticated event host's password",
+        description =
+            "Updates the password of the authenticated event host. " +
+            "The new password must meet the minimum and maximum length " +
+            "requirements. Requires authentication."
+    )
     @PatchMapping(ApiPaths.EventHosts.PASSWORD)
     public SingleMessageResponse editEventHostPassword
     (
@@ -144,6 +199,14 @@ public class EventHostController
      * @param servletRequest an HttpServletRequest from the client
      * @return a SingleMessageResponse describing the request's result
      */
+    @Operation
+    (
+        summary = "Edit the authenticated event host's email address",
+        description =
+            "Updates the email address of the authenticated event host. " +
+            "The new email address must be valid and not already in use " +
+            "by another account. Requires authentication."
+    )
     @PatchMapping(ApiPaths.EventHosts.EMAIL)
     public SingleMessageResponse editEventHostEmail
     (
@@ -167,6 +230,14 @@ public class EventHostController
      * @param request the HttpServletRequest from the client
      * @return a SingleMessageResponse describing the request's result
      */
+    @Operation
+    (
+        summary = "Delete the authenticated event host's account",
+        description =
+            "Permanently deletes the authenticated event host's account " +
+            "and all associated data, including events, sessions, and " +
+            "other related records. Requires authentication."
+    )
     @DeleteMapping
     public SingleMessageResponse deleteEventHost(HttpServletRequest request)
     {
