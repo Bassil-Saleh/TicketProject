@@ -1,5 +1,7 @@
 package com.ticketproject.webapp.dtos.responses;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.validation.constraints.NotBlank;
 
 /**
@@ -8,8 +10,14 @@ import jakarta.validation.constraints.NotBlank;
  * 
  * @param message the detail message
  */
+@Schema(description = "Response body containing a single message indicating the result of the operation")
 public record SingleMessageResponse
 (
+    @Schema
+    (
+        description = "A human-readable message describing the result of the operation",
+        example = "Operation completed successfully"
+    )
     @NotBlank(message = "Message cannot be blank")
     String message
 )
