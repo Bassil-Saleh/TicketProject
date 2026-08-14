@@ -16,6 +16,11 @@ import com.ticketproject.webapp.dtos.responses.CreateEventResponse;
 import com.ticketproject.webapp.model.entities.EventHost;
 import com.ticketproject.webapp.services.model.EventService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
@@ -38,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 @RestController
 @RequestMapping(ApiPaths.BASE + ApiPaths.Events.ROOT)
+@Tag(name = "Events", description = "Endpoints for creating, retrieving, editing, and deleting events")
 public class EventController
 {
     private final EventService eventService;
@@ -54,6 +60,15 @@ public class EventController
      * @param servletRequest the HTTP Servlet request
      * @return a CreateEventResponse on success
      */
+    @Operation
+    (
+        summary = "Create a new event",
+        description =
+            "Creates a new event owned by the authenticated event host. " +
+            "The event includes details such as name, description, dates, " +
+            "type, maximum attendees, and address. Returns the newly " +
+            "created event's public ID. Requires authentication."
+    )
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CreateEventResponse createEvent
@@ -77,9 +92,27 @@ public class EventController
      * @param publicId the event's public ID
      * @return a GetEventByPublicIdResponse on success
      */
+    @Operation
+    (
+        summary = "Get an event by its public ID",
+        description =
+            "Retrieves detailed information about a single event identified " +
+            "by its public ID, including name, description, dates, type, " +
+            "address, and coordinates. This endpoint does not require authentication."
+    )
+    @SecurityRequirements
     @GetMapping(ApiPaths.Events.BY_PUBLIC_ID)
     @ResponseStatus(HttpStatus.OK)
-    public GetEventByPublicIdResponse getEventByPublicId(@PathVariable String publicId)
+    public GetEventByPublicIdResponse getEventByPublicId
+    (
+        @Parameter
+        (
+            description = "The unique public identifier of the event to retrieve",
+            required = true,
+            example = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        )
+        @PathVariable String publicId
+    )
     {
         return eventService.getEventByPublicId(publicId);
     }
@@ -92,10 +125,24 @@ public class EventController
      * @param servletRequest the HTTP Servlet request
      * @return a GetEventsResponse on success
      */
+    @Operation
+    (
+        summary = "Get events created by the authenticated event host",
+        description =
+            "Retrieves a list of events created by the authenticated event host. " +
+            "The number of events returned is controlled by the 'count' query " +
+            "parameter, which must be between 1 and 500. Requires authentication."
+    )
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public GetEventsResponse getEvents
     (
+        @Parameter
+        (
+            description = "The number of events to retrieve (must be between 1 and 500)",
+            required = true,
+            example = "10"
+        )
         @RequestParam("count")
         Long count,
         HttpServletRequest servletRequest
@@ -126,10 +173,23 @@ public class EventController
      * @param servletRequest the HTTP Servlet request
      * @return a SingleMessageResponse on success
      */
+    @Operation
+    (
+        summary = "Delete an event by its public ID",
+        description =
+            "Deletes an event identified by its public ID. Only the event host " +
+            "who created the event is permitted to delete it. Requires authentication."
+    )
     @DeleteMapping(ApiPaths.Events.BY_PUBLIC_ID)
     @ResponseStatus(HttpStatus.OK)
     public SingleMessageResponse deleteEventByPublicId
     (
+        @Parameter
+        (
+            description = "The unique public identifier of the event to delete",
+            required = true,
+            example = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        )
         @PathVariable String publicId,
         HttpServletRequest servletRequest
     )
@@ -150,6 +210,14 @@ public class EventController
      * @param servletRequest the HTTP Servlet request
      * @return a SingleMessageResponse on success
      */
+    @Operation
+    (
+        summary = "Edit an event's address",
+        description =
+            "Updates the address of an event identified by its public ID. " +
+            "Only the event host who created the event is permitted to edit it. " +
+            "Requires authentication."
+    )
     @PatchMapping(ApiPaths.Events.ADDRESS)
     @ResponseStatus(HttpStatus.OK)
     public SingleMessageResponse editEventAddressByPublicId
@@ -175,6 +243,14 @@ public class EventController
      * @param servletRequest the HTTP Servlet request
      * @return a SingleMessageResponse on success
      */
+    @Operation
+    (
+        summary = "Edit an event's name",
+        description =
+            "Updates the name of an event identified by its public ID. " +
+            "Only the event host who created the event is permitted to edit it. " +
+            "Requires authentication."
+    )
     @PatchMapping(ApiPaths.Events.NAME)
     @ResponseStatus(HttpStatus.OK)
     public SingleMessageResponse editEventNameByPublicId
@@ -200,6 +276,14 @@ public class EventController
      * @param servletRequest the HTTP Servlet request
      * @return a SingleMessageResponse on success
      */
+    @Operation
+    (
+        summary = "Edit an event's description",
+        description =
+            "Updates the description of an event identified by its public ID. " +
+            "Only the event host who created the event is permitted to edit it. " +
+            "Requires authentication."
+    )
     @PatchMapping(ApiPaths.Events.DESCRIPTION)
     @ResponseStatus(HttpStatus.OK)
     public SingleMessageResponse editEventDescriptionByPublicId
@@ -226,6 +310,14 @@ public class EventController
      * @param servletRequest the HTTP Servlet request
      * @return a SingleMessageResponse on success
      */
+    @Operation
+    (
+        summary = "Edit an event's start and end dates/times",
+        description =
+            "Updates the start and end dates/times of an event identified by " +
+            "its public ID. Only the event host who created the event is " +
+            "permitted to edit it. Requires authentication."
+    )
     @PatchMapping(ApiPaths.Events.DATES)
     @ResponseStatus(HttpStatus.OK)
     public SingleMessageResponse editEventDatesByPublicId
