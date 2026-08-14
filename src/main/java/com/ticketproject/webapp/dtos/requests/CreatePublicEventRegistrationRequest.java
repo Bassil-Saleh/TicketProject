@@ -2,6 +2,8 @@ package com.ticketproject.webapp.dtos.requests;
 
 import com.ticketproject.webapp.constants.AppConstants;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -16,8 +18,16 @@ import jakarta.validation.constraints.Size;
  * @param lastName the attendee's last name
  * @param email the attendee's email address
  */
+@Schema(description = "Request body for registering an attendee for a public event")
 public record CreatePublicEventRegistrationRequest
 (
+    @Schema
+    (
+        description = "The public ID of the event to register for",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        example = "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        maximum = "36"
+    )
     @NotBlank(message = "Event public id cannot be blank")
     @Size
     (
@@ -28,6 +38,13 @@ public record CreatePublicEventRegistrationRequest
     )
     String publicId,
 
+    @Schema
+    (
+        description = "The attendee's first name",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        example = "Jane",
+        maximum = "100"
+    )
     @NotBlank(message = "First name is required")
     @Size
     (
@@ -36,6 +53,13 @@ public record CreatePublicEventRegistrationRequest
     )
     String firstName,
 
+    @Schema
+    (
+        description = "The attendee's middle name (optional)",
+        requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+        example = "Marie",
+        maximum = "100"
+    )
     @Size
     (
         max = AppConstants.Database.EventHosts.Sizes.MAX_NAME_LENGTH,
@@ -43,6 +67,13 @@ public record CreatePublicEventRegistrationRequest
     )
     String middleName,
 
+    @Schema
+    (
+        description = "The attendee's last name",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        example = "Smith",
+        maximum = "100"
+    )
     @Size
     (
         max = AppConstants.Database.EventHosts.Sizes.MAX_NAME_LENGTH,
@@ -51,6 +82,13 @@ public record CreatePublicEventRegistrationRequest
     @NotBlank(message = "Last name is required")
     String lastName,
 
+    @Schema
+    (
+        description = "The attendee's email address, where the ticket will be sent",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        example = "jane.smith@example.com",
+        maximum = "254"
+    )
     @NotBlank(message = "Email address is required")
     @Email
     (
