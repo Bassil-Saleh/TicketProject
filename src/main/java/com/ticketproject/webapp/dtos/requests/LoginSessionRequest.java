@@ -2,6 +2,8 @@ package com.ticketproject.webapp.dtos.requests;
 
 import com.ticketproject.webapp.constants.AppConstants;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotBlank;
@@ -13,8 +15,16 @@ import jakarta.validation.constraints.NotBlank;
  * @param email an email address
  * @param password a password
  */
+@Schema(description = "Request body for logging into an event host account")
 public record LoginSessionRequest
 (
+    @Schema
+    (
+        description = "The email address of the event host account",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        example = "john.doe@example.com",
+        maximum = "254"
+    )
     @NotBlank(message = "Email address is required")
     @Email
     (
@@ -31,6 +41,14 @@ public record LoginSessionRequest
     )
     String email,
 
+    @Schema
+    (
+        description = "The password of the event host account",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        example = "SecureP@ssw0rd123",
+        minimum = "12",
+        maximum = "128"
+    )
     @NotBlank(message = "Password is required")
     @Size
     (

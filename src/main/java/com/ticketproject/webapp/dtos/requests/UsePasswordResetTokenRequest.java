@@ -2,6 +2,8 @@ package com.ticketproject.webapp.dtos.requests;
 
 import com.ticketproject.webapp.constants.AppConstants;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -12,8 +14,16 @@ import jakarta.validation.constraints.Size;
  * @param passwordResetToken the password reset token
  * @param password the new password
  */
+@Schema(description = "Request body for using a password reset token to set a new password")
 public record UsePasswordResetTokenRequest
 (
+    @Schema
+    (
+        description = "The password reset token received via email",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        example = "abc123def456...",
+        maximum = "64"
+    )
     @NotBlank(message = "Password reset token is required")
     @Size
     (
@@ -24,6 +34,14 @@ public record UsePasswordResetTokenRequest
     )
     String passwordResetToken,
 
+    @Schema
+    (
+        description = "The new password for the account, must be between 12 and 128 characters",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        example = "NewSecureP@ssw0rd789",
+        minimum = "12",
+        maximum = "128"
+    )
     @NotBlank(message = "New password is required")
     @Size
     (
