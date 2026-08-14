@@ -9,6 +9,9 @@ import com.ticketproject.webapp.dtos.requests.ScanTicketRequest;
 import com.ticketproject.webapp.dtos.responses.GetScannedTicketsByEventHostResponse;
 import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -22,6 +25,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping(ApiPaths.BASE + ApiPaths.TicketScans.ROOT)
+@Tag(name = "Ticket Scans", description = "Endpoints for scanning attendee tickets and retrieving scan history")
 public class TicketScanController
 {
     private TicketScanService ticketScanService;
@@ -38,6 +42,15 @@ public class TicketScanController
      * @param servletRequest the HTTP Servlet request
      * @return a SingleMessageResponse on success
      */
+    @Operation
+    (
+        summary = "Scan an attendee's ticket",
+        description =
+            "Scans an attendee's ticket by providing the public token " +
+            "encoded in the ticket's QR code. The ticket is validated " +
+            "against the event host's events, and if valid, the attendee " +
+            "is marked as present. Requires authentication."
+    )
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public SingleMessageResponse scanTicket
@@ -61,6 +74,15 @@ public class TicketScanController
      * @param request the request body
      * @return a GetScannedTicketsByEventHostResponse on success
      */
+    @Operation
+    (
+        summary = "Get all tickets scanned by the authenticated event host",
+        description =
+            "Retrieves a list of all attendee tickets that have been " +
+            "scanned by the authenticated event host, including details " +
+            "about each scanned ticket such as attendee information, " +
+            "event details, and scan timestamp. Requires authentication."
+    )
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public GetScannedTicketsByEventHostResponse getScannedTicketsByEventHost(HttpServletRequest request)
