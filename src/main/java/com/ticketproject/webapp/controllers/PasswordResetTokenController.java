@@ -6,6 +6,10 @@ import com.ticketproject.webapp.dtos.requests.UsePasswordResetTokenRequest;
 import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 import com.ticketproject.webapp.services.model.PasswordResetTokenService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 @RestController
 @RequestMapping(ApiPaths.BASE + ApiPaths.PasswordResetTokens.ROOT)
+@Tag(name = "Password Reset Tokens", description = "Endpoints for requesting and using password reset tokens")
 public class PasswordResetTokenController
 {
     private final PasswordResetTokenService passwordResetTokenService;
@@ -37,6 +42,17 @@ public class PasswordResetTokenController
      * @param request the request body
      * @return a SingleMessageResponse on success
      */
+    @Operation
+    (
+        summary = "Request a password reset token",
+        description =
+            "Initiates a password reset for an event host account by sending " +
+            "a password reset link to the provided email address. If the " +
+            "email address is associated with an existing account, a reset " +
+            "token will be generated and emailed. This endpoint does not " +
+            "require authentication."
+    )
+    @SecurityRequirements
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public SingleMessageResponse createPasswordResetToken
@@ -54,6 +70,16 @@ public class PasswordResetTokenController
      * @param request the request body
      * @return a SingleMessageResponse on success
      */
+    @Operation
+    (
+        summary = "Use a password reset token to set a new password",
+        description =
+            "Completes the password reset process by validating the provided " +
+            "password reset token and setting a new password for the " +
+            "associated account. The token must not be expired or already " +
+            "used. This endpoint does not require authentication."
+    )
+    @SecurityRequirements
     @PatchMapping
     @ResponseStatus(HttpStatus.OK)
     public SingleMessageResponse usePasswordResetToken
