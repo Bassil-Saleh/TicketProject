@@ -2,6 +2,8 @@ package com.ticketproject.webapp.dtos.requests;
 
 import com.ticketproject.webapp.constants.AppConstants;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalDate;
 
 import jakarta.validation.constraints.Email;
@@ -20,8 +22,16 @@ import jakarta.validation.constraints.NotNull;
  * @param password password
  * @param dateOfBirth date of birth
  */
+@Schema(description = "Request body for creating a new event host account")
 public record CreateEventHostRequest
 (
+    @Schema
+    (
+        description = "The event host's first name",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        example = "John",
+        maximum = "100"
+    )
     @NotBlank(message = "First name is required")
     @Size
     (
@@ -30,6 +40,13 @@ public record CreateEventHostRequest
     )
     String firstName,
 
+    @Schema
+    (
+        description = "The event host's middle name (optional)",
+        requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+        example = "Michael",
+        maximum = "100"
+    )
     @Size
     (
         max = AppConstants.Database.EventHosts.Sizes.MAX_NAME_LENGTH,
@@ -37,6 +54,13 @@ public record CreateEventHostRequest
     )
     String middleName,
 
+    @Schema
+    (
+        description = "The event host's last name",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        example = "Doe",
+        maximum = "100"
+    )
     @Size
     (
         max = AppConstants.Database.EventHosts.Sizes.MAX_NAME_LENGTH,
@@ -45,6 +69,13 @@ public record CreateEventHostRequest
     @NotBlank(message = "Last name is required")
     String lastName,
 
+    @Schema
+    (
+        description = "The event host's email address, used for account verification and login",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        example = "john.doe@example.com",
+        maximum = "254"
+    )
     @NotBlank(message = "Email address is required")
     @Email
     (
@@ -61,6 +92,14 @@ public record CreateEventHostRequest
     )
     String email,
 
+    @Schema
+    (
+        description = "The event host's password, must be between 12 and 128 characters",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        example = "SecureP@ssw0rd123",
+        minimum = "12",
+        maximum = "128"
+    )
     @NotBlank(message = "Password is required")
     @Size
     (
@@ -74,6 +113,12 @@ public record CreateEventHostRequest
     )
     String password,
 
+    @Schema
+    (
+        description = "The event host's date of birth, must be in the past",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        example = "1990-05-15"
+    )
     @NotNull(message = "Date of birth is required")
     @Past(message = "Date of birth must be in the past")
     LocalDate dateOfBirth

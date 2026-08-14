@@ -2,6 +2,8 @@ package com.ticketproject.webapp.dtos.requests;
 
 import com.ticketproject.webapp.constants.AppConstants;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -12,8 +14,16 @@ import jakarta.validation.constraints.Size;
  * 
  * @param email an email address
  */
+@Schema(description = "Request body for initiating a password reset")
 public record CreatePasswordResetTokenRequest
 (
+    @Schema
+    (
+        description = "The email address of the event host account to reset the password for",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        example = "john.doe@example.com",
+        maximum = "254"
+    )
     @NotBlank(message = "Email address is required")
     @Email
     (
