@@ -2,6 +2,8 @@ package com.ticketproject.webapp.dtos.responses;
 
 import com.ticketproject.webapp.model.enums.EventType;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -28,47 +30,123 @@ import java.time.LocalDateTime;
  * @param latitude the latitude coordinates of the event's precise location
  * @param longitude the longitude coordinates of the event's precise location
  */
+@Schema(description = "Response body containing detailed information about a single event")
 public record GetEventByPublicIdResponse
 (
+    @Schema
+    (
+        description = "The unique public identifier of the event",
+        example = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+    )
     @NotNull(message = "Event public id cannot be null")
     String publicId,
 
+    @Schema
+    (
+        description = "The name of the event",
+        example = "Annual Tech Conference 2026"
+    )
     @NotBlank(message = "Event name cannot be blank")
     String name,
 
+    @Schema
+    (
+        description = "A detailed description of the event",
+        example = "A full-day conference featuring talks on the latest technology trends."
+    )
     @NotBlank(message = "Event description cannot be blank")
     String description,
 
+    @Schema
+    (
+        description = "The event's start date and time",
+        example = "2026-09-15T09:00:00"
+    )
     @NotNull(message = "Event start date and time cannot be null")
     LocalDateTime startDateTime,
 
+    @Schema
+    (
+        description = "The event's end date and time",
+        example = "2026-09-15T18:00:00"
+    )
     @NotNull(message = "Event end date and time cannot be null")
     LocalDateTime endDateTime,
 
+    @Schema
+    (
+        description = "The type of the event: PUBLIC (open registration) or PRIVATE (invitation only)",
+        example = "PUBLIC"
+    )
     @NotNull(message = "Event type cannot be null")
     EventType eventType,
 
+    @Schema
+    (
+        description = "The maximum number of attendees allowed to register for the event",
+        example = "100"
+    )
     Integer maxAttendees,
 
+    @Schema
+    (
+        description = "The first line of the event's street address",
+        example = "123 Main Street"
+    )
     @NotBlank(message = "Event 1st address line cannot be blank")
     String addressLine1,
 
+    @Schema
+    (
+        description = "The second line of the event's street address (may be null)",
+        example = "Suite 400"
+    )
     String addressLine2,
 
+    @Schema
+    (
+        description = "The city where the event takes place",
+        example = "San Francisco"
+    )
     @NotBlank(message = "Event city cannot be blank")
     String city,
 
+    @Schema
+    (
+        description = "The state or province where the event takes place",
+        example = "California"
+    )
     @NotBlank(message = "Event state cannot be blank")
     String state,
 
+    @Schema
+    (
+        description = "The postal or ZIP code of the event's location",
+        example = "94105"
+    )
     @NotBlank(message = "Event postal code cannot be blank")
     String postalCode,
 
+    @Schema
+    (
+        description = "The country where the event takes place",
+        example = "United States"
+    )
     @NotBlank(message = "Event country cannot be blank")
     String country,
 
+    @Schema
+    (
+        description = "The latitude coordinate of the event's precise location (may be null)",
+        example = "37.7749295"
+    )
     BigDecimal latitude,
 
+    @Schema
+    (
+        description = "The longitude coordinate of the event's precise location (may be null)",
+        example = "-122.4194155"
+    )
     BigDecimal longitude
 )
 {
