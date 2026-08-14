@@ -5,6 +5,10 @@ import com.ticketproject.webapp.dtos.requests.CreatePublicEventRegistrationReque
 import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 import com.ticketproject.webapp.services.model.AttendeeService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 @RestController
 @RequestMapping(ApiPaths.BASE + ApiPaths.Attendees.ROOT)
+@Tag(name = "Attendees", description = "Endpoints for attendee registration and management")
 public class AttendeeController
 {
     private final AttendeeService attendeeService;
@@ -35,6 +40,17 @@ public class AttendeeController
      * @param request the request body
      * @return a SingleMessageResponse on success
      */
+    @Operation
+    (
+        summary = "Register for a public event",
+        description =
+            "Allows an attendee to register for a public event by providing " +
+            "the event's public ID along with their personal details. " +
+            "Upon successful registration, a ticket is generated and sent " +
+            "to the attendee's email address. " +
+            "This endpoint does not require authentication."
+    )
+    @SecurityRequirements
     @PostMapping(ApiPaths.Attendees.REGISTRATION)
     @ResponseStatus(HttpStatus.CREATED)
     public SingleMessageResponse createPublicEventRegistration
