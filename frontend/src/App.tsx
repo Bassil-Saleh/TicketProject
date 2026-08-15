@@ -1,8 +1,14 @@
 import { HomePage } from './HomePage.tsx';
+import { NavigationBar } from './NavigationBar.tsx';
+import { Footer } from './Footer.tsx';
 
 function App() {
   return (
-    <HomePage />
+    <div>
+      <NavigationBar />
+        <HomePage />
+      <Footer />
+    </div>
   );
 }
 
