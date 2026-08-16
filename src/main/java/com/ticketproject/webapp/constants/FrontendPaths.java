@@ -30,4 +30,18 @@ public final class FrontendPaths
 
         public static final String VERIFY_ACCOUNT = "/verify-account";
     }
+
+    public static final class PasswordResetTokens
+    {
+        /**
+         * Private constructor. Not meant to be used.
+         * @throws UnsupportedOperationException
+         */
+        private PasswordResetTokens()
+        {
+            throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+        }
+
+        public static final String RESET_PASSWORD = "/reset-password";
+    }
 }

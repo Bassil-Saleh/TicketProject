@@ -67,10 +67,13 @@ public class EmailService
     {
         try
         {
+            // Build the password reset URL.
+            String passwordResetUrl = buildPasswordResetUrl(rawToken);
+
             // Prepare the Thymeleaf context with template variables.
             Context context = new Context();
             Map<String, Object> variables = new HashMap<>();
-            variables.put("passwordResetToken", rawToken);
+            variables.put("passwordResetUrl", passwordResetUrl);
             variables.put("expirationHours", AppConstants.Database.PasswordResetTokens.Sizes.TOKEN_DURATION_HOURS);
             context.setVariables(variables);
 
@@ -279,8 +282,15 @@ public class EmailService
      */
     private String buildVerificationUrl(String rawToken)
     {
-        // Construct the verification URL (using the base URL from application.properties).
-        String path = FrontendPaths.EventHosts.VERIFY_ACCOUNT;
-        return frontendBaseUrl + path + "?token=" + rawToken;
+        // Construct the verification URL (using the
+        // frontend base URL from application.properties).
+        return frontendBaseUrl + FrontendPaths.EventHosts.VERIFY_ACCOUNT + "?token=" + rawToken;
+    }
+
+    private String buildPasswordResetUrl(String rawToken)
+    {
+        // Construct the password reset URL (using the
+        // frontend base URL from application.properties).
+        return frontendBaseUrl + FrontendPaths.PasswordResetTokens.RESET_PASSWORD + "?token=" + rawToken;
     }
 }
