@@ -9,11 +9,16 @@ export function NavigationBar() {
     //       "Log In" and "Sign Up" buttons and instead show
     //       "Log Out" and "Dashboard" buttons.
 
+    // TODO: When the user clicks on the TicketProject header,
+    //       they should be sent to the home page.
+
     // TODO: Add CSS styling.
 
     return (
         <div>
-            <h1>TicketProject</h1>
+            <a>
+                <h1>TicketProject</h1>
+            </a>
             <div>
                 <button>Log In</button>
                 <button>Sign Up</button>
