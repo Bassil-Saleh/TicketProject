@@ -21,6 +21,9 @@ spring.application.name=webapp
 # If you're running this application locally,
 # you can set this to http://localhost:8080
 app.config.base-url=base_url_to_your_machine
+# If you're running this application locally,
+# you can set this to http://localhost:5173
+app.config.frontend-base.url=base_url_to_your_frontend_machine
 
 # Add your MariaDB database name, username and password
 spring.datasource.url=jdbc:mariadb://localhost:3306/your_database_name
@@ -82,6 +85,6 @@ which this application is running on (if you are running this application
 locally, then `server` would be replaced with `localhost`), then navigate
 to the link of your choice to view the API documentation in your desired format. 
 
-- Swagger UI: <http://server:8080/swagger-ui.html>
+- Swagger UI: <http://server:8080/swagger-ui/index.html>
 - JSON Format: <http://server:8080/v3/api-docs>
 - YAML Format: <http://server:8080/v3/api-docs.yaml>
