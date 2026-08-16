@@ -8,9 +8,8 @@ export function SignUpPage() {
     //       they navigate to this page, then they should be
     //       automatically redirected to the dashboard page.
 
-    // TODO: When the user clicks "Create Account", have the
-    //       page send a request to the route for creating a
-    //       new event host account.
+    // TODO: Add functionality to this page using the API route
+    //       to create a new event host account as reference.
 
     // TODO: After receiving a successful response from the
     //       route to create a new event host account, show

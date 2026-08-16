@@ -8,6 +8,9 @@ export function ProfilePage() {
     //       navigate to this page, then they should be
     //       automatically redirected to the home page.
 
+    // TODO: Add functionality to this page using the API routes
+    //       for fetching and editing profile info as reference.
+
     // TODO: When the user clicks "Edit" next to a field,
     //       show a form consisting of a text field and a
     //       "Save" button to let the user edit a specific

@@ -38,3 +38,6 @@ build/
 
 # Frontend
 frontend/node_modules/
+
+# API Docs in JSON Format
+api-docs.json

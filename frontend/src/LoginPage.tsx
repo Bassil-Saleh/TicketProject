@@ -8,8 +8,8 @@ export function LoginPage() {
     //       to this page, then they should be automatically
     //       redirected to the dashboard page.
 
-    // TODO: When the user clicks "Log In", have the page send a
-    //       request to the API route for creating login sessions.
+    // TODO: Implement the page's functionality using the API route
+    //       for logging into an account as reference.
 
     // TODO: If the user successfully logs in, then they should be
     //       automatically redirected to the dashboard page.
