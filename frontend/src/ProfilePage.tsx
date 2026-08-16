@@ -38,6 +38,7 @@ export function ProfilePage() {
     const [editLastName, setEditLastName] = useState('');
     const [editEmail, setEditEmail] = useState('');
     const [editPassword, setEditPassword] = useState('');
+    const [editConfirmPassword, setEditConfirmPassword] = useState('');
 
     // If the user is not logged in, redirect to the home page.
     useEffect(() => {
@@ -95,6 +96,7 @@ export function ProfilePage() {
             setEditEmail(profile.email);
         } else if (field === 'password') {
             setEditPassword('');
+            setEditConfirmPassword('');
         }
     };
 
@@ -114,6 +116,13 @@ export function ProfilePage() {
         e.preventDefault();
         setSaveMessage('');
         setSaveError('');
+
+        // Client-side validation: passwords must match when editing password.
+        if (editingField === 'password' && editPassword !== editConfirmPassword) {
+            setSaveError('Passwords do not match. Please try again.');
+            return;
+        }
+
         setIsSaving(true);
 
         try {
@@ -345,6 +354,15 @@ export function ProfilePage() {
                                 minLength={12}
                                 maxLength={128}
                                 aria-label="New password"
+                            />
+                            <input
+                                className="form-input"
+                                type="password"
+                                value={editConfirmPassword}
+                                onChange={(e) => setEditConfirmPassword(e.target.value)}
+                                placeholder="Confirm new password"
+                                required
+                                aria-label="Confirm new password"
                             />
                             <button
                                 type="submit"
