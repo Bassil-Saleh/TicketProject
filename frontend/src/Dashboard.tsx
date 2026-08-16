@@ -1,7 +1,8 @@
 /**
- * Dashboard is for implementing the part of the UI that lets a
- * logged in event host navigate to different pages once they
- * have logged in.
+ * Dashboard is for implementing a dashboard to let a logged in
+ * event host navigate to different pages. The dashboard should
+ * remain visible even when the user clicks on different options
+ * in it (i.e. view profile, list of events, etc.).
  * @returns JSX for the site's dashboard
  */
 export function Dashboard() {
