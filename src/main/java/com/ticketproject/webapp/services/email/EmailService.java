@@ -1,7 +1,7 @@
 package com.ticketproject.webapp.services.email;
 
-import com.ticketproject.webapp.constants.ApiPaths;
 import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.constants.FrontendPaths;
 import com.ticketproject.webapp.exceptions.EmailSendFailedException;
 
 import com.google.zxing.BarcodeFormat;
@@ -38,7 +38,7 @@ public class EmailService
 {
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
-    private final String baseUrl;
+    private final String frontendBaseUrl;
 
     /**
      * Constructs a new EmailService with the required dependencies.
@@ -49,12 +49,12 @@ public class EmailService
     (
         JavaMailSender mailSender,
         SpringTemplateEngine templateEngine,
-        @Value("${app.config.base-url}") String baseUrl
+        @Value("${app.config.frontend-base-url}") String baseUrl
     )
     {
         this.mailSender = mailSender;
         this.templateEngine = templateEngine;
-        this.baseUrl = baseUrl;
+        this.frontendBaseUrl = baseUrl;
     }
 
     /**
@@ -280,7 +280,7 @@ public class EmailService
     private String buildVerificationUrl(String rawToken)
     {
         // Construct the verification URL (using the base URL from application.properties).
-        String path = ApiPaths.BASE + ApiPaths.EventHosts.ROOT + ApiPaths.EventHosts.VERIFICATION;
-        return baseUrl + path + "?token=" + rawToken;
+        String path = FrontendPaths.EventHosts.VERIFY_ACCOUNT;
+        return frontendBaseUrl + path + "?token=" + rawToken;
     }
 }
