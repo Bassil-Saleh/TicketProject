@@ -7,6 +7,7 @@ export function LoginPage() {
                 <input type="email"></input><br></br>
                 <label>Password:</label><br></br>
                 <input type="password"></input><br></br>
+                <input type="submit" value="Log In"></input>
             </form>
         </div>
     );
