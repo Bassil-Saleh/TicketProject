@@ -1,3 +1,8 @@
+/**
+ * HomePage is for implementing the first page that someone sees
+ * when they visit the site.
+ * @returns JSX for the site's home page
+ */
 export function HomePage() {
     return (
         <div>
@@ -25,13 +30,6 @@ export function HomePage() {
                     statistics for each of their events, and manage
                     invitations and registrations.
                 </p>
-            </div>
-            <div>
-                <h2>Get Started:</h2>
-                <div>
-                    <button>Log In</button>
-                    <button>Sign Up</button>
-                </div>
             </div>
         </div>
     );
