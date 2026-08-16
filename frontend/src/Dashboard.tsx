@@ -12,6 +12,8 @@ export function Dashboard() {
     // TODO: Add a link to the profile page to let a logged in
     //       event host view and edit their profile info.
 
+    // TODO: Add CSS styling.
+
     return (
         <div>
             <h1>Dashboard</h1>

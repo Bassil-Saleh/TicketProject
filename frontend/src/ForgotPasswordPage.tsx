@@ -11,6 +11,8 @@ export function ForgotPasswordPage() {
     // TODO: Show an appropriate message to the user based on the
     //       request's result (success, failure, etc.).
 
+    // TODO: Add CSS styling.
+
     return (
         <div>
             <p>Enter your email address in the below form to receive a password reset token.</p>

@@ -10,6 +10,8 @@ export function ResetPasswordPage() {
     // TODO: Show an appropriate message to the user based on
     //       the request's result (success, failure, etc.).
 
+    // TODO: Add CSS styling.
+
     return (
         <div>
             <p>Fill out the below form to reset your account's password.</p>

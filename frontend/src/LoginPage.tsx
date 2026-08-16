@@ -16,6 +16,8 @@ export function LoginPage() {
 
     // TODO: If the log in fails, show an appropriate error message.
 
+    // TODO: Add CSS styling.
+
     return (
         <div>
             <h1>Log In</h1>

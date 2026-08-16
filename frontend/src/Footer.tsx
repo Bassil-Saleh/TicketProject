@@ -4,6 +4,8 @@
  * @returns JSX for the site's footer
  */
 export function Footer() {
+    // TODO: Add CSS styling.
+
     return (
         <div>
             <p>&copy; 2026 TicketProject. All rights reserved.</p>

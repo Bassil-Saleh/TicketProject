@@ -9,6 +9,8 @@ export function NavigationBar() {
     //       "Log In" and "Sign Up" buttons and instead show
     //       "Log Out" and "Dashboard" buttons.
 
+    // TODO: Add CSS styling.
+
     return (
         <div>
             <h1>TicketProject</h1>

@@ -21,6 +21,8 @@ export function SignUpPage() {
     //       create a new event host account, show an
     //       appropriate error message.
 
+    // TODO: Add CSS styling.
+
     return (
         <div>
             <h1>Sign Up</h1>

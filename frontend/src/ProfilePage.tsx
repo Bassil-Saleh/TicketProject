@@ -16,6 +16,8 @@ export function ProfilePage() {
     //       "Save" button to let the user edit a specific
     //       profile field.
 
+    // TODO: Add CSS styling.
+
     return (
         <div>
             <h1>Your Profile</h1>

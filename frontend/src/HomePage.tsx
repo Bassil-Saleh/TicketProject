@@ -4,6 +4,8 @@
  * @returns JSX for the site's home page
  */
 export function HomePage() {
+    // TODO: Add CSS styling.
+
     return (
         <div>
             <div>
