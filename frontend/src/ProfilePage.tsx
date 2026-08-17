@@ -1,5 +1,5 @@
 import { useState, useEffect, type SubmitEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext.tsx';
 
 /** Shape of the profile response from GET /api/v1/event-hosts/profile. */
@@ -401,6 +401,18 @@ export function ProfilePage() {
                         {profile ? formatDateTime(profile.lastLogin) : 'N/A'}
                     </div>
                 </div>
+            </div>
+
+            {/* Danger zone */}
+            <div className="profile__danger-zone">
+                <h2 className="profile__danger-zone-title">Danger Zone</h2>
+                <p className="profile__danger-zone-text">
+                    Permanently delete your account and all associated data.
+                    This action cannot be undone.
+                </p>
+                <Link to="/delete-account" className="btn btn--danger">
+                    Delete Account
+                </Link>
             </div>
         </main>
     );
