@@ -30,6 +30,13 @@ interface EventInfo {
  * @returns JSX for the site's dashboard
  */
 export function Dashboard() {
+    // TODO: After implementing ViewEventPage and EditEventPage,
+    //       have each event listing in the dashboard include two
+    //       clickable links:
+    //       - "View Event" to take the user to the event's page.
+    //       - "Edit Event" to take the user to a page to edit the event.
+    //       Construct the clickable links using each event's public ID.
+
     const { isLoggedIn, authFetch } = useAuth();
     const navigate = useNavigate();
 
