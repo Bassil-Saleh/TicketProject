@@ -14,6 +14,12 @@ export function CreateEventPage() {
     //       an event using the POST API route to create
     //       a new event as reference.
 
+    // TODO: After successfully creating an event, show:
+    //       - A URL to navigate to the event and a
+    //       suggestion to share it.
+    //       - A "Back To Dashboard" button to go back to
+    //       the Dashboard page.
+
     // TODO: Show an appropriate message to the user based
     //       on the result of the sent request to create
     //       a new event (success, failure, etc.).

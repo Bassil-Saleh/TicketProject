@@ -10,16 +10,18 @@ export function DeleteAccountPage() {
     //       not currently logged in, then they should
     //       be automatically redirected to the home page.
 
-    // TODO: Add logic to let the logged in event host delete
-    //       their account, using the DELETE API route to delete
-    //       an event host account as reference.
+    // TODO: Add logic to let the logged in event host
+    //       delete their account, using the DELETE API
+    //       route to delete an event host account as reference.
 
-    // TODO: Show an appropriate message based on the result of
-    //       the account deletion request (success, failure, etc.).
+    // TODO: Show an appropriate message based on the
+    //       result of the account deletion request
+    //       (success, failure, etc.).
 
-    // TODO: After successfully deleting an account, the user should
-    //       be automatically redirected to the home page and their
-    //       current login session should be discarded.
+    // TODO: After successfully deleting an account, the
+    //       user should be automatically redirected to
+    //       the home page and their current login session
+    //       should be discarded.
 
     return (
         <div>
