@@ -149,7 +149,7 @@ export function CreateEventPage() {
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            placeholder="Annual Tech Conference 2026"
+                            placeholder="Sponsor Meeting"
                             maxLength={255}
                             required
                         />
