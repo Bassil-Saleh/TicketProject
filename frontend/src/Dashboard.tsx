@@ -108,6 +108,12 @@ export function Dashboard() {
                     <Link to="/profile" className="dashboard__nav-link">
                         👤 View Profile
                     </Link>
+                    <Link to="/create-event" className="dashboard__nav-link">
+                        ➕ Create Event
+                    </Link>
+                    <Link to="/scanned-tickets" className="dashboard__nav-link">
+                        🎫 Scanned Tickets
+                    </Link>
                 </nav>
 
                 {/* Events section */}
@@ -144,6 +150,20 @@ export function Dashboard() {
                                         <div className="profile__field-value">
                                             {event.name}
                                         </div>
+                                    </div>
+                                    <div className="dashboard__event-actions">
+                                        <Link
+                                            to={`/events/${event.publicId}`}
+                                            className="btn btn--outline btn--sm"
+                                        >
+                                            View Event
+                                        </Link>
+                                        <Link
+                                            to={`/events/${event.publicId}/edit`}
+                                            className="btn btn--ghost btn--sm"
+                                        >
+                                            Edit Event
+                                        </Link>
                                     </div>
                                 </div>
                             ))}
