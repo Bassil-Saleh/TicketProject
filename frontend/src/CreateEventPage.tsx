@@ -169,7 +169,7 @@ export function CreateEventPage() {
                         />
                     </div>
 
-                    <div className="form-row">
+                    <div className="form-group">
                         <div className="form-group">
                             <label className="form-label" htmlFor="event-start">Start Date & Time</label>
                             <input
