@@ -25,7 +25,7 @@ spring.application.name=webapp
 app.config.base-url=base_url_to_your_machine
 # If you're running this application locally,
 # you can set this to http://localhost:5173
-app.config.frontend-base.url=base_url_to_your_frontend_machine
+app.config.frontend-base-url=base_url_to_your_frontend_machine
 
 # Add your MariaDB database name, username and password
 spring.datasource.url=jdbc:mariadb://localhost:3306/your_database_name
