@@ -789,7 +789,324 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* --------------------------------------------------------------------------
-   15. Responsive Breakpoints
+   15. Form Layout Utilities
+   -------------------------------------------------------------------------- */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+}
+
+.form-section-title {
+    font-size: var(--font-size-md);
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-md);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border);
+}
+
+.form-actions {
+    display: flex;
+    gap: var(--space-md);
+    margin-top: var(--space-lg);
+    flex-wrap: wrap;
+}
+
+textarea.form-input {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* --------------------------------------------------------------------------
+   16. Edit Event Page
+   -------------------------------------------------------------------------- */
+.edit-event {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: var(--space-xl) var(--space-md);
+}
+
+.edit-event__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-xl);
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.edit-event__title {
+    font-size: var(--font-size-2xl);
+}
+
+.profile__edit-form--column {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.profile__edit-form--column .form-input {
+    min-width: unset;
+}
+
+/* --------------------------------------------------------------------------
+   17. View Event Page
+   -------------------------------------------------------------------------- */
+.view-event {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: var(--space-xl) var(--space-md);
+}
+
+.view-event__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+    flex-wrap: wrap;
+}
+
+.view-event__type-badge {
+    display: inline-block;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-primary);
+    background-color: var(--color-info-bg);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-sm);
+}
+
+.view-event__title {
+    font-size: var(--font-size-2xl);
+}
+
+.view-event__body {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-xl);
+}
+
+.view-event__section {
+    margin-bottom: var(--space-xl);
+}
+
+.view-event__section:last-child {
+    margin-bottom: 0;
+}
+
+.view-event__section-title {
+    font-size: var(--font-size-md);
+    margin-bottom: var(--space-sm);
+    color: var(--color-text-secondary);
+}
+
+.view-event__description {
+    white-space: pre-wrap;
+    line-height: 1.7;
+}
+
+.view-event__coordinates {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    margin-top: var(--space-sm);
+}
+
+.btn--disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: auto;
+}
+
+/* --------------------------------------------------------------------------
+   18. Scanned Tickets Page
+   -------------------------------------------------------------------------- */
+.scanned-tickets {
+    padding: var(--space-xl) 0;
+}
+
+.scanned-tickets__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-xl);
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.scanned-tickets__title {
+    font-size: var(--font-size-2xl);
+}
+
+.scanned-tickets__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.ticket-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.ticket-card__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-md);
+    margin-bottom: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+.ticket-card__attendee {
+    display: flex;
+    flex-direction: column;
+}
+
+.ticket-card__name {
+    font-weight: 600;
+    font-size: var(--font-size-base);
+}
+
+.ticket-card__email {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.ticket-card__scanned-at {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    white-space: nowrap;
+}
+
+.ticket-card__event {
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-sm);
+}
+
+.ticket-card__event-name {
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+}
+
+.ticket-card__event-dates {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+}
+
+/* --------------------------------------------------------------------------
+   19. Delete Account Page
+   -------------------------------------------------------------------------- */
+.delete-account p {
+    margin-bottom: var(--space-md);
+}
+
+.delete-account__list {
+    margin: 0 0 var(--space-md) var(--space-lg);
+}
+
+.delete-account__list li {
+    margin-bottom: var(--space-xs);
+}
+
+.delete-account__confirm-label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    margin: var(--space-lg) 0;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+}
+
+.delete-account__confirm-label input[type="checkbox"] {
+    margin-top: 0.2em;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   20. Dashboard Event Actions
+   -------------------------------------------------------------------------- */
+.dashboard__event-actions {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   21. Profile Danger Zone
+   -------------------------------------------------------------------------- */
+.profile__danger-zone {
+    margin-top: var(--space-2xl);
+    padding: var(--space-lg);
+    border: 1.5px solid var(--color-error);
+    border-radius: var(--radius-md);
+    background-color: var(--color-error-bg);
+}
+
+.profile__danger-zone-title {
+    font-size: var(--font-size-md);
+    color: var(--color-error);
+    margin-bottom: var(--space-sm);
+}
+
+.profile__danger-zone-text {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-md);
+}
+
+/* --------------------------------------------------------------------------
+   22. Modal / Confirmation Dialog
+   -------------------------------------------------------------------------- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: var(--space-md);
+}
+
+.modal {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: var(--space-2xl);
+    max-width: 440px;
+    width: 100%;
+}
+
+.modal__title {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-md);
+}
+
+.modal__message {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-xl);
+    line-height: 1.6;
+}
+
+.modal__actions {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: flex-end;
+}
+
+/* --------------------------------------------------------------------------
+   23. Responsive Breakpoints
    -------------------------------------------------------------------------- */
 @media (max-width: 768px) {
     :root {
