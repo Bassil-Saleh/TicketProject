@@ -9,6 +9,12 @@ import { ProfilePage } from './ProfilePage.tsx';
 import { ForgotPasswordPage } from './ForgotPasswordPage.tsx';
 import { ResetPasswordPage } from './ResetPasswordPage.tsx';
 import { AccountVerificationPage } from './AccountVerificationPage.tsx';
+import { CreateEventPage } from './CreateEventPage.tsx';
+import { EditEventPage } from './EditEventPage.tsx';
+import { ViewEventPage } from './ViewEventPage.tsx';
+import { ViewScannedTicketsPage } from './ViewScannedTicketsPage.tsx';
+import { DeleteAccountPage } from './DeleteAccountPage.tsx';
+import { EventRegistrationPage } from './EventRegistrationPage.tsx';
 
 /**
  * App is the component from which all the other
@@ -29,6 +35,12 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/verify-account" element={<AccountVerificationPage />} />
+        <Route path="/create-event" element={<CreateEventPage />} />
+        <Route path="/scanned-tickets" element={<ViewScannedTicketsPage />} />
+        <Route path="/delete-account" element={<DeleteAccountPage />} />
+        <Route path="/events/:publicId" element={<ViewEventPage />} />
+        <Route path="/events/:publicId/register" element={<EventRegistrationPage />} />
+        <Route path="/events/:publicId/edit" element={<EditEventPage />} />
       </Routes>
       <Footer />
     </div>
