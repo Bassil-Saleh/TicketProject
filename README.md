@@ -18,6 +18,10 @@
 
 ![Event Registration Walkthrough](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-17-2026/ticketproject_demo04.webp)
 
+### Receiving A Ticket
+
+![Receiving A Ticket](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-17-2026/Attendee_Ticket.png)
+
 ### Editing An Event
 
 ![Editing An Event Walkthrough](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-17-2026/ticketproject_demo05.webp)
@@ -25,6 +29,10 @@
 ### Editing Your Profile
 
 ![Editing Your Profile Walkthrough](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-17-2026/ticketproject_demo06.webp)
+
+### Viewing Scanned Tickets
+
+![Viewing Scanned Tickets](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-17-2026/Scanned_Tickets.png)
 
 ## Project Setup:
 
