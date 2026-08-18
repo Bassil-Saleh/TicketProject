@@ -1,6 +1,7 @@
 package com.ticketproject.webapp.services.model;
 
 import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.dtos.requests.ChangeEventToPublicEventRequest;
 import com.ticketproject.webapp.dtos.requests.CreateEventRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventAddressByPublicIdRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventDatesByPublicIdRequest;
@@ -19,6 +20,7 @@ import com.ticketproject.webapp.model.entities.Event;
 import com.ticketproject.webapp.model.entities.EventAddress;
 import com.ticketproject.webapp.model.entities.EventSigningKey;
 import com.ticketproject.webapp.model.enums.EventStatus;
+import com.ticketproject.webapp.model.enums.EventType;
 import com.ticketproject.webapp.model.enums.RegistrationStatus;
 import com.ticketproject.webapp.model.repositories.EventAddressRepository;
 import com.ticketproject.webapp.model.repositories.EventRepository;
@@ -571,5 +573,66 @@ public class EventService
         foundEvent = eventRepository.save(foundEvent);
 
         return new SingleMessageResponse("Event dates updated.");
+    }
+
+    /**
+     * Services a request to let a logged in event host change
+     * one of their preexisting events into a public event.
+     * 
+     * @param eventHost the logged in event host
+     * @param request the request body
+     * @return a SingleMessageResponse on success
+     */
+    public SingleMessageResponse changeEventToPublicEvent(EventHost eventHost, ChangeEventToPublicEventRequest request)
+    {
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+
+        if (request.publicId() == null)
+        {
+            throw new InvalidRequestException("Event public id cannot be null.");
+        }
+
+        if (request.publicId().length() > AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH)
+        {
+            throw new InvalidRequestException
+            (
+                "Event public id cannot be longer than " +
+                AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH +
+                " characters."
+            );
+        }
+
+        Optional<Event> event = eventRepository.findByPublicId(request.publicId());
+        if (event.isEmpty())
+        {
+            throw new EntityNotFoundException("Could not find an event with the provided public id.");
+        }
+
+        Event foundEvent = event.get();
+
+        if (Long.compare(foundEvent.getEventHost().getId(), eventHost.getId()) != 0)
+        {
+            throw new InvalidCredentialsException("Only the event host who created the event can edit it.");
+        }
+
+        if (foundEvent.getEventStatus() == EventStatus.PUBLISHED)
+        {
+            throw new EventAlreadyPublishedException("Event cannot be changed into a public event because the event is already published.");
+        }
+
+        if (foundEvent.getEventType() == EventType.PUBLIC)
+        {
+            return new SingleMessageResponse("This event is already a public event.");
+        }
+
+        foundEvent.setEventType(EventType.PUBLIC);
+        foundEvent.setMaxAttendees(request.maxAttendees());
+        foundEvent.setLastUpdated(LocalDateTime.now());
+        foundEvent = eventRepository.save(foundEvent);
+
+        return new SingleMessageResponse("The event has been changed into a public event.");
     }
 }

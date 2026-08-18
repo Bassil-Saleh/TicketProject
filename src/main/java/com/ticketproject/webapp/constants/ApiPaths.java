@@ -88,6 +88,8 @@ public final class ApiPaths
         public static final String DESCRIPTION = "/description";
         public static final String DATES = "/dates";
         public static final String MAX_ATTENDEES = "/max-attendees";
+        public static final String CHANGE_TO_PUBLIC = "/change-to-public";
+        public static final String CHANGE_TO_PRIVATE = "/change-to-private";
     }
 
     public static final class Attendees
