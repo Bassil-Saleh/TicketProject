@@ -936,4 +936,375 @@ class EventControllerTest
                 .andExpect(jsonPath("$.status").value(409));
         }
     }
+
+    @Nested
+    @DisplayName("PATCH /api/v1/events/change-to-public")
+    class ChangeEventToPublicEventTests
+    {
+        @Test
+        @DisplayName("Successful change to public event returns 200")
+        void successfulChangeToPublicReturns200() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PRIVATE);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            String requestBody = """
+                {
+                    "publicId": "%s",
+                    "maxAttendees": 50
+                }
+                """.formatted(event.getPublicId());
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.CHANGE_TO_PUBLIC)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("The event has been changed into a public event."));
+        }
+
+        @Test
+        @DisplayName("Change to public without JWT returns 401")
+        void changeToPublicWithoutJwtReturns401() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PRIVATE);
+
+            String requestBody = """
+                {
+                    "publicId": "%s",
+                    "maxAttendees": 50
+                }
+                """.formatted(event.getPublicId());
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.CHANGE_TO_PUBLIC)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401));
+        }
+
+        @Test
+        @DisplayName("Change to public of non-existent event returns 404")
+        void changeToPublicOfNonExistentEventReturns404() throws Exception
+        {
+            createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            String requestBody = """
+                {
+                    "publicId": "non-existent-public-id",
+                    "maxAttendees": 50
+                }
+                """;
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.CHANGE_TO_PUBLIC)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404));
+        }
+
+        @Test
+        @DisplayName("Change to public of another host's event returns 401")
+        void changeToPublicOfAnotherHostsEventReturns401() throws Exception
+        {
+            EventHost host1 = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host1, EventType.PRIVATE);
+
+            createVerifiedEventHost("other@example.com", TEST_PASSWORD);
+            String otherJwt = loginAndGetJwt("other@example.com", TEST_PASSWORD);
+
+            String requestBody = """
+                {
+                    "publicId": "%s",
+                    "maxAttendees": 50
+                }
+                """.formatted(event.getPublicId());
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.CHANGE_TO_PUBLIC)
+                    .header("Authorization", "Bearer " + otherJwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401));
+        }
+
+        @Test
+        @DisplayName("Change to public of published event returns 409")
+        void changeToPublicOfPublishedEventReturns409() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PRIVATE);
+            event.setEventStatus(EventStatus.PUBLISHED);
+            eventRepository.save(event);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            String requestBody = """
+                {
+                    "publicId": "%s",
+                    "maxAttendees": 50
+                }
+                """.formatted(event.getPublicId());
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.CHANGE_TO_PUBLIC)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409));
+        }
+
+        @Test
+        @DisplayName("Change to public of already public event returns 200")
+        void changeToPublicOfAlreadyPublicEventReturns200() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PUBLIC);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            String requestBody = """
+                {
+                    "publicId": "%s",
+                    "maxAttendees": 50
+                }
+                """.formatted(event.getPublicId());
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.CHANGE_TO_PUBLIC)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("This event is already a public event."));
+        }
+
+        @Test
+        @DisplayName("Change to public with blank publicId returns 400")
+        void changeToPublicWithBlankPublicIdReturns400() throws Exception
+        {
+            createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            String requestBody = """
+                {
+                    "publicId": "",
+                    "maxAttendees": 50
+                }
+                """;
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.CHANGE_TO_PUBLIC)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+        }
+
+        @Test
+        @DisplayName("Change to public with maxAttendees less than 1 returns 400")
+        void changeToPublicWithMaxAttendeesLessThanOneReturns400() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PRIVATE);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            String requestBody = """
+                {
+                    "publicId": "%s",
+                    "maxAttendees": 0
+                }
+                """.formatted(event.getPublicId());
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.CHANGE_TO_PUBLIC)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+        }
+
+        @Test
+        @DisplayName("Change to public with null maxAttendees returns 400")
+        void changeToPublicWithNullMaxAttendeesReturns400() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PRIVATE);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            String requestBody = """
+                {
+                    "publicId": "%s",
+                    "maxAttendees": null
+                }
+                """.formatted(event.getPublicId());
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.CHANGE_TO_PUBLIC)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+        }
+    }
+
+    @Nested
+    @DisplayName("PATCH /api/v1/events/change-to-private")
+    class ChangeEventToPrivateEventTests
+    {
+        @Test
+        @DisplayName("Successful change to private event returns 200")
+        void successfulChangeToPrivateReturns200() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PUBLIC);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            String requestBody = """
+                {
+                    "publicId": "%s"
+                }
+                """.formatted(event.getPublicId());
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.CHANGE_TO_PRIVATE)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("The event has been changed into a private event."));
+        }
+
+        @Test
+        @DisplayName("Change to private without JWT returns 401")
+        void changeToPrivateWithoutJwtReturns401() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PUBLIC);
+
+            String requestBody = """
+                {
+                    "publicId": "%s"
+                }
+                """.formatted(event.getPublicId());
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.CHANGE_TO_PRIVATE)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401));
+        }
+
+        @Test
+        @DisplayName("Change to private of non-existent event returns 404")
+        void changeToPrivateOfNonExistentEventReturns404() throws Exception
+        {
+            createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            String requestBody = """
+                {
+                    "publicId": "non-existent-public-id"
+                }
+                """;
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.CHANGE_TO_PRIVATE)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404));
+        }
+
+        @Test
+        @DisplayName("Change to private of another host's event returns 401")
+        void changeToPrivateOfAnotherHostsEventReturns401() throws Exception
+        {
+            EventHost host1 = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host1, EventType.PUBLIC);
+
+            createVerifiedEventHost("other@example.com", TEST_PASSWORD);
+            String otherJwt = loginAndGetJwt("other@example.com", TEST_PASSWORD);
+
+            String requestBody = """
+                {
+                    "publicId": "%s"
+                }
+                """.formatted(event.getPublicId());
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.CHANGE_TO_PRIVATE)
+                    .header("Authorization", "Bearer " + otherJwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401));
+        }
+
+        @Test
+        @DisplayName("Change to private of published event returns 409")
+        void changeToPrivateOfPublishedEventReturns409() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PUBLIC);
+            event.setEventStatus(EventStatus.PUBLISHED);
+            eventRepository.save(event);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            String requestBody = """
+                {
+                    "publicId": "%s"
+                }
+                """.formatted(event.getPublicId());
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.CHANGE_TO_PRIVATE)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409));
+        }
+
+        @Test
+        @DisplayName("Change to private of already private event returns 200")
+        void changeToPrivateOfAlreadyPrivateEventReturns200() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PRIVATE);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            String requestBody = """
+                {
+                    "publicId": "%s"
+                }
+                """.formatted(event.getPublicId());
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.CHANGE_TO_PRIVATE)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("This event is already a private event."));
+        }
+
+        @Test
+        @DisplayName("Change to private with blank publicId returns 400")
+        void changeToPrivateWithBlankPublicIdReturns400() throws Exception
+        {
+            createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            String requestBody = """
+                {
+                    "publicId": ""
+                }
+                """;
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.CHANGE_TO_PRIVATE)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+        }
+    }
 }
