@@ -154,7 +154,10 @@ public class AttendeeService
             eventHostName,
             eventAddress.getCity(),
             eventAddress.getState(),
-            eventAddress.getCountry()
+            eventAddress.getCountry(),
+            eventAddress.getAddressLine1(),
+            eventAddress.getAddressLine2(),
+            eventAddress.getPostalCode()
         );
 
         return new SingleMessageResponse

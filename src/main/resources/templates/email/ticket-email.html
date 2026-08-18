@@ -80,7 +80,14 @@
                 <p><strong>Hosted by:</strong> <span th:text="${eventHostName}"></span></p>
                 <p><strong>Start:</strong> <span th:text="${startDateTime}"></span></p>
                 <p><strong>End:</strong> <span th:text="${endDateTime}"></span></p>
-                <p><strong>Location:</strong> <span th:text="${eventCity}"></span>, <span th:text="${eventState}"></span>, <span th:text="${eventCountry}"></span></p>
+                <p>
+                    <strong>Location:</strong>
+                    <span th:text="${addressLine1}"></span><span th:text="${addressLine2}"></span>,
+                    <span th:text="${eventCity}"></span>,
+                    <span th:text="${eventState}"></span>,
+                    <span th:text="${eventCountry}"></span>
+                    <span th:text="${postalCode}"></span>
+                </p>
             </div>
 
             <div class="qr-code-section">

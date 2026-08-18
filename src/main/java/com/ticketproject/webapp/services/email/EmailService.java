@@ -189,7 +189,10 @@ public class EmailService
         String eventHostName,
         String eventCity,
         String eventState,
-        String eventCountry
+        String eventCountry,
+        String addressLine1,
+        String addressLine2,
+        String postalCode
     )
     {
         try
@@ -207,6 +210,9 @@ public class EmailService
             variables.put("eventCity", eventCity);
             variables.put("eventState", eventState);
             variables.put("eventCountry", eventCountry);
+            variables.put("addressLine1", (addressLine2 != null) ? (addressLine1 + " ") : addressLine1);
+            variables.put("addressLine2", (addressLine2 != null) ? addressLine2 : "");
+            variables.put("postalCode", postalCode);
             context.setVariables(variables);
 
             // Render the email HTML using the Thymeleaf template.
