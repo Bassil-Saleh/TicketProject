@@ -9,9 +9,9 @@ import { Link, useSearchParams } from 'react-router-dom';
 export function ResetPasswordPage() {
     const [searchParams] = useSearchParams();
 
-    // Pre-fill the token from the URL query parameter if present
+    // Pre-fill the token from the URL query parameter
     // (e.g. /reset-password?token=abc123).
-    const [token, setToken] = useState(searchParams.get('token') ?? '');
+    const token = searchParams.get('token');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
@@ -64,12 +64,27 @@ export function ResetPasswordPage() {
         }
     };
 
+    // There must be a token supplied as a URL parameter in order
+    // to reset an account's password.
+    if (!token) {
+        return (
+            <main className="auth-page">
+                <div className="auth-card">
+                    <h1 className="auth-card__title">Reset Password</h1>
+                    <div className="alert alert--error" role="alert">
+                        The URL is missing a valid password reset token paramater.
+                    </div>
+                </div>
+            </main>
+        );
+    }
+
     return (
         <main className="auth-page">
             <div className="auth-card">
                 <h1 className="auth-card__title">Reset Password</h1>
                 <p className="auth-card__subtitle">
-                    Enter your password reset token and choose a new password.
+                    Enter your new password below.
                 </p>
 
                 {errorMessage && (
@@ -93,21 +108,6 @@ export function ResetPasswordPage() {
 
                 {!successMessage && (
                     <form onSubmit={handleSubmit} noValidate>
-                        <div className="form-group">
-                            <label className="form-label" htmlFor="reset-token">
-                                Password Reset Token
-                            </label>
-                            <input
-                                id="reset-token"
-                                className="form-input"
-                                type="text"
-                                value={token}
-                                onChange={(e) => setToken(e.target.value)}
-                                placeholder="Paste the token from your email"
-                                required
-                            />
-                        </div>
-
                         <div className="form-group">
                             <label className="form-label" htmlFor="reset-password">
                                 New Password
