@@ -8,6 +8,7 @@ import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 import com.ticketproject.webapp.exceptions.InvalidRequestException;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.dtos.requests.CreateEventRequest;
+import com.ticketproject.webapp.dtos.requests.ChangeEventToPrivateEventRequest;
 import com.ticketproject.webapp.dtos.requests.ChangeEventToPublicEventRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventAddressByPublicIdRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventDatesByPublicIdRequest;
@@ -367,5 +368,38 @@ public class EventController
             throw new UnauthorizedException("Authentication required");
         }
         return eventService.changeEventToPublicEvent(eventHost, request);
+    }
+
+    /**
+     * Handles a request to let a logged in user change a preexisting event
+     * into a private event. Only the logged in user who created the event
+     * should be allowed to edit it.
+     * @param request the request body
+     * @param servletRequest the HTTP Servlet request
+     * @return a SingleMessageResponse on success
+     */
+    @Operation
+    (
+        summary = "Change an existing event into a private event",
+        description =
+            "Change an existing event identified by its public ID " +
+            "into a private event. Only the event host who created the event " +
+            "is permitted to edit it. Requires authentication."
+    )
+    @PatchMapping(ApiPaths.Events.CHANGE_TO_PRIVATE)
+    @ResponseStatus(HttpStatus.OK)
+    public SingleMessageResponse changeEventToPrivateEvent
+    (
+        @Valid
+        @RequestBody ChangeEventToPrivateEventRequest request,
+        HttpServletRequest servletRequest
+    )
+    {
+        EventHost eventHost = (EventHost) servletRequest.getAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_EVENT_HOST_ATTRIBUTE);
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+        return eventService.changeEventToPrivateEvent(eventHost, request);
     }
 }

@@ -1,6 +1,7 @@
 package com.ticketproject.webapp.services.model;
 
 import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.dtos.requests.ChangeEventToPrivateEventRequest;
 import com.ticketproject.webapp.dtos.requests.ChangeEventToPublicEventRequest;
 import com.ticketproject.webapp.dtos.requests.CreateEventRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventAddressByPublicIdRequest;
@@ -634,5 +635,65 @@ public class EventService
         foundEvent = eventRepository.save(foundEvent);
 
         return new SingleMessageResponse("The event has been changed into a public event.");
+    }
+
+    /**
+     * Services a request to let a logged in event host change
+     * one of their preexisting events into a private event.
+     * 
+     * @param eventHost the logged in event host
+     * @param request the request body
+     * @return a SingleMessageResponse on success
+     */
+    public SingleMessageResponse changeEventToPrivateEvent(EventHost eventHost, ChangeEventToPrivateEventRequest request)
+    {
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+
+        if (request.publicId() == null)
+        {
+            throw new InvalidRequestException("Event public id cannot be null.");
+        }
+
+        if (request.publicId().length() > AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH)
+        {
+            throw new InvalidRequestException
+            (
+                "Event public id cannot be longer than " +
+                AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH +
+                " characters."
+            );
+        }
+
+        Optional<Event> event = eventRepository.findByPublicId(request.publicId());
+        if (event.isEmpty())
+        {
+            throw new EntityNotFoundException("Could not find an event with the provided public id.");
+        }
+
+        Event foundEvent = event.get();
+
+        if (Long.compare(foundEvent.getEventHost().getId(), eventHost.getId()) != 0)
+        {
+            throw new InvalidCredentialsException("Only the event host who created the event can edit it.");
+        }
+
+        if (foundEvent.getEventStatus() == EventStatus.PUBLISHED)
+        {
+            throw new EventAlreadyPublishedException("Event cannot be changed into a private event because the event is already published.");
+        }
+
+        if (foundEvent.getEventType() == EventType.PRIVATE)
+        {
+            return new SingleMessageResponse("This event is already a private event.");
+        }
+
+        foundEvent.setEventType(EventType.PRIVATE);
+        foundEvent.setLastUpdated(LocalDateTime.now());
+        foundEvent = eventRepository.save(foundEvent);
+
+        return new SingleMessageResponse("The event has been changed into a private event.");
     }
 }
