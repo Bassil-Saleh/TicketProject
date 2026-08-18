@@ -1,5 +1,31 @@
 # Ticket Project
 
+## Project Demo:
+
+### Account Creation
+
+![Account Creation Walkthrough](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-17-2026/ticketproject_demo01.webp)
+
+### Account Verification
+
+![Account Verification Walkthrough](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-17-2026/ticketproject_demo02.webp)
+
+### Event Creation
+
+![Event Creation Walkthrough](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-17-2026/ticketproject_demo03.webp)
+
+### Event Registration
+
+![Event Registration Walkthrough](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-17-2026/ticketproject_demo04.webp)
+
+### Editing An Event
+
+![Editing An Event Walkthrough](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-17-2026/ticketproject_demo05.webp)
+
+### Editing Your Profile
+
+![Editing Your Profile Walkthrough](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-17-2026/ticketproject_demo06.webp)
+
 ## Project Setup:
 
 1. Clone this Git repository to your local machine.
