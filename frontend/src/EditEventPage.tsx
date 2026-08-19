@@ -10,6 +10,7 @@ interface EventInfo {
     startDateTime: string;
     endDateTime: string;
     eventType: string;
+    eventStatus: string;
     maxAttendees: number;
     addressLine1: string;
     addressLine2: string | null;
@@ -31,31 +32,6 @@ type EditingField = 'name' | 'description' | 'dates' | 'address' | null;
  * @returns JSX for the site's edit event page
  */
 export function EditEventPage() {
-    // TODO: If the event is a public event and the
-    // event's status indicates it is not published
-    // or canceled, show a "Change to Private Event"
-    // button beside the event's current type.
-
-    // TODO: If the event is a private event and the
-    // event's status indicates it is not published
-    // or canceled, show a "Change to Public Event"
-    // button beside the event's current type.
-
-    // TODO: Clicking "Change to Private Event" sends
-    // a request to the API route
-    // PATCH /api/v1/events/change-to-private.
-
-    // TODO: Clicking "Change to Public Event" shows a form containing:
-    // - A field to enter the new number of maximum attendees.
-    // - A "Submit" button that, when clicked, sends a request to the
-    // API route PATCH /api/v1/events/change-to-public.
-    // - A "Cancel" button to close the form.
-
-    // TODO: If the event's status indicates it is published
-    // or canceled, show a message beside the event's type saying
-    // that the event's type cannot be changed once an event is
-    // published or canceled.
-
     const { isLoggedIn, authFetch } = useAuth();
     const navigate = useNavigate();
     const { publicId } = useParams<{ publicId: string }>();
@@ -82,6 +58,13 @@ export function EditEventPage() {
     const [editCountry, setEditCountry] = useState('');
     const [editLatitude, setEditLatitude] = useState('');
     const [editLongitude, setEditLongitude] = useState('');
+
+    // Change-type state
+    const [showChangeToPublicForm, setShowChangeToPublicForm] = useState(false);
+    const [newMaxAttendees, setNewMaxAttendees] = useState('');
+    const [typeMessage, setTypeMessage] = useState('');
+    const [typeError, setTypeError] = useState('');
+    const [isChangingType, setIsChangingType] = useState(false);
 
     // Delete state
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -251,6 +234,79 @@ export function EditEventPage() {
     };
 
     /**
+     * Handles sending a request to change the event to a private event.
+     * Sends PATCH /api/v1/events/change-to-private with the event's publicId.
+     */
+    const handleChangeToPrivate = async () => {
+        if (!publicId) return;
+        setTypeMessage('');
+        setTypeError('');
+        setIsChangingType(true);
+
+        try {
+            const response = await authFetch('/api/v1/events/change-to-private', {
+                method: 'PATCH',
+                body: JSON.stringify({ publicId }),
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                setTypeMessage(data.message || 'Event changed to private.');
+                setShowChangeToPublicForm(false);
+                setNewMaxAttendees('');
+                await fetchEvent();
+            } else {
+                setTypeError(data.message || 'Failed to change event type.');
+            }
+        } catch {
+            setTypeError('An unexpected error occurred. Please try again.');
+        } finally {
+            setIsChangingType(false);
+        }
+    };
+
+    /**
+     * Handles sending a request to change the event to a public event.
+     * Sends PATCH /api/v1/events/change-to-public with the event's publicId
+     * and the new maxAttendees value.
+     */
+    const handleChangeToPublic = async (e: SubmitEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!publicId) return;
+        setTypeMessage('');
+        setTypeError('');
+
+        const parsedMaxAttendees = Number(newMaxAttendees);
+        if (!Number.isInteger(parsedMaxAttendees) || parsedMaxAttendees < 1) {
+            setTypeError('Max attendees must be a whole number of at least 1.');
+            return;
+        }
+
+        setIsChangingType(true);
+
+        try {
+            const response = await authFetch('/api/v1/events/change-to-public', {
+                method: 'PATCH',
+                body: JSON.stringify({ publicId, maxAttendees: parsedMaxAttendees }),
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                setTypeMessage(data.message || 'Event changed to public.');
+                setShowChangeToPublicForm(false);
+                setNewMaxAttendees('');
+                await fetchEvent();
+            } else {
+                setTypeError(data.message || 'Failed to change event type.');
+            }
+        } catch {
+            setTypeError('An unexpected error occurred. Please try again.');
+        } finally {
+            setIsChangingType(false);
+        }
+    };
+
+    /**
      * Handles deleting the event. Shows a confirmation dialog
      * first; on confirmation, calls DELETE /api/v1/events/{publicId}.
      */
@@ -370,6 +426,18 @@ export function EditEventPage() {
                 {deleteError && (
                     <div className="alert alert--error" role="alert">
                         {deleteError}
+                    </div>
+                )}
+
+                {typeMessage && (
+                    <div className="alert alert--success" role="alert">
+                        {typeMessage}
+                    </div>
+                )}
+
+                {typeError && (
+                    <div className="alert alert--error" role="alert">
+                        {typeError}
                     </div>
                 )}
 
@@ -618,11 +686,79 @@ export function EditEventPage() {
                     )}
                 </div>
 
-                {/* Event type (read-only) */}
+                {/* Event type */}
                 <div className="profile__field">
                     <div className="profile__field-info">
                         <div className="profile__field-label">Event Type</div>
-                        <div className="profile__field-value">{event.eventType}</div>
+                        <div className="profile__field-value">
+                            {event.eventType}
+                            {(event.eventStatus === 'PUBLISHED' || event.eventStatus === 'CANCELED') && (
+                                <span className="profile__field-hint">
+                                    {" — The event's type cannot be changed once an event is published or canceled."}
+                                </span>
+                            )}
+                        </div>
+                        {event.eventStatus === 'DRAFT' && event.eventType === 'PUBLIC' && (
+                            <button
+                                className="btn btn--outline btn--sm"
+                                onClick={handleChangeToPrivate}
+                                disabled={isChangingType}
+                            >
+                                {isChangingType ? 'Changing...' : 'Change to Private Event'}
+                            </button>
+                        )}
+                        {event.eventStatus === 'DRAFT' && event.eventType === 'PRIVATE' && !showChangeToPublicForm && (
+                            <button
+                                className="btn btn--outline btn--sm"
+                                onClick={() => {
+                                    setTypeMessage('');
+                                    setTypeError('');
+                                    setNewMaxAttendees('');
+                                    setShowChangeToPublicForm(true);
+                                }}
+                                disabled={isChangingType}
+                            >
+                                Change to Public Event
+                            </button>
+                        )}
+                        {event.eventStatus === 'DRAFT' && event.eventType === 'PRIVATE' && showChangeToPublicForm && (
+                            <form className="profile__edit-form profile__edit-form--column" onSubmit={handleChangeToPublic}>
+                                <div className="form-group">
+                                    <label className="form-label" htmlFor="edit-max-attendees">
+                                        Max Attendees
+                                    </label>
+                                    <input
+                                        id="edit-max-attendees"
+                                        className="form-input"
+                                        type="number"
+                                        min={1}
+                                        step={1}
+                                        value={newMaxAttendees}
+                                        onChange={(e) => setNewMaxAttendees(e.target.value)}
+                                        required
+                                        aria-label="Maximum number of attendees"
+                                    />
+                                </div>
+                                <div className="form-actions">
+                                    <button type="submit" className="btn btn--primary btn--sm" disabled={isChangingType}>
+                                        {isChangingType ? 'Submitting...' : 'Submit'}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn--ghost btn--sm"
+                                        onClick={() => {
+                                            setShowChangeToPublicForm(false);
+                                            setNewMaxAttendees('');
+                                            setTypeMessage('');
+                                            setTypeError('');
+                                        }}
+                                        disabled={isChangingType}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        )}
                     </div>
                 </div>
 
