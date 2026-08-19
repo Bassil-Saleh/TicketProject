@@ -7,6 +7,7 @@ import com.ticketproject.webapp.dtos.requests.CreateEventRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventAddressByPublicIdRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventDatesByPublicIdRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventDescriptionByPublicIdRequest;
+import com.ticketproject.webapp.dtos.requests.EditEventMaxAttendeesByPublicIdRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventNameByPublicIdRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventByPublicIdResponse;
@@ -709,5 +710,72 @@ public class EventService
         foundEvent = eventRepository.save(foundEvent);
 
         return new SingleMessageResponse("The event has been changed into a private event.");
+    }
+
+    /**
+     * Services a request to let a logged in event host change
+     * the max number of attendees for a preexisting event.
+     * @param eventHost the logged in event host
+     * @param request the request body
+     * @return a SingleMessageResponse on success
+     */
+    public SingleMessageResponse editEventMaxAttendeesByPublicId(EventHost eventHost, EditEventMaxAttendeesByPublicIdRequest request)
+    {
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+
+        if (request.publicId() == null)
+        {
+            throw new InvalidRequestException("Event public id cannot be null.");
+        }
+
+        if (request.publicId().length() > AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH)
+        {
+            throw new InvalidRequestException
+            (
+                "Event public id cannot be longer than " +
+                AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH +
+                " characters."
+            );
+        }
+
+        Optional<Event> event = eventRepository.findByPublicId(request.publicId());
+        if (event.isEmpty())
+        {
+            throw new EntityNotFoundException("Could not find an event with the provided public id.");
+        }
+
+        Event foundEvent = event.get();
+
+        if (Long.compare(foundEvent.getEventHost().getId(), eventHost.getId()) != 0)
+        {
+            throw new InvalidCredentialsException("Only the event host who created the event can edit it.");
+        }
+
+        if (foundEvent.getEventStatus() == EventStatus.CANCELED)
+        {
+            throw new EventAlreadyPublishedException("Max number of attendees cannot be changed because the event is already canceled.");
+        }
+
+        long currentNumberOfAttendees = ticketRepository.getRegistrationCountByEventId(foundEvent.getId());
+
+        if (request.maxAttendees() <= currentNumberOfAttendees)
+        {
+            // It is possible to request setting the new max number of attendees
+            // less than or equal to the current number of registrations, although
+            // this will mean no further registrations will be possible unless
+            // the event host decides to later raise the max number of attendees
+            // to an even higher number.
+            foundEvent.setMaxAttendees(currentNumberOfAttendees);
+        }
+        else
+        {
+            foundEvent.setMaxAttendees(request.maxAttendees());
+        }
+        foundEvent.setLastUpdated(LocalDateTime.now());
+
+        return new SingleMessageResponse("Max number of attendees has been updated.");
     }
 }
