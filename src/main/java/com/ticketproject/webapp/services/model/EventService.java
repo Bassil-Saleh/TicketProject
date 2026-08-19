@@ -14,6 +14,7 @@ import com.ticketproject.webapp.dtos.responses.GetEventByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventsResponse;
 import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 import com.ticketproject.webapp.exceptions.InvalidRequestException;
+import com.ticketproject.webapp.exceptions.EventAlreadyCanceledException;
 import com.ticketproject.webapp.exceptions.EventAlreadyPublishedException;
 import com.ticketproject.webapp.exceptions.InvalidCredentialsException;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
@@ -756,7 +757,7 @@ public class EventService
 
         if (foundEvent.getEventStatus() == EventStatus.CANCELED)
         {
-            throw new EventAlreadyPublishedException("Max number of attendees cannot be changed because the event is already canceled.");
+            throw new EventAlreadyCanceledException("Max number of attendees cannot be changed because the event is already canceled.");
         }
 
         long currentNumberOfAttendees = ticketRepository.getRegistrationCountByEventId(foundEvent.getId());

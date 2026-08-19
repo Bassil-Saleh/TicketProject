@@ -1,14 +1,18 @@
 package com.ticketproject.webapp.controllers;
 
 import com.ticketproject.webapp.constants.ApiPaths;
+import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.dtos.requests.CreatePrivateEventInvitationRequest;
 import com.ticketproject.webapp.dtos.requests.CreatePublicEventRegistrationRequest;
 import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
+import com.ticketproject.webapp.model.entities.EventHost;
 import com.ticketproject.webapp.services.model.AttendeeService;
+import com.ticketproject.webapp.exceptions.UnauthorizedException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -61,5 +65,39 @@ public class AttendeeController
     {
         return attendeeService.createPublicEventRegistration(request);
     }
-    
+
+    /**
+     * Handles a request to let a logged in event host create
+     * an invitation for a private event. Only the event host
+     * who created the event should be able to create invitations
+     * for the event.
+     * @param request the request body
+     * @param servletRequest the HTTP Servlet request
+     * @return a SingleMessageResponse on success
+     */
+    @Operation
+    (
+        summary = "Create an invitation for a private event",
+        description =
+            "Create an invitation for a private event. Upon success, " +
+            "a ticket is generated, and an invitation is sent to the " +
+            "recipient's email address. Requires authentication. Only the " +
+            "event host who created the event can invite someone else to the event."
+    )
+    @PostMapping(ApiPaths.Attendees.INVITATION)
+    @ResponseStatus(HttpStatus.CREATED)
+    public SingleMessageResponse createPrivateEventInvitation
+    (
+        @Valid
+        @RequestBody CreatePrivateEventInvitationRequest request,
+        HttpServletRequest servletRequest
+    )
+    {
+        EventHost eventHost = (EventHost) servletRequest.getAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_EVENT_HOST_ATTRIBUTE);
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+        return attendeeService.createPrivateEventInvitation(eventHost, request);
+    }
 }

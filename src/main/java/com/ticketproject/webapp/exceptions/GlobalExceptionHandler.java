@@ -362,6 +362,30 @@ public class GlobalExceptionHandler
     }
 
     /**
+     * Handles EventAlreadyCanceledException by returning a 409 Conflict response.
+     * @param ex      the exception that was thrown
+     * @param request the HTTP servlet request
+     * @return a ResponseEntity containing the error response and a 409 status
+     */
+    @ExceptionHandler(EventAlreadyCanceledException.class)
+    public ResponseEntity<ErrorResponse> handleEventAlreadyCanceled
+    (
+        EventAlreadyCanceledException ex,
+        HttpServletRequest request
+    )
+    {
+        ErrorResponse errorResponse = new ErrorResponse
+        (
+            Instant.now(),
+            HttpStatus.CONFLICT.value(),
+            HttpStatus.CONFLICT.getReasonPhrase(),
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    /**
      * Handles EventRegistrationException by returning a 400 Bad Request response.
      * @param ex      the exception that was thrown
      * @param request the HTTP servlet request

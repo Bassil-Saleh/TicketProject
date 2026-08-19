@@ -3,16 +3,23 @@ package com.ticketproject.webapp.services.model;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.dtos.requests.CreatePrivateEventInvitationRequest;
 import com.ticketproject.webapp.dtos.requests.CreatePublicEventRegistrationRequest;
 import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 import com.ticketproject.webapp.exceptions.EmailAlreadyExistsException;
+import com.ticketproject.webapp.exceptions.EventAlreadyCanceledException;
 import com.ticketproject.webapp.exceptions.EventRegistrationException;
+import com.ticketproject.webapp.exceptions.UnauthorizedException;
+import com.ticketproject.webapp.exceptions.InvalidRequestException;
+import com.ticketproject.webapp.exceptions.InvalidCredentialsException;
 import com.ticketproject.webapp.model.entities.Attendee;
 import com.ticketproject.webapp.model.entities.Event;
 import com.ticketproject.webapp.model.entities.EventAddress;
 import com.ticketproject.webapp.model.entities.EventHost;
 import com.ticketproject.webapp.model.entities.Ticket;
 import com.ticketproject.webapp.model.enums.EventType;
+import com.ticketproject.webapp.model.enums.EventStatus;
 import com.ticketproject.webapp.model.enums.RegistrationStatus;
 import com.ticketproject.webapp.model.repositories.AttendeeRepository;
 import com.ticketproject.webapp.model.repositories.EventRepository;
@@ -162,5 +169,128 @@ public class AttendeeService
 
         return new SingleMessageResponse
         ("Registration completed. A ticket with a QR code has been sent to your email.");
+    }
+
+    /**
+     * Services a request to let a logged in event host create an invitation
+     * to a private event. Only the event host who created the event should
+     * be able to create invitations for the event.
+     * @param eventHost the logged in event host
+     * @param request the request body
+     * @return a SingleMessageResponse on success
+     */
+    public SingleMessageResponse createPrivateEventInvitation(EventHost eventHost, CreatePrivateEventInvitationRequest request)
+    {
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+
+        if (request.publicId() == null)
+        {
+            throw new InvalidRequestException("Event public id cannot be null.");
+        }
+
+        if (request.publicId().length() > AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH)
+        {
+            throw new InvalidRequestException
+            (
+                "Event public id cannot be longer than " +
+                AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH +
+                " characters."
+            );
+        }
+
+        Optional<Event> event = eventRepository.findByPublicId(request.publicId());
+        if (event.isEmpty())
+        {
+            throw new EntityNotFoundException("Could not find an event with the provided public id.");
+        }
+
+        Event foundEvent = event.get();
+
+        if (foundEvent.getEventType() != EventType.PRIVATE)
+        {
+            throw new EventRegistrationException("This is not a private event.");
+        }
+
+        byte[] emailBlindIndex = blindIndexService.computeIndex(request.email());
+
+        if (ticketRepository.attendeeRegistrationExistsByEventId(emailBlindIndex, foundEvent.getId()))
+        {
+            throw new EmailAlreadyExistsException("An invitation designated to the same email address already exists for this event.");
+        }
+
+        if (Long.compare(foundEvent.getEventHost().getId(), eventHost.getId()) != 0)
+        {
+            throw new InvalidCredentialsException("Only the event host who created the event can create invitations for it.");
+        }
+
+        if (foundEvent.getEventStatus() == EventStatus.CANCELED)
+        {
+            throw new EventAlreadyCanceledException("Cannot create new invitations because the event is already canceled.");
+        }
+
+        if (foundEvent.getStartDateTime().isBefore(LocalDateTime.now()))
+        {
+            throw new EventRegistrationException("Cannot create new invitations after the event has already begun.");
+        }
+
+        Ticket signedTicket = ticketService.createSignedTicket(foundEvent);
+
+        // If the attendee isn't already in the database,
+        // create a new Attendee record for them,
+        // otherwise use a pre-existing Attendee record.
+        Optional<Attendee> attendee = attendeeRepository.findByEmailIndex(emailBlindIndex);
+        if (attendee.isEmpty())
+        {
+            Attendee newAttendee = new Attendee.Builder()
+                .firstName(request.firstName())
+                .middleName(request.middleName())
+                .lastName(request.lastName())
+                .email(request.email())
+                .build();
+            
+            signedTicket.setEvent(foundEvent);
+            signedTicket.setAttendee(newAttendee);
+
+            newAttendee = attendeeRepository.save(newAttendee);
+            signedTicket = ticketRepository.save(signedTicket);
+        }
+        else
+        {
+            Attendee foundAttendee = attendee.get();
+
+            signedTicket.setEvent(foundEvent);
+            signedTicket.setAttendee(foundAttendee);
+
+            foundAttendee = attendeeRepository.save(foundAttendee);
+            signedTicket = ticketRepository.save(signedTicket);
+        }
+
+        // Send the ticket email with a QR code to the attendee.
+        // If the email fails to send, the @Transactional annotation
+        // will roll back the entire transaction (no DB persistence).
+        String eventHostName = eventHost.getFirstName() + " " + eventHost.getLastName();
+        EventAddress eventAddress = foundEvent.getEventAddress();
+
+        emailService.sendTicketEmail
+        (
+            request.email(),
+            signedTicket.getPublicToken(),
+            foundEvent.getName(),
+            foundEvent.getStartDateTime(),
+            foundEvent.getEndDateTime(),
+            eventHostName,
+            eventAddress.getCity(),
+            eventAddress.getState(),
+            eventAddress.getCountry(),
+            eventAddress.getAddressLine1(),
+            eventAddress.getAddressLine2(),
+            eventAddress.getPostalCode()
+        );
+
+        return new SingleMessageResponse
+        ("Invitation created. A ticket with a QR code has been sent to your recipient's email.");
     }
 }
