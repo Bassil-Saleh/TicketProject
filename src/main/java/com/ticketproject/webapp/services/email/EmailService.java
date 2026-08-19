@@ -253,6 +253,94 @@ public class EmailService
     }
 
     /**
+     * Sends an invitation email to the recipient containing a QR code
+     * encoding the public token, along with event details.
+     *
+     * @param toEmail the recipient's email address
+     * @param publicToken the public token to encode as a QR code
+     * @param eventName the name of the event
+     * @param startDateTime the event's start date/time
+     * @param endDateTime the event's end date/time
+     * @param eventHostName the full name of the event host who created the event
+     * @param eventCity the city where the event takes place
+     * @param eventState the state where the event takes place
+     * @param eventCountry the country where the event takes place
+     * @throws EmailSendFailedException if the email fails to send
+     */
+    public void sendInvitationEmail
+    (
+        String toEmail,
+        String publicToken,
+        String eventName,
+        LocalDateTime startDateTime,
+        LocalDateTime endDateTime,
+        String eventHostName,
+        String eventCity,
+        String eventState,
+        String eventCountry,
+        String addressLine1,
+        String addressLine2,
+        String postalCode
+    )
+    {
+        try
+        {
+            // Generate the QR code image from the public token.
+            byte[] qrCodeImageBytes = generateQrCodeImage(publicToken);
+
+            // Prepare the Thymeleaf context with template variables.
+            Context context = new Context();
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("eventName", eventName);
+            variables.put("startDateTime", startDateTime.format(AppConstants.Crypto.DATE_TIME_FORMAT));
+            variables.put("endDateTime", endDateTime.format(AppConstants.Crypto.DATE_TIME_FORMAT));
+            variables.put("eventHostName", eventHostName);
+            variables.put("eventCity", eventCity);
+            variables.put("eventState", eventState);
+            variables.put("eventCountry", eventCountry);
+            variables.put("addressLine1", (addressLine2 != null) ? (addressLine1 + " ") : addressLine1);
+            variables.put("addressLine2", (addressLine2 != null) ? addressLine2 : "");
+            variables.put("postalCode", postalCode);
+            context.setVariables(variables);
+
+            // Render the email HTML using the Thymeleaf template.
+            String htmlContent = templateEngine
+                .process(AppConstants.Email.Templates.INVITATION_EMAIL, context);
+
+            // Create and send the email with the QR code as an inline attachment.
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper
+            (
+                message,
+                true,
+                AppConstants.Email.CHARACTER_ENCODING
+            );
+            helper.setFrom
+            (
+                AppConstants.Email.FROM_ADDRESS,
+                AppConstants.Project.PROJECT_NAME
+            );
+            helper.setTo(toEmail);
+            helper.setSubject(AppConstants.Email.Subjects.INVITATION_EMAIL);
+            helper.setText(htmlContent, true);
+            helper.addInline
+            (
+                "qrCode",
+                new jakarta.mail.util.ByteArrayDataSource(qrCodeImageBytes, "image/png")
+            );
+
+            mailSender.send(message);
+        }
+        catch (MailException | MessagingException | WriterException | IOException e)
+        {
+            throw new EmailSendFailedException
+            (
+                "Invitation email could not be sent. Please try again later."
+            );
+        }
+    }
+
+    /**
      * Generates a QR code PNG image from the given text content.
      *
      * @param content the text content to encode in the QR code

@@ -274,7 +274,7 @@ public class AttendeeService
         String eventHostName = eventHost.getFirstName() + " " + eventHost.getLastName();
         EventAddress eventAddress = foundEvent.getEventAddress();
 
-        emailService.sendTicketEmail
+        emailService.sendInvitationEmail
         (
             request.email(),
             signedTicket.getPublicToken(),
