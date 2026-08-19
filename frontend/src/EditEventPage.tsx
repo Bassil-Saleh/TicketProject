@@ -12,6 +12,7 @@ interface EventInfo {
     eventType: string;
     eventStatus: string;
     maxAttendees: number;
+    numberOfRegisteredAttendees: number;
     addressLine1: string;
     addressLine2: string | null;
     city: string;
@@ -23,7 +24,7 @@ interface EventInfo {
 }
 
 /** Which event field is currently being edited, if any. */
-type EditingField = 'name' | 'description' | 'dates' | 'address' | null;
+type EditingField = 'name' | 'description' | 'dates' | 'address' | 'maxAttendees' | null;
 
 /**
  * EditEventPage is for implementing the page that lets a
@@ -58,10 +59,11 @@ export function EditEventPage() {
     const [editCountry, setEditCountry] = useState('');
     const [editLatitude, setEditLatitude] = useState('');
     const [editLongitude, setEditLongitude] = useState('');
+    const [editMaxAttendees, setEditMaxAttendees] = useState('');
 
     // Change-type state
     const [showChangeToPublicForm, setShowChangeToPublicForm] = useState(false);
-    const [newMaxAttendees, setNewMaxAttendees] = useState('');
+    const [newMaxAttendeesWithPublicChange, setNewMaxAttendeesWithPublicChange] = useState('');
     const [typeMessage, setTypeMessage] = useState('');
     const [typeError, setTypeError] = useState('');
     const [isChangingType, setIsChangingType] = useState(false);
@@ -148,6 +150,8 @@ export function EditEventPage() {
             setEditCountry(event.country);
             setEditLatitude(event.latitude !== null ? String(event.latitude) : '');
             setEditLongitude(event.longitude !== null ? String(event.longitude) : '');
+        } else if (field === 'maxAttendees') {
+            setEditMaxAttendees(event.maxAttendees.toString());
         }
     };
 
@@ -175,6 +179,16 @@ export function EditEventPage() {
         if (editingField === 'dates' && editStartDateTime && editEndDateTime
             && new Date(editEndDateTime) <= new Date(editStartDateTime)) {
             setSaveError('The end date/time must be after the start date/time.');
+            return;
+        }
+
+        // Client-side validation for max attendees
+        let parsedEditMaxAttendees = Number(editMaxAttendees);
+        if (editingField === 'maxAttendees' && !Number.isInteger(parsedEditMaxAttendees)) {
+            setSaveError('The new max number of attendees must be an integer >= 1.')
+        }
+        if (editingField === 'maxAttendees' && parsedEditMaxAttendees < 1) {
+            setSaveError('The new max number of attendees cannot be less than 1.');
             return;
         }
 
@@ -210,6 +224,9 @@ export function EditEventPage() {
                 if (editLongitude.trim() !== '') {
                     body.longitude = Number(editLongitude);
                 }
+            } else if (editingField === 'maxAttendees') {
+                url = '/api/v1/events/max-attendees';
+                body.maxAttendees = parsedEditMaxAttendees;
             }
 
             const response = await authFetch(url, {
@@ -253,7 +270,7 @@ export function EditEventPage() {
             if (response.ok) {
                 setTypeMessage(data.message || 'Event changed to private.');
                 setShowChangeToPublicForm(false);
-                setNewMaxAttendees('');
+                setNewMaxAttendeesWithPublicChange('');
                 await fetchEvent();
             } else {
                 setTypeError(data.message || 'Failed to change event type.');
@@ -276,7 +293,7 @@ export function EditEventPage() {
         setTypeMessage('');
         setTypeError('');
 
-        const parsedMaxAttendees = Number(newMaxAttendees);
+        const parsedMaxAttendees = Number(newMaxAttendeesWithPublicChange);
         if (!Number.isInteger(parsedMaxAttendees) || parsedMaxAttendees < 1) {
             setTypeError('Max attendees must be a whole number of at least 1.');
             return;
@@ -294,7 +311,7 @@ export function EditEventPage() {
             if (response.ok) {
                 setTypeMessage(data.message || 'Event changed to public.');
                 setShowChangeToPublicForm(false);
-                setNewMaxAttendees('');
+                setNewMaxAttendeesWithPublicChange('');
                 await fetchEvent();
             } else {
                 setTypeError(data.message || 'Failed to change event type.');
@@ -713,7 +730,7 @@ export function EditEventPage() {
                                 onClick={() => {
                                     setTypeMessage('');
                                     setTypeError('');
-                                    setNewMaxAttendees('');
+                                    setNewMaxAttendeesWithPublicChange('');
                                     setShowChangeToPublicForm(true);
                                 }}
                                 disabled={isChangingType}
@@ -733,8 +750,8 @@ export function EditEventPage() {
                                         type="number"
                                         min={1}
                                         step={1}
-                                        value={newMaxAttendees}
-                                        onChange={(e) => setNewMaxAttendees(e.target.value)}
+                                        value={newMaxAttendeesWithPublicChange}
+                                        onChange={(e) => setNewMaxAttendeesWithPublicChange(e.target.value)}
                                         required
                                         aria-label="Maximum number of attendees"
                                     />
@@ -748,7 +765,7 @@ export function EditEventPage() {
                                         className="btn btn--ghost btn--sm"
                                         onClick={() => {
                                             setShowChangeToPublicForm(false);
-                                            setNewMaxAttendees('');
+                                            setNewMaxAttendeesWithPublicChange('');
                                             setTypeMessage('');
                                             setTypeError('');
                                         }}
@@ -762,12 +779,46 @@ export function EditEventPage() {
                     </div>
                 </div>
 
-                {/* Max attendees (read-only) */}
+                {/* Max attendees field */}
                 <div className="profile__field">
                     <div className="profile__field-info">
-                        <div className="profile__field-label">Max Attendees</div>
-                        <div className="profile__field-value">{event.maxAttendees}</div>
+                        <div className="profile__field-label">Current / Max Attendees</div>
+                        {editingField === 'maxAttendees' ? (
+                            <form className="profile__edit-form profile__edit-form--column" onSubmit={handleSave}>
+                                <div className='form-group'>
+                                    <label className="form-label" htmlFor="edit-max-attendees-only">
+                                        Max Attendees
+                                    </label>
+                                    <input
+                                        id='edit-max-attendees-only'
+                                        className='form-input'
+                                        type='number'
+                                        min={1}
+                                        step={1}
+                                        value={editMaxAttendees}
+                                        onChange={(e) => setEditMaxAttendees(e.target.value)}
+                                        required
+                                        aria-label="Maximum number of attendees"
+                                    />
+                                </div>
+                                <div className="form-actions">
+                                    <button type="submit" className="btn btn--primary btn--sm" disabled={isSaving}>
+                                        {isSaving ? 'Saving...' : 'Save'}
+                                    </button>
+                                    <button type="button" className="btn btn--ghost btn--sm" onClick={cancelEditing}>
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        ) : (
+                            <div className="profile__field-value">{event.numberOfRegisteredAttendees} / {event.maxAttendees}</div>
+                        )}
                     </div>
+                    {editingField !== 'maxAttendees' && (
+                        <button className="btn btn--outline btn--sm" onClick={() => startEditing('maxAttendees')}>
+                            Edit
+                        </button>
+                    )}
                 </div>
 
                 <div className="form-actions">
