@@ -105,7 +105,7 @@ public record GetEventByPublicIdResponse
         description = "The maximum number of attendees allowed to register for the event",
         example = "100"
     )
-    Integer maxAttendees,
+    Long maxAttendees,
 
     @Schema
     (

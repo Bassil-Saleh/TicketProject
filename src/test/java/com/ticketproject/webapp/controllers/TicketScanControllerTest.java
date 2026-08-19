@@ -127,7 +127,7 @@ class TicketScanControllerTest
             .description("A test event description")
             .startDateTime(LocalDateTime.now().plusDays(1))
             .endDateTime(LocalDateTime.now().plusDays(1).plusHours(2))
-            .maxAttendees(100)
+            .maxAttendees(100L)
             .eventHost(eventHost)
             .eventType(eventType)
             .publicId(UUID.randomUUID().toString())

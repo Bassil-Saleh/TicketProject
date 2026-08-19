@@ -114,7 +114,7 @@ class AttendeeControllerTest
         EventHost eventHost,
         EventType eventType,
         RegistrationStatus registrationStatus,
-        int maxAttendees
+        long maxAttendees
     )
     {
         Event event = new Event.Builder()

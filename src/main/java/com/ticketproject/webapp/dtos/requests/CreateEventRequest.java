@@ -111,7 +111,7 @@ public record CreateEventRequest
         value = AppConstants.Database.Events.Sizes.MIN_ATTENDEES,
         message = "Max # of attendees cannot be less than 1"
     )
-    Integer maxAttendees,
+    Long maxAttendees,
 
     @Schema
     (

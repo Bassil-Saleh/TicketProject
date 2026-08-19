@@ -121,7 +121,7 @@ public class TicketScanRepositoryTest
             .startDateTime(LocalDateTime.now().plusDays(5))
             .endDateTime(LocalDateTime.now().plusDays(5).plusHours(3))
             .eventType(EventType.PUBLIC)
-            .maxAttendees(300)
+            .maxAttendees(300L)
             .build();
         
         EventSigningKey signingKey = CryptoService.createSigningKey(event);

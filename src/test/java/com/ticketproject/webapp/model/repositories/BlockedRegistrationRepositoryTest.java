@@ -120,7 +120,7 @@ class BlockedRegistrationRepositoryTest
             .startDateTime(LocalDateTime.now().plusDays(30))
             .endDateTime(LocalDateTime.now().plusDays(30).plusHours(2))
             .eventType(EventType.PUBLIC)
-            .maxAttendees(200)
+            .maxAttendees(200L)
             .build();
 
         EventSigningKey signingKey = CryptoService.createSigningKey(event);
@@ -336,7 +336,7 @@ class BlockedRegistrationRepositoryTest
                 .startDateTime(LocalDateTime.now().plusDays(60))
                 .endDateTime(LocalDateTime.now().plusDays(60).plusHours(2))
                 .eventType(EventType.PUBLIC)
-                .maxAttendees(100)
+                .maxAttendees(100L)
                 .build();
 
             EventSigningKey signingKey2 = CryptoService.createSigningKey(event2);

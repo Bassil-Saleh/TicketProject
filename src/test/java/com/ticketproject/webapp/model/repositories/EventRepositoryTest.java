@@ -117,7 +117,7 @@ public class EventRepositoryTest
             .startDateTime(LocalDateTime.now().plusDays(7))
             .endDateTime(LocalDateTime.now().plusDays(7).plusHours(3))
             .eventType(EventType.PUBLIC)
-            .maxAttendees(100)
+            .maxAttendees(100L)
             .build();
         
         EventSigningKey signingKey = CryptoService.createSigningKey(event);

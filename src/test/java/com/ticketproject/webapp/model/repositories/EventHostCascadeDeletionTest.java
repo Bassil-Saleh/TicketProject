@@ -140,7 +140,7 @@ public class EventHostCascadeDeletionTest
             .startDateTime(LocalDateTime.now().plusDays(7))
             .endDateTime(LocalDateTime.now().plusDays(7).plusHours(3))
             .eventType(EventType.PUBLIC)
-            .maxAttendees(100)
+            .maxAttendees(100L)
             .build();
 
         // 5. Create EventSigningKey (will be cascaded via Event)

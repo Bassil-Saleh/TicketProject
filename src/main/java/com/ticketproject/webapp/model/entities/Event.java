@@ -165,7 +165,7 @@ public class Event
      * a private event are determined by how many people the event host invites.
      */
     @Column(name = AppConstants.Database.Events.TableNames.COLUMN_MAX_ATTENDEES)
-    private Integer maxAttendees;
+    private Long maxAttendees;
 
     /**
      * Whether or not people can still register for the event.
@@ -241,7 +241,7 @@ public class Event
         LocalDateTime startDateTime,
         LocalDateTime endDateTime,
         EventType eventType,
-        Integer maxAttendees
+        Long maxAttendees
     )
     {
         validateDates(startDateTime, endDateTime);
@@ -271,7 +271,7 @@ public class Event
     public LocalDateTime getStartDateTime()                   { return this.startDateTime; }
     public LocalDateTime getEndDateTime()                     { return this.endDateTime; }
     public EventType getEventType()                           { return this.eventType; }
-    public Integer getMaxAttendees()                          { return this.maxAttendees; }
+    public Long getMaxAttendees()                             { return this.maxAttendees; }
     public RegistrationStatus getRegistrationStatus()         { return this.registrationStatus; }
     public EventStatus getEventStatus()                       { return this.eventStatus; }
     public Set<Ticket> getTickets()                           { return this.tickets; }
@@ -290,7 +290,7 @@ public class Event
     public void setStartDateTime(LocalDateTime startDateTime)                          { this.startDateTime = startDateTime; }
     public void setEndDateTime(LocalDateTime endDateTime)                              { this.endDateTime = endDateTime; }
     public void setEventType(EventType eventType)                                      { this.eventType = eventType; }
-    public void setMaxAttendees(Integer maxAttendees)                                  { this.maxAttendees = maxAttendees; }
+    public void setMaxAttendees(Long maxAttendees)                                     { this.maxAttendees = maxAttendees; }
     public void setRegistrationStatus(RegistrationStatus registrationStatus)           { this.registrationStatus = registrationStatus; }
     public void setEventStatus(EventStatus status)                                     { this.eventStatus = status; }
     public void setTickets(Set<Ticket> tickets)                                        { this.tickets = tickets; }
@@ -378,7 +378,7 @@ public class Event
         private LocalDateTime startDateTime;
         private LocalDateTime endDateTime;
         private EventType eventType;
-        private Integer maxAttendees;
+        private Long maxAttendees;
 
         public Builder publicId(String publicId)
         {
@@ -422,7 +422,7 @@ public class Event
             return this;
         }
 
-        public Builder maxAttendees(Integer maxAttendees)
+        public Builder maxAttendees(Long maxAttendees)
         {
             this.maxAttendees = maxAttendees;
             return this;

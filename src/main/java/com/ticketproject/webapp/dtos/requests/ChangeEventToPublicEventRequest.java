@@ -49,7 +49,7 @@ public record ChangeEventToPublicEventRequest
         message = "Max # of attendees cannot be less than 1"
     )
     @NotNull(message = "Maximum number of attendees cannot be null")
-    Integer maxAttendees
+    Long maxAttendees
 )
 {
 }

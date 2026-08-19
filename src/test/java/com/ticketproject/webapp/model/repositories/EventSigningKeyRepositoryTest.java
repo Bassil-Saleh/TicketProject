@@ -114,7 +114,7 @@ public class EventSigningKeyRepositoryTest
             .startDateTime(LocalDateTime.now().plusDays(10))
             .endDateTime(LocalDateTime.now().plusDays(10).plusHours(2))
             .eventType(EventType.PRIVATE)
-            .maxAttendees(50)
+            .maxAttendees(50L)
             .build();
 
         event.setEventAddress(address);
