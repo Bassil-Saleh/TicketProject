@@ -793,7 +793,7 @@ export function EditEventPage() {
                                         id='edit-max-attendees-only'
                                         className='form-input'
                                         type='number'
-                                        min={1}
+                                        min={event.numberOfRegisteredAttendees}
                                         step={1}
                                         value={editMaxAttendees}
                                         onChange={(e) => setEditMaxAttendees(e.target.value)}
