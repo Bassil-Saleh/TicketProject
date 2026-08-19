@@ -25,6 +25,7 @@ import com.ticketproject.webapp.model.enums.EventType;
 import com.ticketproject.webapp.model.enums.RegistrationStatus;
 import com.ticketproject.webapp.model.repositories.EventAddressRepository;
 import com.ticketproject.webapp.model.repositories.EventRepository;
+import com.ticketproject.webapp.model.repositories.TicketRepository;
 import com.ticketproject.webapp.services.database.CryptoService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -49,11 +50,18 @@ public class EventService
 {
     private final EventAddressRepository eventAddressRepository;
     private final EventRepository eventRepository;
+    private final TicketRepository ticketRepository;
 
-    public EventService (EventRepository eventRepository, EventAddressRepository eventAddressRepository)
+    public EventService
+    (
+        EventRepository eventRepository,
+        EventAddressRepository eventAddressRepository,
+        TicketRepository ticketRepository
+    )
     {
         this.eventRepository = eventRepository;
         this.eventAddressRepository = eventAddressRepository;
+        this.ticketRepository = ticketRepository;
     }
 
     /**
@@ -190,6 +198,7 @@ public class EventService
 
         Event foundEvent = event.get();
         EventAddress foundEventAddress = foundEvent.getEventAddress();
+        long numberOfRegisteredAttendees = ticketRepository.getRegistrationCountByEventId(foundEvent.getId());
 
         return new GetEventByPublicIdResponse
         (
@@ -200,6 +209,7 @@ public class EventService
             foundEvent.getEndDateTime(),
             foundEvent.getEventType(),
             foundEvent.getEventStatus(),
+            numberOfRegisteredAttendees,
             foundEvent.getMaxAttendees(),
             foundEventAddress.getAddressLine1(),
             foundEventAddress.getAddressLine2(),
@@ -242,6 +252,7 @@ public class EventService
             (event ->
             {
                 EventAddress address = event.getEventAddress();
+                long numberOfRegisteredAttendees = ticketRepository.getRegistrationCountByEventId(event.getId());
                 GetEventByPublicIdResponse record =
                     new GetEventByPublicIdResponse
                         (
@@ -252,6 +263,7 @@ public class EventService
                             event.getEndDateTime(),
                             event.getEventType(),
                             event.getEventStatus(),
+                            numberOfRegisteredAttendees,
                             event.getMaxAttendees(),
                             address.getAddressLine1(),
                             address.getAddressLine2(),

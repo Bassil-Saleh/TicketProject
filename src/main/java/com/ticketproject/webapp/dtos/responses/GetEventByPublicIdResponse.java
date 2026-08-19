@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
  * @param endDateTime the event's end date and time
  * @param eventType the event's type
  * @param eventStatus the event's status
+ * @param numberOfRegisteredAttendees the current number of attendees registered for the event
  * @param maxAttendees the maximum number of attendees that can register for the event
  * @param addressLine1 the event's 1st address line
  * @param addressLine2 the event's 2nd address line
@@ -90,6 +91,14 @@ public record GetEventByPublicIdResponse
     )
     @NotNull(message = "Event status cannot be null")
     EventStatus eventStatus,
+
+    @Schema
+    (
+        description = "The current number of attendees who are registered under the event (either via public registrations or private invitations).",
+        example = "12"
+    )
+    @NotNull(message = "Number of attendees cannot be null")
+    Long numberOfRegisteredAttendees,
 
     @Schema
     (

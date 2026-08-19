@@ -9,6 +9,7 @@ interface EventInfo {
     startDateTime: string;
     endDateTime: string;
     eventType: string;
+    numberOfRegisteredAttendees: number;
     maxAttendees: number;
     addressLine1: string;
     addressLine2: string | null;
@@ -192,7 +193,7 @@ export function ViewEventPage() {
 
                     <section className="view-event__section">
                         <h2 className="view-event__section-title">Capacity</h2>
-                        <p>Maximum attendees: {event.maxAttendees}</p>
+                        <p>Current / maximum attendees: {event.numberOfRegisteredAttendees} / {event.maxAttendees}</p>
                     </section>
                 </div>
             </div>
