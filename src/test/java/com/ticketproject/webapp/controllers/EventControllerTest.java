@@ -1307,4 +1307,193 @@ class EventControllerTest
                 .andExpect(jsonPath("$.status").value(400));
         }
     }
+
+    @Nested
+    @DisplayName("PATCH /api/v1/events/max-attendees")
+    class EditEventMaxAttendeesTests
+    {
+        @Test
+        @DisplayName("Successful max attendees edit returns 200")
+        void successfulMaxAttendeesEditReturns200() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PUBLIC);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            String requestBody = """
+                {
+                    "publicId": "%s",
+                    "maxAttendees": 200
+                }
+                """.formatted(event.getPublicId());
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.MAX_ATTENDEES)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Max number of attendees has been updated."));
+        }
+
+        @Test
+        @DisplayName("Max attendees edit without JWT returns 401")
+        void maxAttendeesEditWithoutJwtReturns401() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PUBLIC);
+
+            String requestBody = """
+                {
+                    "publicId": "%s",
+                    "maxAttendees": 200
+                }
+                """.formatted(event.getPublicId());
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.MAX_ATTENDEES)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401));
+        }
+
+        @Test
+        @DisplayName("Max attendees edit of non-existent event returns 404")
+        void maxAttendeesEditOfNonExistentEventReturns404() throws Exception
+        {
+            createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            String requestBody = """
+                {
+                    "publicId": "non-existent-public-id",
+                    "maxAttendees": 200
+                }
+                """;
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.MAX_ATTENDEES)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404));
+        }
+
+        @Test
+        @DisplayName("Max attendees edit of another host's event returns 401")
+        void maxAttendeesEditOfAnotherHostsEventReturns401() throws Exception
+        {
+            EventHost host1 = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host1, EventType.PUBLIC);
+
+            createVerifiedEventHost("other@example.com", TEST_PASSWORD);
+            String otherJwt = loginAndGetJwt("other@example.com", TEST_PASSWORD);
+
+            String requestBody = """
+                {
+                    "publicId": "%s",
+                    "maxAttendees": 200
+                }
+                """.formatted(event.getPublicId());
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.MAX_ATTENDEES)
+                    .header("Authorization", "Bearer " + otherJwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401));
+        }
+
+        @Test
+        @DisplayName("Max attendees edit of canceled event returns 409")
+        void maxAttendeesEditOfCanceledEventReturns409() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PUBLIC);
+            event.setEventStatus(EventStatus.CANCELED);
+            eventRepository.save(event);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            String requestBody = """
+                {
+                    "publicId": "%s",
+                    "maxAttendees": 200
+                }
+                """.formatted(event.getPublicId());
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.MAX_ATTENDEES)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409));
+        }
+
+        @Test
+        @DisplayName("Max attendees edit with blank publicId returns 400")
+        void maxAttendeesEditWithBlankPublicIdReturns400() throws Exception
+        {
+            createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            String requestBody = """
+                {
+                    "publicId": "",
+                    "maxAttendees": 200
+                }
+                """;
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.MAX_ATTENDEES)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+        }
+
+        @Test
+        @DisplayName("Max attendees edit with maxAttendees less than 1 returns 400")
+        void maxAttendeesEditWithMaxAttendeesLessThanOneReturns400() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PUBLIC);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            String requestBody = """
+                {
+                    "publicId": "%s",
+                    "maxAttendees": 0
+                }
+                """.formatted(event.getPublicId());
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.MAX_ATTENDEES)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+        }
+
+        @Test
+        @DisplayName("Max attendees edit with null maxAttendees returns 400")
+        void maxAttendeesEditWithNullMaxAttendeesReturns400() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PUBLIC);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            String requestBody = """
+                {
+                    "publicId": "%s",
+                    "maxAttendees": null
+                }
+                """.formatted(event.getPublicId());
+
+            mockMvc.perform(patch(BASE_PATH + ApiPaths.Events.MAX_ATTENDEES)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+        }
+    }
 }
