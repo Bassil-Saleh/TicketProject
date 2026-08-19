@@ -31,6 +31,31 @@ type EditingField = 'name' | 'description' | 'dates' | 'address' | null;
  * @returns JSX for the site's edit event page
  */
 export function EditEventPage() {
+    // TODO: If the event is a public event and the
+    // event's status indicates it is not published
+    // or canceled, show a "Change to Private Event"
+    // button beside the event's current type.
+
+    // TODO: If the event is a private event and the
+    // event's status indicates it is not published
+    // or canceled, show a "Change to Public Event"
+    // button beside the event's current type.
+
+    // TODO: Clicking "Change to Private Event" sends
+    // a request to the API route
+    // PATCH /api/v1/events/change-to-private.
+
+    // TODO: Clicking "Change to Public Event" shows a form containing:
+    // - A field to enter the new number of maximum attendees.
+    // - A "Submit" button that, when clicked, sends a request to the
+    // API route PATCH /api/v1/events/change-to-public.
+    // - A "Cancel" button to close the form.
+
+    // TODO: If the event's status indicates it is published
+    // or canceled, show a message beside the event's type saying
+    // that the event's type cannot be changed once an event is
+    // published or canceled.
+
     const { isLoggedIn, authFetch } = useAuth();
     const navigate = useNavigate();
     const { publicId } = useParams<{ publicId: string }>();

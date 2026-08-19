@@ -1,5 +1,6 @@
 package com.ticketproject.webapp.dtos.responses;
 
+import com.ticketproject.webapp.model.enums.EventStatus;
 import com.ticketproject.webapp.model.enums.EventType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
  * @param startDateTime the event's start date and time
  * @param endDateTime the event's end date and time
  * @param eventType the event's type
+ * @param eventStatus the event's status
  * @param maxAttendees the maximum number of attendees that can register for the event
  * @param addressLine1 the event's 1st address line
  * @param addressLine2 the event's 2nd address line
@@ -80,6 +82,14 @@ public record GetEventByPublicIdResponse
     )
     @NotNull(message = "Event type cannot be null")
     EventType eventType,
+
+    @Schema
+    (
+        description = "The status of the event: DRAFT (not published yet), PUBLISHED (already published), or CANCELED (canceled by event host).",
+        example = "PUBLISHED"
+    )
+    @NotNull(message = "Event status cannot be null")
+    EventStatus eventStatus,
 
     @Schema
     (
