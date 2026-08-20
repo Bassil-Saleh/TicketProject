@@ -23,6 +23,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
+/**
+ * TicketScanController is a REST controller that routes requests
+ * concerning TicketScan entities to different API routes.
+ */
 @RestController
 @RequestMapping(ApiPaths.BASE + ApiPaths.TicketScans.ROOT)
 @Tag(name = "Ticket Scans", description = "Endpoints for scanning attendee tickets and retrieving scan history")
