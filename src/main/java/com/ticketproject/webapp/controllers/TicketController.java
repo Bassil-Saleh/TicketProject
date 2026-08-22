@@ -2,7 +2,6 @@ package com.ticketproject.webapp.controllers;
 
 import com.ticketproject.webapp.constants.ApiPaths;
 import com.ticketproject.webapp.services.model.TicketService;
-import com.ticketproject.webapp.dtos.requests.RespondToInvitationRequest;
 import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,10 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-
-import jakarta.validation.Valid;
 
 /**
  * TicketController is a REST controller that routes requests

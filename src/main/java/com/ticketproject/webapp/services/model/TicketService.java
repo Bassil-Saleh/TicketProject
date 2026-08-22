@@ -1,7 +1,6 @@
 package com.ticketproject.webapp.services.model;
 
 import com.ticketproject.webapp.constants.AppConstants;
-import com.ticketproject.webapp.dtos.requests.RespondToInvitationRequest;
 import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 import com.ticketproject.webapp.exceptions.TicketGenerationException;
 import com.ticketproject.webapp.exceptions.InvalidRequestException;
