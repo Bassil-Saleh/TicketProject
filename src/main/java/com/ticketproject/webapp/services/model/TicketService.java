@@ -197,12 +197,12 @@ public class TicketService
      * @param request the request body
      * @return a SingleMessageResponse on success
      */
-    public SingleMessageResponse respondToInvitation(RespondToInvitationRequest request)
+    public SingleMessageResponse respondToInvitation(String publicToken, String invitationResponse)
     {
         Ticket foundTicket;
         try
         {
-            foundTicket = validateTokenIdentifier(request.publicToken());
+            foundTicket = validateTokenIdentifier(publicToken);
         }
         catch
         (
@@ -217,9 +217,24 @@ public class TicketService
             throw e;
         }
 
+        InvitationStatus response = InvitationStatus.PENDING;
+        switch (invitationResponse)
+        {
+            case "PENDING":
+                throw new InvalidRequestException("Cannot respond to an invitation with PENDING.");
+            case "ACCEPTED":
+                response = InvitationStatus.ACCEPTED;
+                break;
+            case "REJECTED":
+                response = InvitationStatus.REJECTED;
+                break;
+            default:
+                throw new InvalidRequestException("Invalid invitation response.");
+        };
+
         // I don't think it makes sense to change an invitation status back into PENDING,
         // since that's the state that invitations are initialized to.
-        if (request.invitationResponse() == InvitationStatus.PENDING)
+        if (response == InvitationStatus.PENDING)
         {
             throw new InvalidRequestException("Cannot respond to an invitation with PENDING.");
         }
@@ -229,11 +244,11 @@ public class TicketService
         // If the invitation response is the same as its
         // previous state, though, then no email should be sent.
 
-        foundTicket.setInvitationStatus(request.invitationResponse());
+        foundTicket.setInvitationStatus(response);
         foundTicket.setLastUpdated(LocalDateTime.now());
 
         ticketRepository.save(foundTicket);
 
-        return new SingleMessageResponse("Responded to invitation with response: " + request.invitationResponse());
+        return new SingleMessageResponse("Responded to invitation with response: " + response);
     }
 }

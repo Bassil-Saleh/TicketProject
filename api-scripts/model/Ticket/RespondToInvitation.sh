@@ -19,10 +19,9 @@ if [ -z "$publicToken" ] || [ -z "$invitationResponse" ]; then
     exit 1
 fi
 
-contentTypeHeader="Content-Type: application/json"
-json="{ \"publicToken\": \"$publicToken\""
-json="${json}, \"invitationResponse\": \"$invitationResponse\""
-json="${json}}"
+url="http://localhost:8080/api/v1/tickets/invitation"
+url="${url}?publicToken=${publicToken}"
+url="${url}&invitationResponse=${invitationResponse}"
 
-curl -X PATCH -H "$contentTypeHeader" -d "$json" http://localhost:8080/api/v1/tickets/invitation
+curl -X PATCH "$url"
 echo

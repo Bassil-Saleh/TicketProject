@@ -44,4 +44,18 @@ public final class FrontendPaths
 
         public static final String RESET_PASSWORD = "/reset-password";
     }
+
+    public static final class Tickets
+    {
+        /**
+         * Private constructor. Not meant to be used.
+         * @throws UnsupportedOperationException
+         */
+        private Tickets()
+        {
+            throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+        }
+
+        public static final String INVITATION = "/invitation";
+    }
 }

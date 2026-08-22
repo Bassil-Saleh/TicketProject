@@ -3,7 +3,7 @@ package com.ticketproject.webapp.services.email;
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.constants.FrontendPaths;
 import com.ticketproject.webapp.exceptions.EmailSendFailedException;
-
+import com.ticketproject.webapp.model.enums.InvitationStatus;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
@@ -25,6 +25,8 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -285,6 +287,10 @@ public class EmailService
     {
         try
         {
+            // Build the acceptance and rejection decision URLs.
+            String acceptanceUrl = buildAcceptInvitationUrl(publicToken);
+            String rejectionUrl = buildRejectInvitationUrl(publicToken);
+
             // Generate the QR code image from the public token.
             byte[] qrCodeImageBytes = generateQrCodeImage(publicToken);
 
@@ -301,6 +307,8 @@ public class EmailService
             variables.put("addressLine1", (addressLine2 != null) ? (addressLine1 + " ") : addressLine1);
             variables.put("addressLine2", (addressLine2 != null) ? addressLine2 : "");
             variables.put("postalCode", postalCode);
+            variables.put("acceptanceUrl", acceptanceUrl);
+            variables.put("rejectionUrl", rejectionUrl);
             context.setVariables(variables);
 
             // Render the email HTML using the Thymeleaf template.
@@ -381,10 +389,35 @@ public class EmailService
         return frontendBaseUrl + FrontendPaths.EventHosts.VERIFY_ACCOUNT + "?token=" + rawToken;
     }
 
+    /**
+     * Builds the full password reset token URL with the token as a query parameter.
+     * @param rawToken the raw password reset token
+     * @return the full password reset URL
+     */
     private String buildPasswordResetUrl(String rawToken)
     {
         // Construct the password reset URL (using the
         // frontend base URL from application.properties).
         return frontendBaseUrl + FrontendPaths.PasswordResetTokens.RESET_PASSWORD + "?token=" + rawToken;
+    }
+
+    /**
+     * Builds the full invitation acceptance URL using the ticket's public token as a query parameter.
+     * @param publicToken the ticket's public token
+     * @return the full invitation acceptance URL
+     */
+    private String buildAcceptInvitationUrl(String publicToken)
+    {
+        return frontendBaseUrl + FrontendPaths.Tickets.INVITATION + "?publicToken=" + publicToken + "&invitationResponse=" + InvitationStatus.ACCEPTED;
+    }
+
+    /**
+     * Builds the full invitation rejection URL using the ticket's public token as a query parameter.
+     * @param publicToken the ticket's public token
+     * @return the full invitation rejection URL
+     */
+    private String buildRejectInvitationUrl(String publicToken)
+    {
+        return frontendBaseUrl + FrontendPaths.Tickets.INVITATION + "?publicToken=" + publicToken + "&invitationResponse=" + InvitationStatus.REJECTED;
     }
 }

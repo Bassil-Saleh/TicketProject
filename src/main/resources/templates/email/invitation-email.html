@@ -13,6 +13,18 @@
             margin: 0 auto;
             padding: 20px;
         }
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #3498db;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .button:hover {
+            background-color: #2980b9;
+        }
         .container {
             background-color: #f9f9f9;
             border-radius: 8px;
@@ -89,6 +101,17 @@
                     <span th:text="${postalCode}"></span>
                 </p>
             </div>
+
+            <p>You can pick a response to your invitation below:</p>
+
+            <p style="text-align: center;">
+                <a th:href="${rejectionUrl}" class="button">Reject Invitation</a>
+            </p>
+            <p style="text-align: center;">
+                <a th:href="${acceptanceUrl}" class="button">Accept Invitation</a>
+            </p>
+
+            <p>If you change your mind later, you can always pick a different response as long as you keep this email message.</p>
 
             <div class="qr-code-section">
                 <img src="cid:qrCode" alt="Ticket QR Code" width="250" height="250" />
