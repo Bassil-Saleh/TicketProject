@@ -1,10 +1,12 @@
 package com.ticketproject.webapp.dtos.requests;
 
 import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.model.enums.InvitationStatus;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 /**
@@ -32,7 +34,16 @@ public record RespondToInvitationRequest
         AppConstants.Database.Tickets.Sizes.PUBLIC_TOKEN_LENGTH +
         " characters"
     )
-    String publicToken
+    String publicToken,
+
+    @Schema
+    (
+        description = "The response to the invitation: PENDING, ACCEPTED, or REJECTED.",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        example = "ACCEPTED"
+    )
+    @NotNull(message = "Invitation response cannot be null")
+    InvitationStatus invitationResponse
 )
 {
 }

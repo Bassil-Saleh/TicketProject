@@ -191,4 +191,49 @@ public class TicketService
 
         return foundTicket;
     }
+
+    /**
+     * Services a request to respond to an invitation to a private event.
+     * @param request the request body
+     * @return a SingleMessageResponse on success
+     */
+    public SingleMessageResponse respondToInvitation(RespondToInvitationRequest request)
+    {
+        Ticket foundTicket;
+        try
+        {
+            foundTicket = validateTokenIdentifier(request.publicToken());
+        }
+        catch
+        (
+            InvalidRequestException |
+            EntityNotFoundException |
+            TicketAlreadyScannedException |
+            EventEndedException |
+            SigningKeyNotFoundException |
+            TicketScanFailedException e
+        )
+        {
+            throw e;
+        }
+
+        // I don't think it makes sense to change an invitation status back into PENDING,
+        // since that's the state that invitations are initialized to.
+        if (request.invitationResponse() == InvitationStatus.PENDING)
+        {
+            throw new InvalidRequestException("Cannot respond to an invitation with PENDING.");
+        }
+
+        // TODO: Send an email to the event host based on the
+        // invitation response (accepted or rejected).
+        // If the invitation response is the same as its
+        // previous state, though, then no email should be sent.
+
+        foundTicket.setInvitationStatus(request.invitationResponse());
+        foundTicket.setLastUpdated(LocalDateTime.now());
+
+        ticketRepository.save(foundTicket);
+
+        return new SingleMessageResponse("Responded to invitation with response: " + request.invitationResponse());
+    }
 }

@@ -43,22 +43,22 @@ public class TicketController
      * @param request the request body
      * @return a SingleMessageResponse on success
      */
-    // @Operation
-    // (
-    //     summary = "Respond to an invitation for a private event",
-    //     description =
-    //         "Records a response to an invitation for a private event. " +
-    //         "This endpoint does not require authentication."
-    // )
-    // @SecurityRequirements
-    // @PatchMapping(ApiPaths.Tickets.INVITATION)
-    // @ResponseStatus(HttpStatus.OK)
-    // public SingleMessageResponse respondToInvitation
-    // (
-    //     @Valid
-    //     @RequestBody RespondToInvitationRequest request
-    // )
-    // {
-    //     return ticketService.respondToInvitation(request);
-    // }
+    @Operation
+    (
+        summary = "Respond to an invitation for a private event",
+        description =
+            "Records a response to an invitation for a private event. " +
+            "This endpoint does not require authentication."
+    )
+    @SecurityRequirements
+    @PatchMapping(ApiPaths.Tickets.INVITATION)
+    @ResponseStatus(HttpStatus.OK)
+    public SingleMessageResponse respondToInvitation
+    (
+        @Valid
+        @RequestBody RespondToInvitationRequest request
+    )
+    {
+        return ticketService.respondToInvitation(request);
+    }
 }
