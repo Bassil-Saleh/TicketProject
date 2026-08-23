@@ -29,6 +29,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ticketproject.webapp.model.enums.EventType;
 import com.ticketproject.webapp.model.enums.InvitationStatus;
 import com.ticketproject.webapp.model.repositories.EventSigningKeyRepository;
 import com.ticketproject.webapp.model.repositories.TicketRepository;
@@ -215,6 +216,13 @@ public class TicketService
         )
         {
             throw e;
+        }
+
+        // Responding to an invitation only makes sense if
+        // the ticket is for a private event, not a public event.
+        if (foundTicket.getEvent().getEventType() != EventType.PRIVATE)
+        {
+            throw new InvalidRequestException("This event is not a private event.");
         }
 
         // I don't think it makes sense to change an invitation status back into PENDING,
