@@ -157,6 +157,14 @@ export function Dashboard() {
                                         >
                                             Edit Event
                                         </Link>
+                                        {event.eventType === 'PRIVATE' && (
+                                            <Link
+                                                to={`/events/${event.publicId}/invite`}
+                                                className="btn btn--accent btn--sm"
+                                            >
+                                                Create Invitation
+                                            </Link>
+                                        )}
                                     </div>
                                 </div>
                             ))}
