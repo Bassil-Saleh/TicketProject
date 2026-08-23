@@ -96,16 +96,9 @@ export function InvitationResponsePage() {
                 </p>
 
                 {successMessage && (
-                    <>
-                        <div className="alert alert--success" role="alert">
-                            {successMessage}
-                        </div>
-                        <div className="auth-card__footer">
-                            <Link to="/" className="btn btn--primary">
-                                Back to Home
-                            </Link>
-                        </div>
-                    </>
+                    <div className="alert alert--success" role="alert">
+                        {successMessage}
+                    </div>
                 )}
 
                 {errorMessage && (
