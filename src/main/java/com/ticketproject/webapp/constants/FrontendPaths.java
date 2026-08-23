@@ -56,6 +56,6 @@ public final class FrontendPaths
             throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
         }
 
-        public static final String INVITATION = "/invitation";
+        public static final String INVITATION = "/respond-to-invitation";
     }
 }

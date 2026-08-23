@@ -940,6 +940,32 @@ public final class AppConstants
                 }
             }
         }
+
+        public static final class Tickets
+        {
+            /**
+             * Private constructor. Not meant to be used.
+             * @throws UnsupportedOperationException
+             */
+            private Tickets()
+            {
+                throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+            }
+
+            public static final class Sizes
+            {
+                /**
+                 * Private constructor. Not meant to be used.
+                 * @throws UnsupportedOperationException
+                 */
+                private Sizes()
+                {
+                    throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
+                }
+
+                public static final int MAX_MESSAGE_LENGTH = 5000;
+            }
+        }
     }
 
     /**

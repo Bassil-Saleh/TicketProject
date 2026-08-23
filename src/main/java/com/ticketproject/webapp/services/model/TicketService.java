@@ -1,6 +1,7 @@
 package com.ticketproject.webapp.services.model;
 
 import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.dtos.requests.RespondToInvitationRequest;
 import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 import com.ticketproject.webapp.exceptions.TicketGenerationException;
 import com.ticketproject.webapp.exceptions.InvalidRequestException;
@@ -196,12 +197,12 @@ public class TicketService
      * @param request the request body
      * @return a SingleMessageResponse on success
      */
-    public SingleMessageResponse respondToInvitation(String publicToken, String invitationResponse)
+    public SingleMessageResponse respondToInvitation(RespondToInvitationRequest request)
     {
         Ticket foundTicket;
         try
         {
-            foundTicket = validateTokenIdentifier(publicToken);
+            foundTicket = validateTokenIdentifier(request.publicToken());
         }
         catch
         (
@@ -216,38 +217,25 @@ public class TicketService
             throw e;
         }
 
-        InvitationStatus response = InvitationStatus.PENDING;
-        switch (invitationResponse)
-        {
-            case "PENDING":
-                throw new InvalidRequestException("Cannot respond to an invitation with PENDING.");
-            case "ACCEPTED":
-                response = InvitationStatus.ACCEPTED;
-                break;
-            case "REJECTED":
-                response = InvitationStatus.REJECTED;
-                break;
-            default:
-                throw new InvalidRequestException("Invalid invitation response.");
-        };
-
         // I don't think it makes sense to change an invitation status back into PENDING,
         // since that's the state that invitations are initialized to.
-        if (response == InvitationStatus.PENDING)
+        if (request.invitationResponse() == InvitationStatus.PENDING)
         {
             throw new InvalidRequestException("Cannot respond to an invitation with PENDING.");
         }
 
         // TODO: Send an email to the event host based on the
         // invitation response (accepted or rejected).
-        // If the invitation response is the same as its
-        // previous state, though, then no email should be sent.
+        // - If the invitation response includes a message,
+        // then include it in the email sent to the event host.
+        // - If the invitation response is the same as its
+        // previous state, then no email should be sent.
 
-        foundTicket.setInvitationStatus(response);
+        foundTicket.setInvitationStatus(request.invitationResponse());
         foundTicket.setLastUpdated(LocalDateTime.now());
 
         ticketRepository.save(foundTicket);
 
-        return new SingleMessageResponse("Responded to invitation with response: " + response);
+        return new SingleMessageResponse("Responded to invitation with response: " + request.invitationResponse());
     }
 }
