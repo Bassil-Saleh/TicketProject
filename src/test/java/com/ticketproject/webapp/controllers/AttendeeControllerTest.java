@@ -26,6 +26,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -63,6 +64,7 @@ class AttendeeControllerTest
     private EmailService emailService;
 
     private static final String BASE_PATH = ApiPaths.BASE + ApiPaths.Attendees.ROOT + ApiPaths.Attendees.REGISTRATION;
+    private static final String INVITATION_PATH = ApiPaths.BASE + ApiPaths.Attendees.ROOT + ApiPaths.Attendees.INVITATION;
     private static final String TEST_EMAIL = "attendeetest@example.com";
     private static final String TEST_PASSWORD = "securePassword123";
 
@@ -147,6 +149,59 @@ class AttendeeControllerTest
     }
 
     /**
+     * Creates and persists an Event with its EventAddress and EventSigningKey,
+     * allowing custom event status and start/end date times.
+     *
+     * @param eventHost the event host who created the event
+     * @param eventType the type of the event
+     * @param registrationStatus the registration status of the event
+     * @param maxAttendees the maximum number of attendees
+     * @param eventStatus the event status
+     * @param startDateTime the event's start date/time
+     * @param endDateTime the event's end date/time
+     * @return the persisted Event entity
+     */
+    private Event createEvent
+    (
+        EventHost eventHost,
+        EventType eventType,
+        RegistrationStatus registrationStatus,
+        long maxAttendees,
+        EventStatus eventStatus,
+        LocalDateTime startDateTime,
+        LocalDateTime endDateTime
+    )
+    {
+        Event event = new Event.Builder()
+            .name("Test Event")
+            .description("A test event description")
+            .startDateTime(startDateTime)
+            .endDateTime(endDateTime)
+            .maxAttendees(maxAttendees)
+            .eventHost(eventHost)
+            .eventType(eventType)
+            .publicId(UUID.randomUUID().toString())
+            .build();
+
+        event.setEventStatus(eventStatus);
+        event.setRegistrationStatus(registrationStatus);
+
+        EventAddress address = new EventAddress.Builder()
+            .addressLine1("123 Test Street")
+            .city("Test City")
+            .state("Test State")
+            .postalCode("12345")
+            .country("Test Country")
+            .build();
+
+        EventSigningKey signingKey = CryptoService.createSigningKey(event);
+        event.setSigningKey(signingKey);
+        event.setEventAddress(address);
+
+        return eventRepository.save(event);
+    }
+
+    /**
      * Builds a JSON request body for public event registration.
      *
      * @param publicId the event's public ID
@@ -171,6 +226,64 @@ class AttendeeControllerTest
                 "email": "%s"
             }
             """.formatted(publicId, firstName, lastName, email);
+    }
+
+    /**
+     * Builds a JSON request body for private event invitation.
+     *
+     * @param publicId the event's public ID
+     * @param firstName the attendee's first name
+     * @param lastName the attendee's last name
+     * @param email the attendee's email address
+     * @return a JSON string representing the invitation request
+     */
+    private String buildInvitationRequestBody
+    (
+        String publicId,
+        String firstName,
+        String lastName,
+        String email
+    )
+    {
+        return """
+            {
+                "publicId": "%s",
+                "firstName": "%s",
+                "lastName": "%s",
+                "email": "%s"
+            }
+            """.formatted(publicId, firstName, lastName, email);
+    }
+
+    /**
+     * Performs a login request and returns the JWT from the response.
+     *
+     * @param email the email address
+     * @param password the password
+     * @return the JWT string from the login response
+     * @throws Exception if the request fails
+     */
+    private String loginAndGetJwt(String email, String password) throws Exception
+    {
+        String loginPath = ApiPaths.BASE + ApiPaths.Sessions.ROOT + ApiPaths.Sessions.LOGIN;
+        String requestBody = """
+            {
+                "email": "%s",
+                "password": "%s"
+            }
+            """.formatted(email, password);
+
+        MvcResult result = mockMvc.perform(post(loginPath)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.jwt").isNotEmpty())
+            .andReturn();
+
+        String responseBody = result.getResponse().getContentAsString();
+        int jwtStart = responseBody.indexOf("\"jwt\":\"") + 7;
+        int jwtEnd = responseBody.indexOf("\"", jwtStart);
+        return responseBody.substring(jwtStart, jwtEnd);
     }
 
     @Nested
@@ -324,6 +437,262 @@ class AttendeeControllerTest
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(buildRegistrationRequestBody(
                         "", "John", "Doe", "attendee@example.com")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+        }
+    }
+
+    @Nested
+    @DisplayName("POST /api/v1/attendees/invitation")
+    class CreatePrivateEventInvitationTests
+    {
+        @Test
+        @DisplayName("Successful invitation creation returns 201 and sends invitation email")
+        void successfulInvitationReturns201() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PRIVATE, RegistrationStatus.OPEN, 100);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            mockMvc.perform(post(INVITATION_PATH)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(buildInvitationRequestBody(
+                        event.getPublicId(), "Jane", "Smith", "invitee@example.com")))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.message").value("Invitation created. A ticket with a QR code has been sent to your recipient's email."));
+
+            // Verify that the invitation email was sent with the correct arguments.
+            ArgumentCaptor<String> emailCaptor = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<String> tokenCaptor = ArgumentCaptor.forClass(String.class);
+            verify(emailService).sendInvitationEmail
+            (
+                emailCaptor.capture(),
+                tokenCaptor.capture(),
+                anyString(),
+                any(LocalDateTime.class),
+                any(LocalDateTime.class),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                isNull(),
+                anyString()
+            );
+
+            assertThat(emailCaptor.getValue()).isEqualTo("invitee@example.com");
+            assertThat(tokenCaptor.getValue()).isNotBlank();
+        }
+
+        @Test
+        @DisplayName("Invitation creation without JWT returns 401")
+        void invitationWithoutJwtReturns401() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PRIVATE, RegistrationStatus.OPEN, 100);
+
+            mockMvc.perform(post(INVITATION_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(buildInvitationRequestBody(
+                        event.getPublicId(), "Jane", "Smith", "invitee@example.com")))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401));
+        }
+
+        @Test
+        @DisplayName("Invitation creation for non-existent event returns 404")
+        void invitationNonExistentEventReturns404() throws Exception
+        {
+            createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            mockMvc.perform(post(INVITATION_PATH)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(buildInvitationRequestBody(
+                        "non-existent-public-id", "Jane", "Smith", "invitee@example.com")))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404));
+        }
+
+        @Test
+        @DisplayName("Invitation creation for public event returns 400")
+        void invitationPublicEventReturns400() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PUBLIC, RegistrationStatus.OPEN, 100);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            mockMvc.perform(post(INVITATION_PATH)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(buildInvitationRequestBody(
+                        event.getPublicId(), "Jane", "Smith", "invitee@example.com")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+        }
+
+        @Test
+        @DisplayName("Invitation creation by different host returns 401")
+        void invitationDifferentHostReturns401() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PRIVATE, RegistrationStatus.OPEN, 100);
+
+            createVerifiedEventHost("other@example.com", TEST_PASSWORD);
+            String otherJwt = loginAndGetJwt("other@example.com", TEST_PASSWORD);
+
+            mockMvc.perform(post(INVITATION_PATH)
+                    .header("Authorization", "Bearer " + otherJwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(buildInvitationRequestBody(
+                        event.getPublicId(), "Jane", "Smith", "invitee@example.com")))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401));
+        }
+
+        @Test
+        @DisplayName("Invitation creation for canceled event returns 409")
+        void invitationCanceledEventReturns409() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent
+            (
+                host,
+                EventType.PRIVATE,
+                RegistrationStatus.OPEN,
+                100,
+                EventStatus.CANCELED,
+                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(1).plusHours(2)
+            );
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            mockMvc.perform(post(INVITATION_PATH)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(buildInvitationRequestBody(
+                        event.getPublicId(), "Jane", "Smith", "invitee@example.com")))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409));
+        }
+
+        @Test
+        @DisplayName("Invitation creation for event that already began returns 400")
+        void invitationEventAlreadyBeganReturns400() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent
+            (
+                host,
+                EventType.PRIVATE,
+                RegistrationStatus.OPEN,
+                100,
+                EventStatus.PUBLISHED,
+                LocalDateTime.now().minusDays(1),
+                LocalDateTime.now().minusDays(1).plusHours(2)
+            );
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            mockMvc.perform(post(INVITATION_PATH)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(buildInvitationRequestBody(
+                        event.getPublicId(), "Jane", "Smith", "invitee@example.com")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+        }
+
+        @Test
+        @DisplayName("Invitation creation with duplicate email returns 409")
+        void invitationDuplicateEmailReturns409() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PRIVATE, RegistrationStatus.OPEN, 100);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            // Create the first invitation.
+            mockMvc.perform(post(INVITATION_PATH)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(buildInvitationRequestBody(
+                        event.getPublicId(), "Jane", "Smith", "invitee@example.com")))
+                .andExpect(status().isCreated());
+
+            // Attempt to create a second invitation with the same email.
+            mockMvc.perform(post(INVITATION_PATH)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(buildInvitationRequestBody(
+                        event.getPublicId(), "Jane", "Smith", "invitee@example.com")))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409));
+        }
+
+        @Test
+        @DisplayName("Invitation creation with blank public ID returns 400")
+        void invitationBlankPublicIdReturns400() throws Exception
+        {
+            createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            mockMvc.perform(post(INVITATION_PATH)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(buildInvitationRequestBody(
+                        "", "Jane", "Smith", "invitee@example.com")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+        }
+
+        @Test
+        @DisplayName("Invitation creation with blank first name returns 400")
+        void invitationBlankFirstNameReturns400() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PRIVATE, RegistrationStatus.OPEN, 100);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            mockMvc.perform(post(INVITATION_PATH)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(buildInvitationRequestBody(
+                        event.getPublicId(), "", "Smith", "invitee@example.com")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+        }
+
+        @Test
+        @DisplayName("Invitation creation with blank last name returns 400")
+        void invitationBlankLastNameReturns400() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PRIVATE, RegistrationStatus.OPEN, 100);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            mockMvc.perform(post(INVITATION_PATH)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(buildInvitationRequestBody(
+                        event.getPublicId(), "Jane", "", "invitee@example.com")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+        }
+
+        @Test
+        @DisplayName("Invitation creation with invalid email returns 400")
+        void invitationInvalidEmailReturns400() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PRIVATE, RegistrationStatus.OPEN, 100);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            mockMvc.perform(post(INVITATION_PATH)
+                    .header("Authorization", "Bearer " + jwt)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(buildInvitationRequestBody(
+                        event.getPublicId(), "Jane", "Smith", "not-an-email")))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400));
         }
