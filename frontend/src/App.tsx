@@ -15,6 +15,8 @@ import { ViewEventPage } from './ViewEventPage.tsx';
 import { ViewScannedTicketsPage } from './ViewScannedTicketsPage.tsx';
 import { DeleteAccountPage } from './DeleteAccountPage.tsx';
 import { EventRegistrationPage } from './EventRegistrationPage.tsx';
+import { CreateInvitationPage } from './CreateInvitationPage.tsx';
+import { InvitationResponsePage } from './InvitationResponsePage.tsx';
 
 /**
  * App is the component from which all the other
@@ -40,7 +42,9 @@ function App() {
         <Route path="/delete-account" element={<DeleteAccountPage />} />
         <Route path="/events/:publicId" element={<ViewEventPage />} />
         <Route path="/events/:publicId/register" element={<EventRegistrationPage />} />
+        <Route path="/events/:publicId/invite" element={<CreateInvitationPage />} />
         <Route path="/events/:publicId/edit" element={<EditEventPage />} />
+        <Route path="/respond-to-invitation" element={<InvitationResponsePage />} />
       </Routes>
       <Footer />
     </div>
