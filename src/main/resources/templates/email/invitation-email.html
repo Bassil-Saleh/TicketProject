@@ -102,16 +102,17 @@
                 </p>
             </div>
 
-            <p>You can pick a response to your invitation below:</p>
+            <p>Click the below button to send a response to your invitation:</p>
 
             <p style="text-align: center;">
-                <a th:href="${rejectionUrl}" class="button">Reject Invitation</a>
-            </p>
-            <p style="text-align: center;">
-                <a th:href="${acceptanceUrl}" class="button">Accept Invitation</a>
+                <a th:href="${invitationResponseUrl}" class="button">Respond To Invitation</a>
             </p>
 
-            <p>If you change your mind later, you can always pick a different response as long as you keep this email message.</p>
+            <p>
+                If you change your mind later, you can always use the QR code below
+                to check-in and even send a different response to the event host as
+                long as you keep this email message.
+            </p>
 
             <div class="qr-code-section">
                 <img src="cid:qrCode" alt="Ticket QR Code" width="250" height="250" />

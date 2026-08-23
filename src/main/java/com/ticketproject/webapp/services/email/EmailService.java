@@ -3,7 +3,6 @@ package com.ticketproject.webapp.services.email;
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.constants.FrontendPaths;
 import com.ticketproject.webapp.exceptions.EmailSendFailedException;
-import com.ticketproject.webapp.model.enums.InvitationStatus;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
@@ -286,8 +285,7 @@ public class EmailService
         try
         {
             // Build the acceptance and rejection decision URLs.
-            String acceptanceUrl = buildAcceptInvitationUrl(publicToken);
-            String rejectionUrl = buildRejectInvitationUrl(publicToken);
+            String invitationResponseUrl = buildInvitationResponseUrl(publicToken);
 
             // Generate the QR code image from the public token.
             byte[] qrCodeImageBytes = generateQrCodeImage(publicToken);
@@ -305,8 +303,7 @@ public class EmailService
             variables.put("addressLine1", (addressLine2 != null) ? (addressLine1 + " ") : addressLine1);
             variables.put("addressLine2", (addressLine2 != null) ? addressLine2 : "");
             variables.put("postalCode", postalCode);
-            variables.put("acceptanceUrl", acceptanceUrl);
-            variables.put("rejectionUrl", rejectionUrl);
+            variables.put("invitationResponseUrl", invitationResponseUrl);
             context.setVariables(variables);
 
             // Render the email HTML using the Thymeleaf template.
@@ -400,22 +397,13 @@ public class EmailService
     }
 
     /**
-     * Builds the full invitation acceptance URL using the ticket's public token as a query parameter.
+     * Builds the full invitation response URL using
+     * the ticket's public token as a query parameter.
      * @param publicToken the ticket's public token
-     * @return the full invitation acceptance URL
+     * @return the full invitation response URL
      */
-    private String buildAcceptInvitationUrl(String publicToken)
+    private String buildInvitationResponseUrl(String publicToken)
     {
-        return frontendBaseUrl + FrontendPaths.Tickets.INVITATION + "?publicToken=" + publicToken + "&invitationResponse=" + InvitationStatus.ACCEPTED;
-    }
-
-    /**
-     * Builds the full invitation rejection URL using the ticket's public token as a query parameter.
-     * @param publicToken the ticket's public token
-     * @return the full invitation rejection URL
-     */
-    private String buildRejectInvitationUrl(String publicToken)
-    {
-        return frontendBaseUrl + FrontendPaths.Tickets.INVITATION + "?publicToken=" + publicToken + "&invitationResponse=" + InvitationStatus.REJECTED;
+        return frontendBaseUrl + FrontendPaths.Tickets.INVITATION + "?publicToken=" + publicToken;
     }
 }
