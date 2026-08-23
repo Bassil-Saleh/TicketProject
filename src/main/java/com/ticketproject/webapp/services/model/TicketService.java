@@ -33,6 +33,7 @@ import com.ticketproject.webapp.model.enums.EventType;
 import com.ticketproject.webapp.model.enums.InvitationStatus;
 import com.ticketproject.webapp.model.repositories.EventSigningKeyRepository;
 import com.ticketproject.webapp.model.repositories.TicketRepository;
+import com.ticketproject.webapp.services.email.EmailService;
 
 /**
  * TicketService is used to generate Ticket entities for attendees.
@@ -43,15 +44,18 @@ public class TicketService
 {
     private final TicketRepository ticketRepository;
     private final EventSigningKeyRepository eventSigningKeyRepository;
+    private final EmailService emailService;
 
     public TicketService
     (
         TicketRepository ticketRepository,
-        EventSigningKeyRepository eventSigningKeyRepository
+        EventSigningKeyRepository eventSigningKeyRepository,
+        EmailService emailService
     )
     {
         this.ticketRepository = ticketRepository;
         this.eventSigningKeyRepository = eventSigningKeyRepository;
+        this.emailService = emailService;
     }
 
     /**
@@ -218,6 +222,8 @@ public class TicketService
             throw e;
         }
 
+        InvitationStatus previousInvitationStatus = foundTicket.getInvitationStatus();
+
         // Responding to an invitation only makes sense if
         // the ticket is for a private event, not a public event.
         if (foundTicket.getEvent().getEventType() != EventType.PRIVATE)
@@ -232,12 +238,29 @@ public class TicketService
             throw new InvalidRequestException("Cannot respond to an invitation with PENDING.");
         }
 
-        // TODO: Send an email to the event host based on the
-        // invitation response (accepted or rejected).
-        // - If the invitation response includes a message,
-        // then include it in the email sent to the event host.
-        // - If the invitation response is the same as its
-        // previous state, then no email should be sent.
+        if
+        (
+            previousInvitationStatus != request.invitationResponse() ||
+            (request.message() != null && !request.message().isBlank())
+        )
+        {
+            // Send an email to the event host notifying them of the invitee's response.
+            String inviteeName = foundTicket.getAttendee().getFirstName();
+            if (foundTicket.getAttendee().getMiddleName() != null && !foundTicket.getAttendee().getMiddleName().isBlank())
+            {
+                inviteeName = inviteeName + " " + foundTicket.getAttendee().getMiddleName();
+            }
+            inviteeName = inviteeName + " " + foundTicket.getAttendee().getLastName();
+
+            emailService.sendInvitationResponseEmail
+            (
+                foundTicket.getEvent().getEventHost().getEmail(),
+                foundTicket.getEvent().getName(),
+                inviteeName,
+                (request.invitationResponse() == InvitationStatus.ACCEPTED) ? "accepted" : "rejected",
+                (request.message() != null) ? request.message() : ""
+            );
+        }
 
         foundTicket.setInvitationStatus(request.invitationResponse());
         foundTicket.setLastUpdated(LocalDateTime.now());

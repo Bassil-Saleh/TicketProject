@@ -343,6 +343,67 @@ public class EmailService
         }
     }
 
+    public void sendInvitationResponseEmail
+    (
+        String toEmail,
+        String eventName,
+        String inviteeName,
+        String inviteeResponse,
+        String inviteeMessage
+    )
+    {
+        try
+        {
+            // Prepare the Thymeleaf context with template variables.
+            Context context = new Context();
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("eventName", eventName);
+            variables.put("inviteeName", inviteeName);
+            variables.put("inviteeResponse", inviteeResponse);
+            if (inviteeMessage != null && !inviteeMessage.isBlank())
+            {
+                variables.put("inviteeMessage", inviteeMessage);
+            }
+            context.setVariables(variables);
+
+            // Render the email HTML using the Thymeleaf template.
+            String htmlContent = templateEngine
+                .process
+                (
+                    (inviteeMessage != null && !inviteeMessage.isBlank())
+                    ? AppConstants.Email.Templates.INVITATION_RESPONSE_WITH_MESSAGE_EMAIL
+                    : AppConstants.Email.Templates.INVITATION_RESPONSE_NO_MESSAGE_EMAIL,
+                    context
+                );
+
+            // Create and send the email.
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper
+            (
+                message,
+                true,
+                AppConstants.Email.CHARACTER_ENCODING
+            );
+            helper.setFrom
+            (
+                AppConstants.Email.FROM_ADDRESS,
+                AppConstants.Project.PROJECT_NAME
+            );
+            helper.setTo(toEmail);
+            helper.setSubject(AppConstants.Email.Subjects.INVITATION_RESPONSE_EMAIL);
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
+        }
+        catch (MailException | MessagingException | IOException e)
+        {
+            throw new EmailSendFailedException
+            (
+                "Invitation response email could not be sent. Please try again later."
+            );
+        }
+    }
+
     /**
      * Generates a QR code PNG image from the given text content.
      *
