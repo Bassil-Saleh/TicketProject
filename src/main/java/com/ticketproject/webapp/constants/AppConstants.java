@@ -852,6 +852,8 @@ public final class AppConstants
                 {
                     throw new UnsupportedOperationException(NO_CONSTRUCTION_MSG);
                 }
+
+                public static final int MIN_AGE_YEARS = 18;
             }
 
             public static final class Definitions

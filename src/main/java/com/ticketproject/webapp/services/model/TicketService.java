@@ -265,7 +265,7 @@ public class TicketService
         foundTicket.setInvitationStatus(request.invitationResponse());
         foundTicket.setLastUpdated(LocalDateTime.now());
 
-        ticketRepository.save(foundTicket);
+        foundTicket = ticketRepository.save(foundTicket);
 
         return new SingleMessageResponse("Responded to invitation with response: " + request.invitationResponse());
     }

@@ -84,9 +84,10 @@ public class EventHostService
         // creating a new event host account.
         LocalDate today = LocalDate.now();
         long yearsOld = ChronoUnit.YEARS.between(request.dateOfBirth(), today);
-        if (yearsOld < 18)
+        if (yearsOld < AppConstants.DTO.EventHosts.Sizes.MIN_AGE_YEARS)
         {
-            throw new EventHostUnderageException("Must be at least 18 years old to create a new account");
+            throw new EventHostUnderageException
+            ("Must be at least " + AppConstants.DTO.EventHosts.Sizes.MIN_AGE_YEARS + " years old to create a new account");
         }
 
         // Create a new EventHost entity.
@@ -236,6 +237,7 @@ public class EventHostService
         }
 
         eventHost.setPassword(request.password());
+        eventHost.setLastUpdated(LocalDateTime.now());
         eventHostRepository.save(eventHost);
 
         return new SingleMessageResponse("Your password has been updated.");
@@ -270,6 +272,7 @@ public class EventHostService
         }
 
         eventHost.setEmail(request.email());
+        eventHost.setLastUpdated(LocalDateTime.now());
         eventHostRepository.save(eventHost);
 
         return new SingleMessageResponse("Your email address has been updated.");

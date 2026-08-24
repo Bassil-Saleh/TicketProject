@@ -776,6 +776,7 @@ public class EventService
             foundEvent.setMaxAttendees(request.maxAttendees());
         }
         foundEvent.setLastUpdated(LocalDateTime.now());
+        foundEvent = eventRepository.save(foundEvent);
 
         return new SingleMessageResponse("Max number of attendees has been updated.");
     }
