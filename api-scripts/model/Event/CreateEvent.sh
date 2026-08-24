@@ -20,28 +20,28 @@ longitude=""
 # Parse named parameters
 while [ $# -gt 0 ]; do
 	case "$1" in
-		--token)          token="$2";          shift 2 ;;
-		--name)           name="$2";           shift 2 ;;
-		--description)    description="$2";    shift 2 ;;
-		--start-date)     startDateTime="$2";  shift 2 ;;
-		--end-date)       endDateTime="$2";    shift 2 ;;
-		--event-type)     eventType="$2";      shift 2 ;;
-		--max-attendees)  maxAttendees="$2";   shift 2 ;;
-		--address-line1)  addressLine1="$2";   shift 2 ;;
-		--address-line2)  addressLine2="$2";   shift 2 ;;
-		--city)           city="$2";           shift 2 ;;
-		--state)          state="$2";          shift 2 ;;
-		--postal-code)    postalCode="$2";     shift 2 ;;
-		--country)        country="$2";        shift 2 ;;
-		--latitude)       latitude="$2";       shift 2 ;;
-		--longitude)      longitude="$2";      shift 2 ;;
-		*)                shift ;;
+		--token)           token="$2";         shift 2 ;;
+		--name)            name="$2";          shift 2 ;;
+		--description)     description="$2";   shift 2 ;;
+		--start-date)      startDateTime="$2"; shift 2 ;;
+		--end-date)        endDateTime="$2";   shift 2 ;;
+		--event-type)      eventType="$2";     shift 2 ;;
+		--max-attendees)   maxAttendees="$2";  shift 2 ;;
+		--address-line-1)  addressLine1="$2";  shift 2 ;;
+		--address-line-2)  addressLine2="$2";  shift 2 ;;
+		--city)            city="$2";          shift 2 ;;
+		--state)           state="$2";         shift 2 ;;
+		--postal-code)     postalCode="$2";    shift 2 ;;
+		--country)         country="$2";       shift 2 ;;
+		--latitude)        latitude="$2";      shift 2 ;;
+		--longitude)       longitude="$2";     shift 2 ;;
+		*)                 shift ;;
 	esac
 done
 
 # Validate mandatory parameters
 if [ -z "$token" ] || [ -z "$name" ] || [ -z "$description" ] || [ -z "$startDateTime" ] || [ -z "$endDateTime" ] || [ -z "$eventType" ] || [ -z "$maxAttendees" ] || [ -z "$addressLine1" ] || [ -z "$city" ] || [ -z "$state" ] || [ -z "$postalCode" ] || [ -z "$country" ]; then
-	echo "Usage: $0 --token <value> --name <value> --description <value> --start-date <value> --end-date <value> --event-type <value> --max-attendees <value> --address-line1 <value> --city <value> --state <value> --postal-code <value> --country <value> [--address-line2 <value>] [--latitude <value>] [--longitude <value>]"
+	echo "Usage: $0 --token <value> --name <value> --description <value> --start-date <value> --end-date <value> --event-type <value> --max-attendees <value> --address-line-1 <value> --city <value> --state <value> --postal-code <value> --country <value> [--address-line-2 <value>] [--latitude <value>] [--longitude <value>]"
 	exit 1
 fi
 
