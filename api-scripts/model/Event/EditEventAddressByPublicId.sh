@@ -15,23 +15,23 @@ longitude=""
 # Parse named parameters
 while [ $# -gt 0 ]; do
 	case "$1" in
-		--token)          token="$2";          shift 2 ;;
-		--publicId)       publicId="$2";       shift 2 ;;
-		--address-line1)  addressLine1="$2";   shift 2 ;;
-		--address-line2)  addressLine2="$2";   shift 2 ;;
-		--city)           city="$2";           shift 2 ;;
-		--state)          state="$2";          shift 2 ;;
-		--postal-code)    postalCode="$2";     shift 2 ;;
-		--country)        country="$2";        shift 2 ;;
-		--latitude)       latitude="$2";       shift 2 ;;
-		--longitude)      longitude="$2";      shift 2 ;;
+		--token)          token="$2";         shift 2 ;;
+		--public-id)      publicId="$2";      shift 2 ;;
+		--address-line-1) addressLine1="$2";  shift 2 ;;
+		--address-line-2) addressLine2="$2";  shift 2 ;;
+		--city)           city="$2";          shift 2 ;;
+		--state)          state="$2";         shift 2 ;;
+		--postal-code)    postalCode="$2";    shift 2 ;;
+		--country)        country="$2";       shift 2 ;;
+		--latitude)       latitude="$2";      shift 2 ;;
+		--longitude)      longitude="$2";     shift 2 ;;
 		*)                shift ;;
 	esac
 done
 
 # Validate mandatory parameters
 if [ -z "$token" ] || [ -z "$publicId" ] || [ -z "$addressLine1" ] || [ -z "$city" ] || [ -z "$state" ] || [ -z "$postalCode" ] || [ -z "$country" ]; then
-	echo "Usage: $0 --token <value> --publicId <value> --address-line1 <value> --city <value> --state <value> --postal-code <value> --country <value> [--address-line2 <value>] [--latitude <value>] [--longitude <value>]"
+	echo "Usage: $0 --token <value> --public-id <value> --address-line-1 <value> --city <value> --state <value> --postal-code <value> --country <value> [--address-line-2 <value>] [--latitude <value>] [--longitude <value>]"
 	exit 1
 fi
 

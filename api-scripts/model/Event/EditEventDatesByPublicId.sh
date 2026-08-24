@@ -9,17 +9,17 @@ endDateTime=""
 # Parse named parameters
 while [ $# -gt 0 ]; do
 	case "$1" in
-		--token)          token="$2";          shift 2 ;;
-		--publicId)       publicId="$2";       shift 2 ;;
-		--startDateTime)  startDateTime="$2";  shift 2 ;;
-		--endDateTime)    endDateTime="$2";    shift 2 ;;
-		*)                shift ;;
+		--token)           token="$2";         shift 2 ;;
+		--public-id)       publicId="$2";      shift 2 ;;
+		--start-date-time) startDateTime="$2"; shift 2 ;;
+		--end-date-time)   endDateTime="$2";   shift 2 ;;
+		*)                 shift ;;
 	esac
 done
 
 # Validate mandatory parameters
 if [ -z "$token" ] || [ -z "$publicId" ] || [ -z "$startDateTime" ] || [ -z "$endDateTime" ]; then
-    echo "Usage: $0 --token <value> --publicId <value> --startDateTime <value> --endDateTime <value>"
+    echo "Usage: $0 --token <value> --public-id <value> --start-date-time <value> --end-date-time <value>"
     exit 1
 fi
 

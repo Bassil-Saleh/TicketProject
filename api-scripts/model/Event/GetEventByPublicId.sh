@@ -6,14 +6,14 @@ publicId=""
 # Parse named parameters
 while [ $# -gt 0 ]; do
     case "$1" in
-        --publicId) publicId="$2" shift 2 ;;
-        *)          shift ;;
+        --public-id) publicId="$2" shift 2 ;;
+        *)           shift ;;
     esac
 done
 
 # Validate mandatory parameters
 if [ -z "$publicId" ]; then
-    echo "Usage: $0 --publicId <value>"
+    echo "Usage: $0 --public-id <value>"
     exit 1
 fi
 
