@@ -30,6 +30,10 @@ interface EventInfo {
  * @returns JSX for the site's dashboard
  */
 export function Dashboard() {
+    // TODO: Add a "Start Scanning Tickets" button to the Dashboard page
+    //       so that the logged in event host can navigate to the
+    //       ticket scanning page at ScanTicketPage.tsx
+
     const { isLoggedIn, authFetch } = useAuth();
     const navigate = useNavigate();
 

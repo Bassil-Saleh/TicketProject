@@ -34,6 +34,12 @@ export function ScanTicketPage() {
     // TODO: Show an appropriate message to the user based on the
     //       result of the request (success, failure, etc.).
 
+    // TODO: Add a "Back to Dashboard" button so the user can go back
+    //       to the dashboard page at Dashboard.tsx
+
+    // TODO: Add a "View Scanned Tickets" page so the user can go to
+    //       the view scanned tickets page at ViewScannedTicketsPage.tsx
+
     return (
         <div></div>
     );
