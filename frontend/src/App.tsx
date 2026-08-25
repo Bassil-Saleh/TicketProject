@@ -13,6 +13,7 @@ import { CreateEventPage } from './CreateEventPage.tsx';
 import { EditEventPage } from './EditEventPage.tsx';
 import { ViewEventPage } from './ViewEventPage.tsx';
 import { ViewScannedTicketsPage } from './ViewScannedTicketsPage.tsx';
+import { ScanTicketPage } from './ScanTicketPage.tsx';
 import { DeleteAccountPage } from './DeleteAccountPage.tsx';
 import { EventRegistrationPage } from './EventRegistrationPage.tsx';
 import { CreateInvitationPage } from './CreateInvitationPage.tsx';
@@ -39,6 +40,7 @@ function App() {
         <Route path="/verify-account" element={<AccountVerificationPage />} />
         <Route path="/create-event" element={<CreateEventPage />} />
         <Route path="/scanned-tickets" element={<ViewScannedTicketsPage />} />
+        <Route path="/scan-tickets" element={<ScanTicketPage />} />
         <Route path="/delete-account" element={<DeleteAccountPage />} />
         <Route path="/events/:publicId" element={<ViewEventPage />} />
         <Route path="/events/:publicId/register" element={<EventRegistrationPage />} />

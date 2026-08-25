@@ -1212,3 +1212,102 @@ textarea.form-input {
         align-items: flex-start;
     }
 }
+
+/* --------------------------------------------------------------------------
+   25. Scan Ticket Page
+   -------------------------------------------------------------------------- */
+.scan-ticket {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: var(--space-xl) var(--space-md);
+}
+
+.scan-ticket__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-xl);
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.scan-ticket__title {
+    font-size: var(--font-size-2xl);
+}
+
+.scan-ticket__nav-actions {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+.scan-ticket__setup-card {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-md);
+}
+
+.scan-ticket__setup-card .form-label {
+    margin-bottom: 0;
+}
+
+.scan-ticket__scanner {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.scan-ticket__video-container {
+    width: 100%;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background-color: var(--color-primary-dark);
+}
+
+/* Force the camera feed to fill the available width on all screen
+   sizes, overriding the inline pixel sizes set by the QR scanner
+   library, so the scan page stays mobile-friendly. */
+.scan-ticket__video-container video {
+    width: 100% !important;
+    height: auto !important;
+    display: block;
+}
+
+.scan-ticket__hint {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    text-align: center;
+    margin: var(--space-md) 0;
+}
+
+.scan-ticket__actions {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    margin-top: var(--space-md);
+}
+
+.scan-ticket__actions .btn {
+    flex: 1;
+    min-width: 160px;
+}
+
+@media (max-width: 480px) {
+    .scan-ticket__header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .scan-ticket__nav-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .scan-ticket__actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
