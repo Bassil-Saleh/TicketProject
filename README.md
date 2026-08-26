@@ -37,8 +37,8 @@
 ## Running on a Home-Network Server (Docker Compose)
 
 This project ships with a Docker Compose stack so you can run the entire
-application — MariaDB, Mailpit, the Spring Boot backend, the React frontend,
-and an HTTPS reverse proxy (Caddy) — on a dedicated machine on your home
+application (MariaDB, Mailpit, the Spring Boot backend, the React frontend,
+and an HTTPS reverse proxy using Caddy) on a dedicated machine on your home
 network and reach it from any device (phones, laptops) over Wi-Fi.
 
 This is useful for:
@@ -81,16 +81,18 @@ make up          # starts the whole stack
 
 `make bootstrap` prints the path to mkcert's root CA (`rootCA.pem`). Install
 that CA on each device you want to test from so they trust
-`https://ticketproject.local`:
+`https://ticketproject.local` (or whatever else you set your hostname to):
 
 - **Android:** Settings → Security → Install certificate (choose user CA).
 - **iOS:** Install the profile, then enable full trust under
   Settings → General → About → Certificate Trust Settings.
 
-Once trusted, `https://ticketproject.local` is a secure context, so the
-camera-based QR ticket scanner works on your phone.
+Once trusted, `https://ticketproject.local` (or `https://whatever_else_your_hostname_is`)
+is a secure context, so the camera-based QR ticket scanner works on your phone.
 
 ### Using it
+
+Assuming your chosen hostname is `ticketproject.local`:
 
 | What | Where |
 | --- | --- |
