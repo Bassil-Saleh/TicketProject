@@ -1,0 +1,39 @@
+# Makefile for the Ticket Project home-network Docker deployment.
+#
+# Common targets:
+#   make bootstrap  Generate .env secrets and TLS certs (first time only).
+#   make build      Build the backend and frontend Docker images.
+#   make up         Start the full stack in the background.
+#   make down       Stop and remove the stack (data volume is preserved).
+#   make logs       Tail logs from all services.
+#   make status     Show the status of all services.
+
+.PHONY: bootstrap build up down restart logs status clean help
+
+help: ## Show this help.
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-12s\033[0m %s\n", $$1, $$2}'
+
+bootstrap: ## Generate .env secrets and TLS certificates (first time only).
+	./scripts/init-secrets.sh
+	./scripts/make-certs.sh
+
+build: ## Build the backend and frontend Docker images.
+	docker compose build
+
+up: ## Start the full stack in the background.
+	docker compose up -d
+
+down: ## Stop and remove the stack (data volume preserved).
+	docker compose down
+
+restart: down up ## Restart the full stack.
+
+logs: ## Tail logs from all services.
+	docker compose logs -f
+
+status: ## Show the status of all services.
+	docker compose ps
+
+clean: ## Stop the stack AND delete the MariaDB data volume.
+	docker compose down -v
+	@echo "Note: this removed the mariadb_data volume (database data)."
