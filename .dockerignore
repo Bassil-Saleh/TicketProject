@@ -1,0 +1,34 @@
+# Version control
+.git
+.gitattributes
+.gitignore
+
+# Build outputs and caches
+target
+
+# The frontend is built in its own context; not needed for the backend image
+frontend
+
+# Secrets and local-only files — never bake these into images
+.env
+*.env
+certs
+src/main/resources/application.properties
+src/test/resources/application-test.properties
+
+# Docker / deploy files not needed inside the app image
+Caddyfile
+compose.yaml
+docker-compose*.yml
+*.Dockerfile
+.dockerignore
+Makefile
+scripts
+
+# Misc
+*.log
+.vscode
+.idea
+api-docs.json
+api-scripts
+HELP.md
