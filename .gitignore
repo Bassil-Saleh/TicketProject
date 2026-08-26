@@ -41,3 +41,14 @@ frontend/node_modules/
 
 # API Docs in JSON Format
 api-docs.json
+
+# Local deployment secrets and generated TLS certificates
+# must NEVER be committed into version control.
+.env
+certs/
+
+# Built frontend assets
+frontend/dist
+
+# Logs
+*.log
