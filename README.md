@@ -34,7 +34,78 @@
 
 ![Viewing Scanned Tickets](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-17-2026/Scanned_Tickets.png)
 
-## Project Setup:
+## Running on a Home-Network Server (Docker Compose)
+
+This project ships with a Docker Compose stack so you can run the entire
+application — MariaDB, Mailpit, the Spring Boot backend, the React frontend,
+and an HTTPS reverse proxy (Caddy) — on a dedicated machine on your home
+network and reach it from any device (phones, laptops) over Wi-Fi.
+
+This is useful for:
+
+- Testing the app on multiple devices.
+- Opening the emails your app sends (including ticket QR codes) directly on
+  your phone via Mailpit's web UI, instead of copying files around by hand.
+- Reproducible, automated setup of every dependency.
+
+### One-time host preparation
+
+1. Install Docker Engine and the Compose plugin:
+   ```
+   curl -fsSL https://get.docker.com | sh
+   ```
+2. Install `mkcert` (and the NSS tools it needs):
+   ```
+   sudo apt install -y mkcert libnss3-tools
+   ```
+3. (Recommended) Give this machine a hostname other devices can resolve over
+   mDNS, e.g. `ticketproject.local`. On Ubuntu/Debian, install Avahi and set
+   the hostname to match `SITE_HOST` in `.env`:
+   ```
+   sudo apt install -y avahi-daemon
+   ```
+4. (Recommended) Reserve this machine's IP address in your router's DHCP
+   settings so it does not change.
+
+### First-time setup
+
+From the repository root:
+
+```
+make bootstrap   # generates .env secrets + TLS certificates
+make build       # builds the backend and frontend images
+make up          # starts the whole stack
+```
+
+### Trusting the certificate on your devices
+
+`make bootstrap` prints the path to mkcert's root CA (`rootCA.pem`). Install
+that CA on each device you want to test from so they trust
+`https://ticketproject.local`:
+
+- **Android:** Settings → Security → Install certificate (choose user CA).
+- **iOS:** Install the profile, then enable full trust under
+  Settings → General → About → Certificate Trust Settings.
+
+Once trusted, `https://ticketproject.local` is a secure context, so the
+camera-based QR ticket scanner works on your phone.
+
+### Using it
+
+| What | Where |
+| --- | --- |
+| App (HTTPS) | `https://ticketproject.local` |
+| Mailpit web UI (emails + QR codes) | `http://ticketproject.local:8025` |
+| Swagger API docs | `https://ticketproject.local/swagger-ui/index.html` |
+
+Manage the stack with `make status`, `make logs`, `make down`, and
+`make restart`. Run `make help` to list all targets.
+
+> Secrets live in the gitignored `.env` file. Delete it and re-run
+> `make bootstrap` only if you want fresh secrets (this does NOT delete
+> database data; use `make clean` for that).
+
+## Local Development Setup (without Docker)
 
 1. Clone this Git repository to your local machine.
 2. Create a MariaDB database on your local machine.
