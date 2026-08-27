@@ -27,7 +27,7 @@ echo "Generating $ENV_FILE ..."
 # Hostname devices on your network will use to reach the app. It must resolve
 # to this machine (e.g. via mDNS/Avahi). It MUST be served over HTTPS for the
 # browser to treat it as a secure context (required for camera access).
-SITE_HOST=$(hostname)
+SITE_HOST=$(hostname -f)
 
 cat > "$ENV_FILE" <<EOF
 # ---------------------------------------------------------------------------
