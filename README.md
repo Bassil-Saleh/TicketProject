@@ -2,37 +2,25 @@
 
 ## Project Demo:
 
-### Account Creation
+### Homepage:
 
-![Account Creation Walkthrough](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-17-2026/ticketproject_demo01.webp)
+![Homepage](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-27-2026/Homepage.png)
 
-### Account Verification
+### Account Creation, Verification, Login
 
-![Account Verification Walkthrough](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-17-2026/ticketproject_demo02.webp)
+![Account Creation, Verification, Login Walkthrough](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-27-2026/SignUp.webp)
 
 ### Event Creation
 
-![Event Creation Walkthrough](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-17-2026/ticketproject_demo03.webp)
+![Event Creation Walkthrough](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-27-2026/CreateEvent.webp)
 
-### Event Registration
+### Event Registration, Receiving A Ticket
 
-![Event Registration Walkthrough](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-17-2026/ticketproject_demo04.webp)
+![Event Registration, Receiving A Ticket Walkthrough](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-27-2026/RegisterForEvent.webp)
 
-### Receiving A Ticket
+### Scanning Tickets, Viewing Scanned Tickets
 
-![Receiving A Ticket](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-17-2026/Attendee_Ticket.png)
-
-### Editing An Event
-
-![Editing An Event Walkthrough](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-17-2026/ticketproject_demo05.webp)
-
-### Editing Your Profile
-
-![Editing Your Profile Walkthrough](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-17-2026/ticketproject_demo06.webp)
-
-### Viewing Scanned Tickets
-
-![Viewing Scanned Tickets](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-17-2026/Scanned_Tickets.png)
+![Scanning Tickets, Viewing Scanned Tickets Walkthrough](https://pub-60aaad6e8e644991aa7688bb88a9a11b.r2.dev/08-27-2026/ScanTicketOnMobile.webp)
 
 ## Running on a Home-Network Server (Docker Compose)
 
