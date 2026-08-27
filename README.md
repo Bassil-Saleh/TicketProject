@@ -50,9 +50,16 @@ This is useful for:
 
 ### One-time host preparation
 
-1. Install Docker Engine and the Compose plugin:
+1. Install Docker Engine and the Compose plugin using the Docker installation script:
    ```
-   curl -fsSL https://get.docker.com | sh
+   # Download the script
+   curl -fsSL https://get.docker.com -o install-docker.sh
+   # Verify the script's content
+   cat install-docker.sh
+   # Run the script with --dry-run to verify the steps it executes
+   sh install-docker.sh --dry-run
+   # Run the script either as root or using sudo to perform the installation
+   sudo sh install-docker.sh
    ```
 2. Install `mkcert` (and the NSS tools it needs):
    ```
