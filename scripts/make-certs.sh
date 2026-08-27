@@ -12,11 +12,17 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-# Read SITE_HOST from .env if present, otherwise use the default.
-SITE_HOST="ticketproject.local"
+# Read SITE_HOST from .env; fail fast if it is missing or empty rather than
+# silently falling back to a hard-coded default hostname.
+SITE_HOST=""
 if [ -f .env ]; then
     SITE_HOST="$(grep -E '^SITE_HOST=' .env | tail -n 1 | cut -d '=' -f 2- || true)"
-    SITE_HOST="${SITE_HOST:-ticketproject.local}"
+fi
+
+if [ -z "$SITE_HOST" ]; then
+    echo "ERROR: site host name (SITE_HOST) is missing from the .env file." >&2
+    echo "Run scripts/init-secrets.sh (or 'make bootstrap') to generate it first." >&2
+    exit 1
 fi
 
 if ! command -v mkcert >/dev/null 2>&1; then
