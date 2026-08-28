@@ -102,6 +102,11 @@ public class AttendeeService
             throw new EventRegistrationException("The registration period for this event is already closed.");
         }
 
+        if (foundEvent.getEventStatus() == EventStatus.CANCELED)
+        {
+            throw new EventAlreadyCanceledException("Cannot register for the event because it is already canceled.");
+        }
+
         if (foundEvent.getMaxAttendees() != null && ticketRepository.getRegistrationCountByEventId(foundEvent.getId()) >= foundEvent.getMaxAttendees())
         {
             throw new EventRegistrationException("The event is currently at maximum capacity, so no further registrations are possible.");
