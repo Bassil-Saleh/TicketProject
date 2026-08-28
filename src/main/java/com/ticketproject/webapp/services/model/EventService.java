@@ -9,6 +9,7 @@ import com.ticketproject.webapp.dtos.requests.EditEventDatesByPublicIdRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventDescriptionByPublicIdRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventMaxAttendeesByPublicIdRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventNameByPublicIdRequest;
+import com.ticketproject.webapp.dtos.requests.EditEventStatusByPublicIdRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventByPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.GetEventsResponse;
@@ -779,5 +780,82 @@ public class EventService
         foundEvent = eventRepository.save(foundEvent);
 
         return new SingleMessageResponse("Max number of attendees has been updated.");
+    }
+
+    /**
+     * Services a request to let a logged in event host
+     * edit an existing event's status. Only the event host who
+     * created the event should be allowed to edit it.
+     * @param eventHost the logged in event host
+     * @param request the request body
+     * @return a SingleMessageResponse on success
+     */
+    public SingleMessageResponse editEventStatusByPublicId(EventHost eventHost, EditEventStatusByPublicIdRequest request)
+    {
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+
+        if (request.publicId() == null)
+        {
+            throw new InvalidRequestException("Event public id cannot be null.");
+        }
+
+        if (request.publicId().length() > AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH)
+        {
+            throw new InvalidRequestException
+            (
+                "Event public id cannot be longer than " +
+                AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH +
+                " characters."
+            );
+        }
+
+        Optional<Event> event = eventRepository.findByPublicId(request.publicId());
+        if (event.isEmpty())
+        {
+            throw new EntityNotFoundException("Could not find an event with the provided public id.");
+        }
+
+        Event foundEvent = event.get();
+
+        if (Long.compare(foundEvent.getEventHost().getId(), eventHost.getId()) != 0)
+        {
+            throw new InvalidCredentialsException("Only the event host who created the event can publish it.");
+        }
+
+        EventStatus oldStatus = foundEvent.getEventStatus();
+
+        if (request.status() == oldStatus)
+        {
+            return new SingleMessageResponse("New event status is already the same as the current status.");
+        }
+
+        if (foundEvent.getEventStatus() == EventStatus.CANCELED)
+        {
+            throw new EventAlreadyCanceledException("Event's status cannot be changed because the event is already canceled.");
+        }
+
+        if (request.status() == EventStatus.DRAFT)
+        {
+            throw new InvalidRequestException("Event cannot be changed back into draft status.");
+        }
+
+        String message = switch (request.status())
+        {
+            case EventStatus.PUBLISHED -> "Event successfully published.";
+            case EventStatus.CANCELED -> "Event successfully canceled.";
+            // In practice, this case should not be reachable,
+            // but it is included here to satisfy the Java compiler's
+            // exhaustiveness requirement for a switch expression.
+            case EventStatus.DRAFT -> "Event is a draft.";
+        };
+
+        foundEvent.setEventStatus(request.status());
+        foundEvent.setLastUpdated(LocalDateTime.now());
+        foundEvent = eventRepository.save(foundEvent);
+
+        return new SingleMessageResponse(message);
     }
 }

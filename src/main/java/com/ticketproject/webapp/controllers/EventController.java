@@ -15,6 +15,7 @@ import com.ticketproject.webapp.dtos.requests.EditEventDatesByPublicIdRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventDescriptionByPublicIdRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventMaxAttendeesByPublicIdRequest;
 import com.ticketproject.webapp.dtos.requests.EditEventNameByPublicIdRequest;
+import com.ticketproject.webapp.dtos.requests.EditEventStatusByPublicIdRequest;
 import com.ticketproject.webapp.dtos.responses.CreateEventResponse;
 import com.ticketproject.webapp.model.entities.EventHost;
 import com.ticketproject.webapp.services.model.EventService;
@@ -435,5 +436,38 @@ public class EventController
             throw new UnauthorizedException("Authentication required");
         }
         return eventService.editEventMaxAttendeesByPublicId(eventHost, request);
+    }
+
+    /**
+     * Handles a request to let a logged in user
+     * edit an existing event's status. Only the event host
+     * who created the event should be allowed to edit it.
+     * @param request the request body
+     * @param servletRequest the HTTP Servlet request
+     * @return a SingleMessageResponse on success
+     */
+    @Operation
+    (
+        summary = "Edit an existing event's status",
+        description = 
+            "Change an existing event's status identified by its public ID. " +
+            "Only the event host who created the event is permitted to edit it. " +
+            "Requires authentication."
+    )
+    @PatchMapping(ApiPaths.Events.STATUS)
+    @ResponseStatus(HttpStatus.OK)
+    public SingleMessageResponse editEventStatusByPublicId
+    (
+        @Valid
+        @RequestBody EditEventStatusByPublicIdRequest request,
+        HttpServletRequest servletRequest
+    )
+    {
+        EventHost eventHost = (EventHost) servletRequest.getAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_EVENT_HOST_ATTRIBUTE);
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+        return eventService.editEventStatusByPublicId(eventHost, request);
     }
 }
