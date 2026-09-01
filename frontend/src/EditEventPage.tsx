@@ -100,7 +100,9 @@ export function EditEventPage() {
         setIsLoading(true);
         setLoadError('');
         try {
-            const response = await fetch(`/api/v1/events/${encodeURIComponent(publicId)}`);
+            // Use authFetch so that draft events (which are only visible to
+            // the event host who created them) can still be loaded for editing.
+            const response = await authFetch(`/api/v1/events/${encodeURIComponent(publicId)}`);
             const data = await response.json();
 
             if (response.ok) {

@@ -93,7 +93,12 @@ public class EventController
     /**
      * Handles a request to retrieve info on a single event based on its public ID.
      * 
+     * Authentication is optional: events in the DRAFT status are only visible
+     * to the event host who created them (any other requester gets a 404),
+     * while events in the PUBLISHED or CANCELED status are visible to everyone.
+     * 
      * @param publicId the event's public ID
+     * @param servletRequest the HTTP Servlet request
      * @return a GetEventByPublicIdResponse on success
      */
     @Operation
@@ -102,7 +107,10 @@ public class EventController
         description =
             "Retrieves detailed information about a single event identified " +
             "by its public ID, including name, description, dates, type, " +
-            "address, and coordinates. This endpoint does not require authentication."
+            "address, and coordinates. This endpoint does not require authentication. " +
+            "However, events in the DRAFT status are only visible to the event host " +
+            "who created them; any other requester receives a 404 for such events. " +
+            "Events in the PUBLISHED or CANCELED status are visible to everyone."
     )
     @SecurityRequirements
     @GetMapping(ApiPaths.Events.BY_PUBLIC_ID)
@@ -115,10 +123,12 @@ public class EventController
             required = true,
             example = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
         )
-        @PathVariable String publicId
+        @PathVariable String publicId,
+        HttpServletRequest servletRequest
     )
     {
-        return eventService.getEventByPublicId(publicId);
+        EventHost eventHost = (EventHost) servletRequest.getAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_EVENT_HOST_ATTRIBUTE);
+        return eventService.getEventByPublicId(publicId, eventHost);
     }
 
     /**

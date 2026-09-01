@@ -108,8 +108,9 @@ export function CreateEventPage() {
                     <div className="status-page__icon" aria-hidden="true">🎉</div>
                     <h1 className="card__title">Event Created!</h1>
                     <p className="card__subtitle">
-                        Your event has been created successfully. Share the link
-                        below so people can view and register for your event.
+                        Your event has been created successfully. It is currently
+                        a draft and is only visible to you until you publish it.
+                        You can view and edit your event via the link below.
                     </p>
                     <div className="alert alert--success" role="alert">
                         <a href={eventUrl} target="_blank" rel="noreferrer">

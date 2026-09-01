@@ -401,11 +401,73 @@ class EventControllerTest
     class GetEventByPublicIdTests
     {
         @Test
-        @DisplayName("Successful event retrieval returns 200")
+        @DisplayName("Successful retrieval of published event returns 200")
         void successfulRetrievalReturns200() throws Exception
         {
             EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
             Event event = createEvent(host, EventType.PUBLIC);
+            event.setEventStatus(EventStatus.PUBLISHED);
+            eventRepository.save(event);
+
+            mockMvc.perform(get(BASE_PATH + "/" + event.getPublicId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.publicId").value(event.getPublicId()))
+                .andExpect(jsonPath("$.name").value("Test Event"))
+                .andExpect(jsonPath("$.description").value("A test event description"));
+        }
+
+        @Test
+        @DisplayName("Retrieval of draft event without authentication returns 404")
+        void draftEventRetrievalWithoutAuthenticationReturns404() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PUBLIC);
+
+            mockMvc.perform(get(BASE_PATH + "/" + event.getPublicId()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404));
+        }
+
+        @Test
+        @DisplayName("Retrieval of draft event by its owner returns 200")
+        void draftEventRetrievalByOwnerReturns200() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PUBLIC);
+            String jwt = loginAndGetJwt(TEST_EMAIL, TEST_PASSWORD);
+
+            mockMvc.perform(get(BASE_PATH + "/" + event.getPublicId())
+                    .header("Authorization", "Bearer " + jwt))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.publicId").value(event.getPublicId()))
+                .andExpect(jsonPath("$.name").value("Test Event"))
+                .andExpect(jsonPath("$.description").value("A test event description"));
+        }
+
+        @Test
+        @DisplayName("Retrieval of draft event by another event host returns 404")
+        void draftEventRetrievalByAnotherEventHostReturns404() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PUBLIC);
+
+            createVerifiedEventHost("other@example.com", TEST_PASSWORD);
+            String otherJwt = loginAndGetJwt("other@example.com", TEST_PASSWORD);
+
+            mockMvc.perform(get(BASE_PATH + "/" + event.getPublicId())
+                    .header("Authorization", "Bearer " + otherJwt))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404));
+        }
+
+        @Test
+        @DisplayName("Retrieval of canceled event without authentication returns 200")
+        void canceledEventRetrievalWithoutAuthenticationReturns200() throws Exception
+        {
+            EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
+            Event event = createEvent(host, EventType.PUBLIC);
+            event.setEventStatus(EventStatus.CANCELED);
+            eventRepository.save(event);
 
             mockMvc.perform(get(BASE_PATH + "/" + event.getPublicId()))
                 .andExpect(status().isOk())

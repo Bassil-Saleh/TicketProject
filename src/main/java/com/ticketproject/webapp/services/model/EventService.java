@@ -173,10 +173,15 @@ public class EventService
     /**
      * Services a request to retrieve info on an event identified by its public ID.
      * 
+     * Note that events in the DRAFT status are only visible to the event host
+     * who created them. Any other requester (including unauthenticated users)
+     * gets the same "not found" response as if the event did not exist.
+     * 
      * @param publicId the event's public ID
+     * @param requester the (possibly null) authenticated event host making the request
      * @return a GetEventByPublicIdResponse on success
      */
-    public GetEventByPublicIdResponse getEventByPublicId(String publicId)
+    public GetEventByPublicIdResponse getEventByPublicId(String publicId, EventHost requester)
     {
         if (publicId == null)
         {
@@ -200,6 +205,17 @@ public class EventService
         }
 
         Event foundEvent = event.get();
+
+        // Draft events are only visible to the event host who created them.
+        // Any other requester gets the same response as if the event did not
+        // exist, so that a draft event's existence is not revealed.
+        boolean isOwner = requester != null &&
+            Long.compare(foundEvent.getEventHost().getId(), requester.getId()) == 0;
+        if (foundEvent.getEventStatus() == EventStatus.DRAFT && !isOwner)
+        {
+            throw new EntityNotFoundException("Could not find an event with the provided public id.");
+        }
+
         EventAddress foundEventAddress = foundEvent.getEventAddress();
         long numberOfRegisteredAttendees = ticketRepository.getRegistrationCountByEventId(foundEvent.getId());
 
