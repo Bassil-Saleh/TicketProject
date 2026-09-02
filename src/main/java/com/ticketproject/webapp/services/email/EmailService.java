@@ -35,6 +35,15 @@ import java.util.Map;
 @Service
 public class EmailService
 {
+    // TODO: Add the following new methods to send out emails
+    //       to attendees when an event's details changes:
+    //       - sendEventAddressChangedEmail()
+    //       - sendEventDatesChangedEmail()
+    //       - sendEventDescriptionChangedEmail()
+    //       - sendEventMaxAttendeesChangedEmail()
+    //       - sendEventNameChangedEmail()
+    //       - sendEventTypeChangedEmail()
+
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
     private final String frontendBaseUrl;

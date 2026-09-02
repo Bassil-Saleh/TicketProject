@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.List;
 
 /**
  * TicketRepository is used to perform CRUD operations with Ticket entities.
@@ -47,4 +48,13 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>
      */
     @Query("SELECT COUNT(t) FROM Ticket t WHERE t.event.id = :eventId")
     long getRegistrationCountByEventId(@Param("eventId") Long eventId);
+
+    /**
+     * Find and retrieve all Ticket (and Attendee) entities for a given Event
+     * identified by its ID, such that each Ticket entity is not marked as deleted.
+     * @param eventId the ID of an Event
+     * @return a list of Ticket entities which are not marked as deleted
+     */
+    @Query("SELECT t FROM Ticket t JOIN FETCH t.attendee WHERE t.event.id = :eventId AND t.deletedAt IS NOT NULL")
+    List<Ticket> findAllActiveTicketsByEventId(@Param("eventId") Long eventId);
 }
