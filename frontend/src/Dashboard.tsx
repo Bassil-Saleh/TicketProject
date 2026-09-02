@@ -10,6 +10,7 @@ interface EventInfo {
     startDateTime: string;
     endDateTime: string;
     eventType: string;
+    eventStatus: string;
     maxAttendees: number;
     addressLine1: string;
     addressLine2: string | null;
@@ -30,6 +31,9 @@ interface EventInfo {
  * @returns JSX for the site's dashboard
  */
 export function Dashboard() {
+    // TODO: For each event listing, show a badge indicating
+    //       the event's status (DRAFT, PUBLISHED, or CANCELED).
+
     const { isLoggedIn, authFetch } = useAuth();
     const navigate = useNavigate();
 
@@ -173,6 +177,38 @@ interface EventActionsMenuProps {
  * @returns JSX for the event's actions drop-down menu
  */
 function EventActionsMenu({ event }: EventActionsMenuProps) {
+    // TODO: Add a "Publish Event" option to the event actions menu
+    //       to let the user publish the event. Clicking "Publish Event"
+    //       should show a confirmation dialog that has:
+    //       - A "Go Back" button.
+    //       - A "Publish Event" button.
+    //       - A message saying that once an event is published,
+    //         it cannot be changed back into a draft, and its type
+    //         (public event or private event) cannot be changed either.
+
+    // TODO: Add a "Cancel Event" option to the event actions menu
+    //       to let the user cancel the event. Clicking "Cancel Event"
+    //       should show a confirmation dialog that has:
+    //       - A "Go Back" button.
+    //       - A "Cancel Event" button.
+    //       - A message saying that once an event is canceled,
+    //         the cancellation cannot be undone, people will no
+    //         longer be able to register for the event or receive
+    //         invitations to it, and that no further edits to the
+    //         event will be possible.
+
+    // TODO: Send a request to the API route PATCH /api/v1/events/status
+    //       when the user confirms to either the "Publish Event" dialog
+    //       or the "Cancel Event" dialog.
+
+    // TODO: Show an appropriate message to the user based on the result
+    //       of a request sent to the API route PATCH /api/v1/events/status.
+
+    // TODO: If an event's status is PUBLISHED, then hide the "Publish Event" option.
+
+    // TODO: If an event's status is CANCELED, then hide the "Publish Event" option
+    //       and the "Cancel Event" option.
+
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement | null>(null);
 
