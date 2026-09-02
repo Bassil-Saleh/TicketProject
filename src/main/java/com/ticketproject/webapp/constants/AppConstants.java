@@ -1066,6 +1066,12 @@ public final class AppConstants
             public static final String TICKET_EMAIL = "Your " + AppConstants.Project.PROJECT_NAME + " Event Ticket";
             public static final String INVITATION_EMAIL = AppConstants.Project.PROJECT_NAME + " Event Invitation";
             public static final String INVITATION_RESPONSE_EMAIL = "Invitation Response";
+            public static final String EVENT_ADDRESS_CHANGED_EMAIL = "Event Address Changed";
+            public static final String EVENT_DATES_CHANGED_EMAIL = "Event Dates Changed";
+            public static final String EVENT_DESCRIPTION_CHANGED_EMAIL = "Event Description Changed";
+            public static final String EVENT_MAX_ATTENDEES_CHANGED_EMAIL = "Event Attendance Cap Changed";
+            public static final String EVENT_NAME_CHANGED_EMAIL = "Event Name Changed";
+            public static final String EVENT_TYPE_CHANGED_EMAIL = "Event Type Changed";
         }
 
         public static final class Templates
@@ -1086,6 +1092,12 @@ public final class AppConstants
             public static final String INVITATION_EMAIL = "email/invitation-email";
             public static final String INVITATION_RESPONSE_WITH_MESSAGE_EMAIL = "email/invitation-response-with-message-email";
             public static final String INVITATION_RESPONSE_NO_MESSAGE_EMAIL = "email/invitation-response-no-message-email";
+            public static final String EVENT_ADDRESS_CHANGED_EMAIL = "email/event-address-changed-email";
+            public static final String EVENT_DATES_CHANGED_EMAIL = "email/event-dates-changed-email";
+            public static final String EVENT_DESCRIPTION_CHANGED_EMAIL = "email/event-description-changed-email";
+            public static final String EVENT_MAX_ATTENDEES_CHANGED_EMAIL = "email/event-max-attendees-changed-email";
+            public static final String EVENT_NAME_CHANGED_EMAIL = "email/event-name-changed-email";
+            public static final String EVENT_TYPE_CHANGED_EMAIL = "email/event-type-changed-email";
         }
     }
 
