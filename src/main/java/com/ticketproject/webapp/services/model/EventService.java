@@ -373,6 +373,9 @@ public class EventService
      */
     public SingleMessageResponse editEventAddressByPublicId(EventHost eventHost, EditEventAddressByPublicIdRequest request)
     {
+        // TODO: After successfully editing an event's address, send out
+        //       an email to every attendee notifying them of the new address.
+
         if (eventHost == null)
         {
             throw new UnauthorizedException("Authentication required");
@@ -444,6 +447,9 @@ public class EventService
      */
     public SingleMessageResponse editEventNameByPublicId(EventHost eventHost, EditEventNameByPublicIdRequest request)
     {
+        // TODO: After successfully editing the event's name, send out
+        //       an email to every attendee notifying them of the new name.
+
         if (eventHost == null)
         {
             throw new UnauthorizedException("Authentication required");
@@ -493,6 +499,9 @@ public class EventService
      */
     public SingleMessageResponse editEventDescriptionByPublicId(EventHost eventHost, EditEventDescriptionByPublicIdRequest request)
     {
+        // TODO: After successfully editing the event's description, send out
+        //       an email to every attendee notifying them of the new description.
+
         if (eventHost == null)
         {
             throw new UnauthorizedException("Authentication required");
@@ -542,6 +551,9 @@ public class EventService
      */
     public SingleMessageResponse editEventDatesByPublicId(EventHost eventHost, EditEventDatesByPublicIdRequest request)
     {
+        // TODO: After successfully editing the event's start and end dates/times, send out
+        //       an email to every attendee notifying them of the new start and end dates/times.
+
         if (eventHost == null)
         {
             throw new UnauthorizedException("Authentication required");
@@ -619,6 +631,9 @@ public class EventService
      */
     public SingleMessageResponse changeEventToPublicEvent(EventHost eventHost, ChangeEventToPublicEventRequest request)
     {
+        // TODO: After successfully changing the event into a public event, send out
+        //       an email to every attendee notifying them that the event is now a public event.
+
         if (eventHost == null)
         {
             throw new UnauthorizedException("Authentication required");
@@ -680,6 +695,9 @@ public class EventService
      */
     public SingleMessageResponse changeEventToPrivateEvent(EventHost eventHost, ChangeEventToPrivateEventRequest request)
     {
+        // TODO: After successfully changing the event into a private event, send out
+        //       an email to every attendee notifying them that the event is now a private event.
+
         if (eventHost == null)
         {
             throw new UnauthorizedException("Authentication required");
@@ -739,6 +757,9 @@ public class EventService
      */
     public SingleMessageResponse editEventMaxAttendeesByPublicId(EventHost eventHost, EditEventMaxAttendeesByPublicIdRequest request)
     {
+        // TODO: After successfully changing the event's attendance cap, send out
+        //       an email to every attendee notifying them of the new attendance cap.
+
         if (eventHost == null)
         {
             throw new UnauthorizedException("Authentication required");
