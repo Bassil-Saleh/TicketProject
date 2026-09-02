@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext.tsx';
 
@@ -147,28 +147,7 @@ export function Dashboard() {
                                             {event.name}
                                         </div>
                                     </div>
-                                    <div className="dashboard__event-actions">
-                                        <Link
-                                            to={`/events/${event.publicId}`}
-                                            className="btn btn--outline btn--sm"
-                                        >
-                                            View Event
-                                        </Link>
-                                        <Link
-                                            to={`/events/${event.publicId}/edit`}
-                                            className="btn btn--ghost btn--sm"
-                                        >
-                                            Edit Event
-                                        </Link>
-                                        {event.eventType === 'PRIVATE' && (
-                                            <Link
-                                                to={`/events/${event.publicId}/invite`}
-                                                className="btn btn--accent btn--sm"
-                                            >
-                                                Create Invitation
-                                            </Link>
-                                        )}
-                                    </div>
+                                    <EventActionsMenu event={event} />
                                 </div>
                             ))}
                         </div>
@@ -176,5 +155,95 @@ export function Dashboard() {
                 </section>
             </div>
         </main>
+    );
+}
+
+/** Props accepted by the per-event actions drop-down menu. */
+interface EventActionsMenuProps {
+    event: EventInfo;
+}
+
+/**
+ * EventActionsMenu is a drop-down menu providing the navigation
+ * actions available for a single event on the dashboard: viewing
+ * the event, editing the event, and, for private events, creating
+ * an invitation. The menu is closed when the user clicks outside
+ * of it or presses the Escape key.
+ * @param props the component's props
+ * @returns JSX for the event's actions drop-down menu
+ */
+function EventActionsMenu({ event }: EventActionsMenuProps) {
+    const [isOpen, setIsOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement | null>(null);
+
+    // Close the menu when the user clicks outside of it or presses Escape.
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const handleMouseDown = (mouseEvent: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(mouseEvent.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+        const handleKeyDown = (keyEvent: KeyboardEvent) => {
+            if (keyEvent.key === 'Escape') {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleMouseDown);
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('mousedown', handleMouseDown);
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isOpen]);
+
+    return (
+        <div className="dashboard__event-actions" ref={menuRef}>
+            <button
+                type="button"
+                className="btn btn--outline btn--sm"
+                aria-haspopup="menu"
+                aria-expanded={isOpen}
+                onClick={() => setIsOpen((previous) => !previous)}
+            >
+                Actions &#9662;
+            </button>
+            {isOpen && (
+                <div
+                    className="dashboard__event-menu"
+                    role="menu"
+                    aria-label={`Actions for ${event.name}`}
+                >
+                    <Link
+                        to={`/events/${event.publicId}`}
+                        className="dashboard__event-menu__item"
+                        role="menuitem"
+                        onClick={() => setIsOpen(false)}
+                    >
+                        View Event
+                    </Link>
+                    <Link
+                        to={`/events/${event.publicId}/edit`}
+                        className="dashboard__event-menu__item"
+                        role="menuitem"
+                        onClick={() => setIsOpen(false)}
+                    >
+                        Edit Event
+                    </Link>
+                    {event.eventType === 'PRIVATE' && (
+                        <Link
+                            to={`/events/${event.publicId}/invite`}
+                            className="dashboard__event-menu__item"
+                            role="menuitem"
+                            onClick={() => setIsOpen(false)}
+                        >
+                            Create Invitation
+                        </Link>
+                    )}
+                </div>
+            )}
+        </div>
     );
 }

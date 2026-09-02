@@ -1035,10 +1035,45 @@ textarea.form-input {
    20. Dashboard Event Actions
    -------------------------------------------------------------------------- */
 .dashboard__event-actions {
-    display: flex;
-    gap: var(--space-sm);
-    align-items: center;
+    position: relative;
     flex-shrink: 0;
+}
+
+.dashboard__event-menu {
+    position: absolute;
+    top: calc(100% + var(--space-xs));
+    right: 0;
+    z-index: 10;
+    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-xs) 0;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+}
+
+.dashboard__event-menu__item {
+    display: block;
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dashboard__event-menu__item:hover {
+    background-color: rgba(0, 0, 0, 0.06);
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.dashboard__event-menu__item:focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: -3px;
 }
 
 /* --------------------------------------------------------------------------
@@ -1190,6 +1225,10 @@ textarea.form-input {
 
     .profile__field {
         flex-direction: column;
+    }
+
+    .dashboard__event-actions {
+        align-self: flex-start;
     }
 
     .profile__edit-form {
