@@ -1076,6 +1076,17 @@ textarea.form-input {
     outline-offset: -3px;
 }
 
+/* Reset for menu items rendered as buttons (e.g. the "Publish Event"
+   and "Cancel Event" options) so they look like the link menu items. */
+.dashboard__event-menu__item--button {
+    width: 100%;
+    background: none;
+    border: none;
+    text-align: left;
+    font-family: inherit;
+    cursor: pointer;
+}
+
 /* --------------------------------------------------------------------------
    21. Profile Danger Zone
    -------------------------------------------------------------------------- */
@@ -1349,4 +1360,34 @@ textarea.form-input {
         flex-direction: column;
         align-items: stretch;
     }
+}
+
+/* --------------------------------------------------------------------------
+   26. Dashboard Event Status Badges
+   -------------------------------------------------------------------------- */
+.event-status-badge {
+    display: inline-block;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-full);
+    margin-right: var(--space-sm);
+    vertical-align: middle;
+}
+
+.event-status-badge--draft {
+    color: var(--color-info);
+    background-color: var(--color-info-bg);
+}
+
+.event-status-badge--published {
+    color: var(--color-success);
+    background-color: var(--color-success-bg);
+}
+
+.event-status-badge--canceled {
+    color: var(--color-error);
+    background-color: var(--color-error-bg);
 }

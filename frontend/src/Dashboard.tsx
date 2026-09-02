@@ -238,48 +238,22 @@ interface EventActionsMenuProps {
 }
 
 /**
- * EventActionsMenu is a drop-down menu providing the navigation
- * actions available for a single event on the dashboard: viewing
- * the event, editing the event, and, for private events, creating
- * an invitation. The menu is closed when the user clicks outside
- * of it or presses the Escape key.
+ * EventActionsMenu is a drop-down menu providing the actions available
+ * for a single event on the dashboard: viewing the event, editing the
+ * event, creating an invitation for private events, publishing the event,
+ * and canceling the event. Publishing and canceling each open a confirmation
+ * dialog before sending a request to PATCH /api/v1/events/status. The menu
+ * is closed when the user clicks outside of it or presses the Escape key.
  * @param props the component's props
  * @returns JSX for the event's actions drop-down menu
  */
-function EventActionsMenu({ event }: EventActionsMenuProps) {
-    // TODO: Add a "Publish Event" option to the event actions menu
-    //       to let the user publish the event. Clicking "Publish Event"
-    //       should show a confirmation dialog that has:
-    //       - A "Go Back" button.
-    //       - A "Publish Event" button.
-    //       - A message saying that once an event is published,
-    //         it cannot be changed back into a draft, and its type
-    //         (public event or private event) cannot be changed either.
-
-    // TODO: Add a "Cancel Event" option to the event actions menu
-    //       to let the user cancel the event. Clicking "Cancel Event"
-    //       should show a confirmation dialog that has:
-    //       - A "Go Back" button.
-    //       - A "Cancel Event" button.
-    //       - A message saying that once an event is canceled,
-    //         the cancellation cannot be undone, people will no
-    //         longer be able to register for the event or receive
-    //         invitations to it, and that no further edits to the
-    //         event will be possible.
-
-    // TODO: Send a request to the API route PATCH /api/v1/events/status
-    //       when the user confirms to either the "Publish Event" dialog
-    //       or the "Cancel Event" dialog.
-
-    // TODO: Show an appropriate message to the user based on the result
-    //       of a request sent to the API route PATCH /api/v1/events/status.
-
-    // TODO: If an event's status is PUBLISHED, then hide the "Publish Event" option.
-
-    // TODO: If an event's status is CANCELED, then hide the "Publish Event" option
-    //       and the "Cancel Event" option.
+function EventActionsMenu({ event, onStatusChange, onStatusError }: EventActionsMenuProps) {
+    const { authFetch } = useAuth();
 
     const [isOpen, setIsOpen] = useState(false);
+    // Which confirmation dialog (if any) is currently open.
+    const [confirmAction, setConfirmAction] = useState<'publish' | 'cancel' | null>(null);
+    const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
     const menuRef = useRef<HTMLDivElement | null>(null);
 
     // Close the menu when the user clicks outside of it or presses Escape.
@@ -304,6 +278,42 @@ function EventActionsMenu({ event }: EventActionsMenuProps) {
             document.removeEventListener('keydown', handleKeyDown);
         };
     }, [isOpen]);
+
+    /**
+     * Sends a request to PATCH /api/v1/events/status to change the
+     * event's status to the given new status, and reports the result
+     * via the onStatusChange (on success) or onStatusError (on failure)
+     * callback.
+     * @param newStatus the event's new status (PUBLISHED or CANCELED)
+     */
+    const handleStatusUpdate = async (newStatus: 'PUBLISHED' | 'CANCELED') => {
+        setIsUpdatingStatus(true);
+        try {
+            const response = await authFetch('/api/v1/events/status', {
+                method: 'PATCH',
+                body: JSON.stringify({
+                    publicId: event.publicId,
+                    status: newStatus,
+                }),
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                onStatusChange(
+                    event.publicId,
+                    newStatus,
+                    data.message || 'Event status has been updated.'
+                );
+            } else {
+                onStatusError(data.message || 'Failed to update the event status.');
+            }
+        } catch {
+            onStatusError('An unexpected error occurred while updating the event status.');
+        } finally {
+            setIsUpdatingStatus(false);
+            setConfirmAction(null);
+        }
+    };
 
     return (
         <div className="dashboard__event-actions" ref={menuRef}>
@@ -348,6 +358,113 @@ function EventActionsMenu({ event }: EventActionsMenuProps) {
                             Create Invitation
                         </Link>
                     )}
+                    {event.eventStatus !== 'PUBLISHED' && event.eventStatus !== 'CANCELED' && (
+                        <button
+                            type="button"
+                            className="dashboard__event-menu__item dashboard__event-menu__item--button"
+                            role="menuitem"
+                            onClick={() => {
+                                setIsOpen(false);
+                                setConfirmAction('publish');
+                            }}
+                        >
+                            Publish Event
+                        </button>
+                    )}
+                    {event.eventStatus !== 'CANCELED' && (
+                        <button
+                            type="button"
+                            className="dashboard__event-menu__item dashboard__event-menu__item--button"
+                            role="menuitem"
+                            onClick={() => {
+                                setIsOpen(false);
+                                setConfirmAction('cancel');
+                            }}
+                        >
+                            Cancel Event
+                        </button>
+                    )}
+                </div>
+            )}
+
+            {/* Publish Event confirmation dialog */}
+            {confirmAction === 'publish' && (
+                <div
+                    className="modal-overlay"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby={`publish-confirm-title-${event.publicId}`}
+                >
+                    <div className="modal">
+                        <h2 id={`publish-confirm-title-${event.publicId}`} className="modal__title">
+                            Publish Event?
+                        </h2>
+                        <p className="modal__message">
+                            Are you sure you want to publish "{event.name}"? Once an
+                            event is published, it cannot be changed back into a draft,
+                            and its type (public event or private event) cannot be
+                            changed either.
+                        </p>
+                        <div className="modal__actions">
+                            <button
+                                type="button"
+                                className="btn btn--primary"
+                                onClick={() => handleStatusUpdate('PUBLISHED')}
+                                disabled={isUpdatingStatus}
+                            >
+                                {isUpdatingStatus ? 'Publishing...' : 'Publish Event'}
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn--ghost"
+                                onClick={() => setConfirmAction(null)}
+                                disabled={isUpdatingStatus}
+                            >
+                                Go Back
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Cancel Event confirmation dialog */}
+            {confirmAction === 'cancel' && (
+                <div
+                    className="modal-overlay"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby={`cancel-confirm-title-${event.publicId}`}
+                >
+                    <div className="modal">
+                        <h2 id={`cancel-confirm-title-${event.publicId}`} className="modal__title">
+                            Cancel Event?
+                        </h2>
+                        <p className="modal__message">
+                            Are you sure you want to cancel "{event.name}"? Once an
+                            event is canceled, the cancellation cannot be undone,
+                            people will no longer be able to register for the event
+                            or receive invitations to it, and no further edits to
+                            the event will be possible.
+                        </p>
+                        <div className="modal__actions">
+                            <button
+                                type="button"
+                                className="btn btn--danger"
+                                onClick={() => handleStatusUpdate('CANCELED')}
+                                disabled={isUpdatingStatus}
+                            >
+                                {isUpdatingStatus ? 'Canceling...' : 'Cancel Event'}
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn--ghost"
+                                onClick={() => setConfirmAction(null)}
+                                disabled={isUpdatingStatus}
+                            >
+                                Go Back
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
