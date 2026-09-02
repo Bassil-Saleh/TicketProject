@@ -2,6 +2,27 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext.tsx';
 
+/** The possible statuses an event can have, as returned by the API. */
+type EventStatus = 'DRAFT' | 'PUBLISHED' | 'CANCELED';
+
+/** Display label and badge CSS class for each event status. */
+const EVENT_STATUS_BADGES: Record<EventStatus, { label: string; className: string }> = {
+    DRAFT: { label: 'Draft', className: 'event-status-badge event-status-badge--draft' },
+    PUBLISHED: { label: 'Published', className: 'event-status-badge event-status-badge--published' },
+    CANCELED: { label: 'Canceled', className: 'event-status-badge event-status-badge--canceled' },
+};
+
+/**
+ * Returns the display label and badge CSS class for the given
+ * event status, falling back to the raw status value if the
+ * status is not recognized.
+ * @param status the event's status
+ * @returns the label and CSS class to use for the status badge
+ */
+function getEventStatusBadge(status: EventStatus): { label: string; className: string } {
+    return EVENT_STATUS_BADGES[status] ?? { label: status, className: 'event-status-badge event-status-badge--draft' };
+}
+
 /** Shape of a single event returned by GET /api/v1/events. */
 interface EventInfo {
     publicId: string;
@@ -10,7 +31,7 @@ interface EventInfo {
     startDateTime: string;
     endDateTime: string;
     eventType: string;
-    eventStatus: string;
+    eventStatus: EventStatus;
     maxAttendees: number;
     addressLine1: string;
     addressLine2: string | null;
@@ -31,15 +52,15 @@ interface EventInfo {
  * @returns JSX for the site's dashboard
  */
 export function Dashboard() {
-    // TODO: For each event listing, show a badge indicating
-    //       the event's status (DRAFT, PUBLISHED, or CANCELED).
-
     const { isLoggedIn, authFetch } = useAuth();
     const navigate = useNavigate();
 
     const [events, setEvents] = useState<EventInfo[]>([]);
     const [isLoadingEvents, setIsLoadingEvents] = useState(true);
     const [eventsError, setEventsError] = useState('');
+    // Message showing the result of a PATCH /api/v1/events/status request
+    // (i.e. publishing or canceling an event from the actions menu).
+    const [statusUpdateMessage, setStatusUpdateMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
     // If the user is not logged in, redirect to the home page.
     useEffect(() => {
@@ -75,6 +96,32 @@ export function Dashboard() {
 
         fetchEvents();
     }, [isLoggedIn, authFetch]);
+
+    /**
+     * Updates the eventStatus of the event with the given public ID in the
+     * local events list and shows a success message. Called by an
+     * EventActionsMenu after a successful PATCH /api/v1/events/status request.
+     * @param publicId the event's public ID
+     * @param newStatus the event's new status
+     * @param message the success message returned by the API
+     */
+    const handleEventStatusChange = (publicId: string, newStatus: EventStatus, message: string) => {
+        setEvents((previous) =>
+            previous.map((event) =>
+                event.publicId === publicId ? { ...event, eventStatus: newStatus } : event
+            )
+        );
+        setStatusUpdateMessage({ type: 'success', text: message });
+    };
+
+    /**
+     * Shows an error message. Called by an EventActionsMenu when
+     * a request to PATCH /api/v1/events/status has failed.
+     * @param message the error message to show
+     */
+    const handleEventStatusError = (message: string) => {
+        setStatusUpdateMessage({ type: 'error', text: message });
+    };
 
     /**
      * Formats an ISO date-time string into a human-readable format.
@@ -120,6 +167,15 @@ export function Dashboard() {
                 <section className="dashboard__section">
                     <h2 className="dashboard__section-title">Your Events</h2>
 
+                    {statusUpdateMessage && (
+                        <div
+                            className={`alert ${statusUpdateMessage.type === 'success' ? 'alert--success' : 'alert--error'}`}
+                            role="alert"
+                        >
+                            {statusUpdateMessage.text}
+                        </div>
+                    )}
+
                     {isLoadingEvents && (
                         <div className="dashboard__empty">
                             <div className="spinner" aria-label="Loading events" />
@@ -141,19 +197,29 @@ export function Dashboard() {
 
                     {!isLoadingEvents && !eventsError && events.length > 0 && (
                         <div>
-                            {events.map((event) => (
-                                <div key={event.publicId} className="profile__field">
-                                    <div className="profile__field-info">
-                                        <div className="profile__field-label">
-                                            {event.eventType} &middot; {formatDateTime(event.startDateTime)}
+                            {events.map((event) => {
+                                const statusBadge = getEventStatusBadge(event.eventStatus);
+                                return (
+                                    <div key={event.publicId} className="profile__field">
+                                        <div className="profile__field-info">
+                                            <div className="profile__field-label">
+                                                {event.eventType} &middot; {formatDateTime(event.startDateTime)}
+                                            </div>
+                                            <div className="profile__field-value">
+                                                <span className={statusBadge.className}>
+                                                    {statusBadge.label}
+                                                </span>
+                                                {event.name}
+                                            </div>
                                         </div>
-                                        <div className="profile__field-value">
-                                            {event.name}
-                                        </div>
+                                        <EventActionsMenu
+                                            event={event}
+                                            onStatusChange={handleEventStatusChange}
+                                            onStatusError={handleEventStatusError}
+                                        />
                                     </div>
-                                    <EventActionsMenu event={event} />
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
                 </section>
@@ -165,6 +231,10 @@ export function Dashboard() {
 /** Props accepted by the per-event actions drop-down menu. */
 interface EventActionsMenuProps {
     event: EventInfo;
+    /** Called after a successful PATCH /api/v1/events/status request. */
+    onStatusChange: (publicId: string, newStatus: EventStatus, message: string) => void;
+    /** Called when a request to PATCH /api/v1/events/status fails. */
+    onStatusError: (message: string) => void;
 }
 
 /**
