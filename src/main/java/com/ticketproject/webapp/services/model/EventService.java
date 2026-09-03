@@ -30,6 +30,7 @@ import com.ticketproject.webapp.model.repositories.EventAddressRepository;
 import com.ticketproject.webapp.model.repositories.EventRepository;
 import com.ticketproject.webapp.model.repositories.TicketRepository;
 import com.ticketproject.webapp.services.database.CryptoService;
+import com.ticketproject.webapp.services.email.EmailService;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -54,17 +55,20 @@ public class EventService
     private final EventAddressRepository eventAddressRepository;
     private final EventRepository eventRepository;
     private final TicketRepository ticketRepository;
+    private final EmailService emailService;
 
     public EventService
     (
         EventRepository eventRepository,
         EventAddressRepository eventAddressRepository,
-        TicketRepository ticketRepository
+        TicketRepository ticketRepository,
+        EmailService emailService
     )
     {
         this.eventRepository = eventRepository;
         this.eventAddressRepository = eventAddressRepository;
         this.ticketRepository = ticketRepository;
+        this.emailService = emailService;
     }
 
     /**
@@ -373,10 +377,6 @@ public class EventService
      */
     public SingleMessageResponse editEventAddressByPublicId(EventHost eventHost, EditEventAddressByPublicIdRequest request)
     {
-        // TODO: After successfully editing an event's address, send out
-        //       an email to every attendee notifying them of the new address
-        //       using the EmailService.sendEventAddressChangedEmail() method.
-
         if (eventHost == null)
         {
             throw new UnauthorizedException("Authentication required");
@@ -436,6 +436,20 @@ public class EventService
         foundEventAddress = eventAddressRepository.save(foundEventAddress);
         foundEvent = eventRepository.save(foundEvent);
 
+        // Notify every attendee of the event's new address.
+        emailService.sendEventAddressChangedEmail
+        (
+            getActiveAttendeeEmails(foundEvent.getId()),
+            getEventHostFullName(foundEvent),
+            foundEvent.getName(),
+            foundEventAddress.getAddressLine1(),
+            foundEventAddress.getAddressLine2(),
+            foundEventAddress.getCity(),
+            foundEventAddress.getState(),
+            foundEventAddress.getCountry(),
+            foundEventAddress.getPostalCode()
+        );
+
         return new SingleMessageResponse("Event address updated.");
     }
 
@@ -448,10 +462,6 @@ public class EventService
      */
     public SingleMessageResponse editEventNameByPublicId(EventHost eventHost, EditEventNameByPublicIdRequest request)
     {
-        // TODO: After successfully editing the event's name, send out
-        //       an email to every attendee notifying them of the new name
-        //       using the EmailService.sendEventNameChangedEmail() method.
-
         if (eventHost == null)
         {
             throw new UnauthorizedException("Authentication required");
@@ -485,9 +495,20 @@ public class EventService
             throw new InvalidCredentialsException("Only the event host who created the event can edit it.");
         }
 
+        String oldEventName = foundEvent.getName();
+
         foundEvent.setName(request.name());
         foundEvent.setLastUpdated(LocalDateTime.now());
         foundEvent = eventRepository.save(foundEvent);
+
+        // Notify every attendee of the event's new name.
+        emailService.sendEventNameChangedEmail
+        (
+            getActiveAttendeeEmails(foundEvent.getId()),
+            getEventHostFullName(foundEvent),
+            oldEventName,
+            foundEvent.getName()
+        );
 
         return new SingleMessageResponse("Event name changed.");
     }
@@ -501,10 +522,6 @@ public class EventService
      */
     public SingleMessageResponse editEventDescriptionByPublicId(EventHost eventHost, EditEventDescriptionByPublicIdRequest request)
     {
-        // TODO: After successfully editing the event's description, send out
-        //       an email to every attendee notifying them of the new description
-        //       using the EmailService.sendEventDescriptionChangedEmail() method.
-
         if (eventHost == null)
         {
             throw new UnauthorizedException("Authentication required");
@@ -542,6 +559,15 @@ public class EventService
         foundEvent.setLastUpdated(LocalDateTime.now());
         foundEvent = eventRepository.save(foundEvent);
 
+        // Notify every attendee of the event's new description.
+        emailService.sendEventDescriptionChangedEmail
+        (
+            getActiveAttendeeEmails(foundEvent.getId()),
+            getEventHostFullName(foundEvent),
+            foundEvent.getName(),
+            foundEvent.getDescription()
+        );
+
         return new SingleMessageResponse("Event description changed.");
     }
 
@@ -554,11 +580,6 @@ public class EventService
      */
     public SingleMessageResponse editEventDatesByPublicId(EventHost eventHost, EditEventDatesByPublicIdRequest request)
     {
-        // TODO: After successfully editing the event's start and end dates/times,
-        //       send out an email to every attendee notifying them of the new
-        //       start and end dates/times using the
-        //       EmailService.sendEventDatesChangedEmail() method.
-
         if (eventHost == null)
         {
             throw new UnauthorizedException("Authentication required");
@@ -623,6 +644,16 @@ public class EventService
         foundEvent.setLastUpdated(LocalDateTime.now());
         foundEvent = eventRepository.save(foundEvent);
 
+        // Notify every attendee of the event's new start and end date/times.
+        emailService.sendEventDatesChangedEmail
+        (
+            getActiveAttendeeEmails(foundEvent.getId()),
+            getEventHostFullName(foundEvent),
+            foundEvent.getName(),
+            foundEvent.getStartDateTime(),
+            foundEvent.getEndDateTime()
+        );
+
         return new SingleMessageResponse("Event dates updated.");
     }
 
@@ -636,11 +667,6 @@ public class EventService
      */
     public SingleMessageResponse changeEventToPublicEvent(EventHost eventHost, ChangeEventToPublicEventRequest request)
     {
-        // TODO: After successfully changing the event into a public event,
-        //       send out an email to every attendee notifying them that
-        //       the event is now a public event using the
-        //       EmailService.sendEventTypeChangedEmail() method.
-
         if (eventHost == null)
         {
             throw new UnauthorizedException("Authentication required");
@@ -684,10 +710,22 @@ public class EventService
             return new SingleMessageResponse("This event is already a public event.");
         }
 
+        EventType oldEventType = foundEvent.getEventType();
+
         foundEvent.setEventType(EventType.PUBLIC);
         foundEvent.setMaxAttendees(request.maxAttendees());
         foundEvent.setLastUpdated(LocalDateTime.now());
         foundEvent = eventRepository.save(foundEvent);
+
+        // Notify every attendee that the event is now a public event.
+        emailService.sendEventTypeChangedEmail
+        (
+            getActiveAttendeeEmails(foundEvent.getId()),
+            getEventHostFullName(foundEvent),
+            foundEvent.getName(),
+            oldEventType,
+            EventType.PUBLIC
+        );
 
         return new SingleMessageResponse("The event has been changed into a public event.");
     }
@@ -702,11 +740,6 @@ public class EventService
      */
     public SingleMessageResponse changeEventToPrivateEvent(EventHost eventHost, ChangeEventToPrivateEventRequest request)
     {
-        // TODO: After successfully changing the event into a private event,
-        //       send out an email to every attendee notifying them that
-        //       the event is now a private event using the
-        //       EmailService.sendEventTypeChangedEmail() method.
-
         if (eventHost == null)
         {
             throw new UnauthorizedException("Authentication required");
@@ -750,9 +783,21 @@ public class EventService
             return new SingleMessageResponse("This event is already a private event.");
         }
 
+        EventType oldEventType = foundEvent.getEventType();
+
         foundEvent.setEventType(EventType.PRIVATE);
         foundEvent.setLastUpdated(LocalDateTime.now());
         foundEvent = eventRepository.save(foundEvent);
+
+        // Notify every attendee that the event is now a private event.
+        emailService.sendEventTypeChangedEmail
+        (
+            getActiveAttendeeEmails(foundEvent.getId()),
+            getEventHostFullName(foundEvent),
+            foundEvent.getName(),
+            oldEventType,
+            EventType.PRIVATE
+        );
 
         return new SingleMessageResponse("The event has been changed into a private event.");
     }
@@ -766,11 +811,6 @@ public class EventService
      */
     public SingleMessageResponse editEventMaxAttendeesByPublicId(EventHost eventHost, EditEventMaxAttendeesByPublicIdRequest request)
     {
-        // TODO: After successfully changing the event's attendance cap,
-        //       send out an email to every attendee notifying them of
-        //       the new attendance cap using the
-        //       EmailService.sendEventMaxAttendeesChangedEmail() method.
-
         if (eventHost == null)
         {
             throw new UnauthorizedException("Authentication required");
@@ -826,6 +866,15 @@ public class EventService
         }
         foundEvent.setLastUpdated(LocalDateTime.now());
         foundEvent = eventRepository.save(foundEvent);
+
+        // Notify every attendee of the event's new attendance cap.
+        emailService.sendEventMaxAttendeesChangedEmail
+        (
+            getActiveAttendeeEmails(foundEvent.getId()),
+            getEventHostFullName(foundEvent),
+            foundEvent.getName(),
+            foundEvent.getMaxAttendees()
+        );
 
         return new SingleMessageResponse("Max number of attendees has been updated.");
     }
@@ -905,5 +954,32 @@ public class EventService
         foundEvent = eventRepository.save(foundEvent);
 
         return new SingleMessageResponse(message);
+    }
+
+    /**
+     * Retrieves the email addresses of every attendee
+     * who has an active (non-deleted) ticket for the given event.
+     *
+     * @param eventId the ID of the event
+     * @return a list of attendee email addresses
+     */
+    private List<String> getActiveAttendeeEmails(Long eventId)
+    {
+        return ticketRepository.findAllActiveTicketsByEventId(eventId)
+            .stream()
+            .map(ticket -> ticket.getAttendee().getEmail())
+            .toList();
+    }
+
+    /**
+     * Builds the full name of the event host who created the given event.
+     *
+     * @param event the event
+     * @return the event host's full name
+     */
+    private String getEventHostFullName(Event event)
+    {
+        EventHost eventHost = event.getEventHost();
+        return eventHost.getFirstName() + " " + eventHost.getLastName();
     }
 }
