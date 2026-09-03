@@ -3,6 +3,7 @@ package com.ticketproject.webapp.services.email;
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.constants.FrontendPaths;
 import com.ticketproject.webapp.exceptions.EmailSendFailedException;
+import com.ticketproject.webapp.model.enums.EventType;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,15 +37,6 @@ import java.util.Map;
 @Service
 public class EmailService
 {
-    // TODO: Add the following new methods to send out emails
-    //       to attendees when an event's details changes:
-    //       - sendEventAddressChangedEmail()
-    //       - sendEventDatesChangedEmail()
-    //       - sendEventDescriptionChangedEmail()
-    //       - sendEventMaxAttendeesChangedEmail()
-    //       - sendEventNameChangedEmail()
-    //       - sendEventTypeChangedEmail()
-
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
     private final String frontendBaseUrl;
@@ -410,6 +403,336 @@ public class EmailService
             (
                 "Invitation response email could not be sent. Please try again later."
             );
+        }
+    }
+
+    /**
+     * Sends an email to every attendee of an event notifying them
+     * that the event host has changed the event's address.
+     *
+     * @param attendeeEmails the email addresses of the event's attendees
+     * @param eventHostName the full name of the event host who changed the event
+     * @param eventName the name of the event
+     * @param newAddressLine1 the event's new first address line
+     * @param newAddressLine2 the event's new second address line (may be null)
+     * @param newEventCity the event's new city
+     * @param newEventState the event's new state
+     * @param newEventCountry the event's new country
+     * @param newPostalCode the event's new postal code
+     * @throws EmailSendFailedException if the email fails to send
+     */
+    public void sendEventAddressChangedEmail
+    (
+        List<String> attendeeEmails,
+        String eventHostName,
+        String eventName,
+        String newAddressLine1,
+        String newAddressLine2,
+        String newEventCity,
+        String newEventState,
+        String newEventCountry,
+        String newPostalCode
+    )
+    {
+        try
+        {
+            // Prepare the Thymeleaf context with template variables.
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("eventHostName", eventHostName);
+            variables.put("eventName", eventName);
+            variables.put("newAddressLine1", (newAddressLine2 != null) ? (newAddressLine1 + " ") : newAddressLine1);
+            variables.put("newAddressLine2", (newAddressLine2 != null) ? newAddressLine2 : "");
+            variables.put("newEventCity", newEventCity);
+            variables.put("newEventState", newEventState);
+            variables.put("newEventCountry", newEventCountry);
+            variables.put("newPostalCode", newPostalCode);
+
+            sendHtmlEmail
+            (
+                attendeeEmails,
+                AppConstants.Email.Subjects.EVENT_ADDRESS_CHANGED_EMAIL,
+                AppConstants.Email.Templates.EVENT_ADDRESS_CHANGED_EMAIL,
+                variables
+            );
+        }
+        catch (MailException | MessagingException | IOException e)
+        {
+            throw new EmailSendFailedException
+            (
+                "Event address changed email could not be sent. Please try again later."
+            );
+        }
+    }
+
+    /**
+     * Sends an email to every attendee of an event notifying them
+     * that the event host has changed the event's start and end date/times.
+     *
+     * @param attendeeEmails the email addresses of the event's attendees
+     * @param eventHostName the full name of the event host who changed the event
+     * @param eventName the name of the event
+     * @param newStartDateTime the event's new start date/time
+     * @param newEndDateTime the event's new end date/time
+     * @throws EmailSendFailedException if the email fails to send
+     */
+    public void sendEventDatesChangedEmail
+    (
+        List<String> attendeeEmails,
+        String eventHostName,
+        String eventName,
+        LocalDateTime newStartDateTime,
+        LocalDateTime newEndDateTime
+    )
+    {
+        try
+        {
+            // Prepare the Thymeleaf context with template variables.
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("eventHostName", eventHostName);
+            variables.put("eventName", eventName);
+            variables.put("newStartDateTime", newStartDateTime.format(AppConstants.Crypto.DATE_TIME_FORMAT));
+            variables.put("newEndDateTime", newEndDateTime.format(AppConstants.Crypto.DATE_TIME_FORMAT));
+
+            sendHtmlEmail
+            (
+                attendeeEmails,
+                AppConstants.Email.Subjects.EVENT_DATES_CHANGED_EMAIL,
+                AppConstants.Email.Templates.EVENT_DATES_CHANGED_EMAIL,
+                variables
+            );
+        }
+        catch (MailException | MessagingException | IOException e)
+        {
+            throw new EmailSendFailedException
+            (
+                "Event dates changed email could not be sent. Please try again later."
+            );
+        }
+    }
+
+    /**
+     * Sends an email to every attendee of an event notifying them
+     * that the event host has changed the event's description.
+     *
+     * @param attendeeEmails the email addresses of the event's attendees
+     * @param eventHostName the full name of the event host who changed the event
+     * @param eventName the name of the event
+     * @param newEventDescription the event's new description
+     * @throws EmailSendFailedException if the email fails to send
+     */
+    public void sendEventDescriptionChangedEmail
+    (
+        List<String> attendeeEmails,
+        String eventHostName,
+        String eventName,
+        String newEventDescription
+    )
+    {
+        try
+        {
+            // Prepare the Thymeleaf context with template variables.
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("eventHostName", eventHostName);
+            variables.put("eventName", eventName);
+            variables.put("newEventDescription", newEventDescription);
+
+            sendHtmlEmail
+            (
+                attendeeEmails,
+                AppConstants.Email.Subjects.EVENT_DESCRIPTION_CHANGED_EMAIL,
+                AppConstants.Email.Templates.EVENT_DESCRIPTION_CHANGED_EMAIL,
+                variables
+            );
+        }
+        catch (MailException | MessagingException | IOException e)
+        {
+            throw new EmailSendFailedException
+            (
+                "Event description changed email could not be sent. Please try again later."
+            );
+        }
+    }
+
+    /**
+     * Sends an email to every attendee of an event notifying them
+     * that the event host has changed the event's attendance cap.
+     *
+     * @param attendeeEmails the email addresses of the event's attendees
+     * @param eventHostName the full name of the event host who changed the event
+     * @param eventName the name of the event
+     * @param newMaxAttendees the event's new maximum number of attendees
+     * @throws EmailSendFailedException if the email fails to send
+     */
+    public void sendEventMaxAttendeesChangedEmail
+    (
+        List<String> attendeeEmails,
+        String eventHostName,
+        String eventName,
+        Long newMaxAttendees
+    )
+    {
+        try
+        {
+            // Prepare the Thymeleaf context with template variables.
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("eventHostName", eventHostName);
+            variables.put("eventName", eventName);
+            variables.put("newMaxAttendees", newMaxAttendees);
+
+            sendHtmlEmail
+            (
+                attendeeEmails,
+                AppConstants.Email.Subjects.EVENT_MAX_ATTENDEES_CHANGED_EMAIL,
+                AppConstants.Email.Templates.EVENT_MAX_ATTENDEES_CHANGED_EMAIL,
+                variables
+            );
+        }
+        catch (MailException | MessagingException | IOException e)
+        {
+            throw new EmailSendFailedException
+            (
+                "Event attendance cap changed email could not be sent. Please try again later."
+            );
+        }
+    }
+
+    /**
+     * Sends an email to every attendee of an event notifying them
+     * that the event host has renamed the event.
+     *
+     * @param attendeeEmails the email addresses of the event's attendees
+     * @param eventHostName the full name of the event host who changed the event
+     * @param oldEventName the event's previous name
+     * @param newEventName the event's new name
+     * @throws EmailSendFailedException if the email fails to send
+     */
+    public void sendEventNameChangedEmail
+    (
+        List<String> attendeeEmails,
+        String eventHostName,
+        String oldEventName,
+        String newEventName
+    )
+    {
+        try
+        {
+            // Prepare the Thymeleaf context with template variables.
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("eventHostName", eventHostName);
+            variables.put("oldEventName", oldEventName);
+            variables.put("newEventName", newEventName);
+
+            sendHtmlEmail
+            (
+                attendeeEmails,
+                AppConstants.Email.Subjects.EVENT_NAME_CHANGED_EMAIL,
+                AppConstants.Email.Templates.EVENT_NAME_CHANGED_EMAIL,
+                variables
+            );
+        }
+        catch (MailException | MessagingException | IOException e)
+        {
+            throw new EmailSendFailedException
+            (
+                "Event name changed email could not be sent. Please try again later."
+            );
+        }
+    }
+
+    /**
+     * Sends an email to every attendee of an event notifying them
+     * that the event host has changed the event's type
+     * (i.e. from a public event to a private event, or vice versa).
+     *
+     * @param attendeeEmails the email addresses of the event's attendees
+     * @param eventHostName the full name of the event host who changed the event
+     * @param eventName the name of the event
+     * @param oldEventType the event's previous type
+     * @param newEventType the event's new type
+     * @throws EmailSendFailedException if the email fails to send
+     */
+    public void sendEventTypeChangedEmail
+    (
+        List<String> attendeeEmails,
+        String eventHostName,
+        String eventName,
+        EventType oldEventType,
+        EventType newEventType
+    )
+    {
+        try
+        {
+            // Prepare the Thymeleaf context with template variables.
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("eventHostName", eventHostName);
+            variables.put("eventName", eventName);
+            variables.put("oldEventType", oldEventType.name());
+            variables.put("newEventType", newEventType.name());
+
+            sendHtmlEmail
+            (
+                attendeeEmails,
+                AppConstants.Email.Subjects.EVENT_TYPE_CHANGED_EMAIL,
+                AppConstants.Email.Templates.EVENT_TYPE_CHANGED_EMAIL,
+                variables
+            );
+        }
+        catch (MailException | MessagingException | IOException e)
+        {
+            throw new EmailSendFailedException
+            (
+                "Event type changed email could not be sent. Please try again later."
+            );
+        }
+    }
+
+    /**
+     * Renders a Thymeleaf email template and sends the rendered
+     * HTML email to every recipient in the given list.
+     *
+     * @param toEmails the email addresses of the recipients
+     * @param subject the subject line of the email
+     * @param templateName the name of the Thymeleaf template to render
+     * @param variables the template variables to include in the email
+     * @throws MessagingException if an email message cannot be created or sent
+     * @throws UnsupportedEncodingException if the character encoding is unsupported
+     */
+    private void sendHtmlEmail
+    (
+        List<String> toEmails,
+        String subject,
+        String templateName,
+        Map<String, Object> variables
+    )
+        throws MessagingException, UnsupportedEncodingException
+    {
+        // Prepare the Thymeleaf context with template variables.
+        Context context = new Context();
+        context.setVariables(variables);
+
+        // Render the email HTML using the Thymeleaf template.
+        String htmlContent = templateEngine.process(templateName, context);
+
+        // Create and send one email to each recipient.
+        for (String toEmail : toEmails)
+        {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper
+            (
+                message,
+                true,
+                AppConstants.Email.CHARACTER_ENCODING
+            );
+            helper.setFrom
+            (
+                AppConstants.Email.FROM_ADDRESS,
+                AppConstants.Project.PROJECT_NAME
+            );
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
         }
     }
 
