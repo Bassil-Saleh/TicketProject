@@ -1,9 +1,13 @@
 package com.ticketproject.webapp.controllers;
 
 import com.ticketproject.webapp.constants.ApiPaths;
+import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.services.model.TicketService;
 import com.ticketproject.webapp.dtos.requests.RespondToInvitationRequest;
+import com.ticketproject.webapp.dtos.responses.GetTicketsByEventPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
+import com.ticketproject.webapp.model.entities.EventHost;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,8 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -60,5 +67,38 @@ public class TicketController
     )
     {
         return ticketService.respondToInvitation(request);
+    }
+
+    /**
+     * Handles a request to let a logged in event host retrieve
+     * a list of records on tickets for a specific event.
+     * Only the event host who created the event should be
+     * allowed to manage those records.
+     * @param publicId the event's public ID
+     * @param servletRequest the HTTP Servlet request
+     * @return a GetTicketsByEventPublicIdResponse on success
+     */
+    @Operation
+    (
+        summary = "Retrieve info on a list of tickets for a specific event",
+        description =
+            "Retrieves a list of records on tickets for a specific event. " +
+            "Only the event host who created the event should be allowed see those records. " +
+            "Requires authentication."
+    )
+    @GetMapping(ApiPaths.Tickets.BY_EVENT_PUBLIC_ID)
+    @ResponseStatus(HttpStatus.OK)
+    public GetTicketsByEventPublicIdResponse getTicketsByEventPublicId
+    (
+        @PathVariable String publicId,
+        HttpServletRequest servletRequest
+    )
+    {
+        EventHost eventHost = (EventHost) servletRequest.getAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_EVENT_HOST_ATTRIBUTE);
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+        return ticketService.getTicketsByEventPublicId(eventHost, publicId);
     }
 }

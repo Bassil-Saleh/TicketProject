@@ -2,6 +2,8 @@ package com.ticketproject.webapp.services.model;
 
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.dtos.requests.RespondToInvitationRequest;
+import com.ticketproject.webapp.dtos.responses.EventTicketInfo;
+import com.ticketproject.webapp.dtos.responses.GetTicketsByEventPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
 import com.ticketproject.webapp.exceptions.TicketGenerationException;
 import com.ticketproject.webapp.exceptions.InvalidRequestException;
@@ -10,7 +12,10 @@ import com.ticketproject.webapp.exceptions.TicketScanFailedException;
 import com.ticketproject.webapp.exceptions.EventEndedException;
 import com.ticketproject.webapp.exceptions.SigningKeyNotFoundException;
 import com.ticketproject.webapp.exceptions.InvalidSignatureException;
+import com.ticketproject.webapp.exceptions.UnauthorizedException;
+import com.ticketproject.webapp.exceptions.InvalidCredentialsException;
 import com.ticketproject.webapp.model.entities.Event;
+import com.ticketproject.webapp.model.entities.EventHost;
 import com.ticketproject.webapp.model.entities.EventSigningKey;
 import com.ticketproject.webapp.model.entities.Ticket;
 
@@ -23,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.UUID;
 import java.util.Optional;
+import java.util.List;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -31,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ticketproject.webapp.model.enums.EventType;
 import com.ticketproject.webapp.model.enums.InvitationStatus;
+import com.ticketproject.webapp.model.repositories.EventRepository;
 import com.ticketproject.webapp.model.repositories.EventSigningKeyRepository;
 import com.ticketproject.webapp.model.repositories.TicketRepository;
 import com.ticketproject.webapp.services.email.EmailService;
@@ -43,17 +50,20 @@ import com.ticketproject.webapp.services.email.EmailService;
 public class TicketService
 {
     private final TicketRepository ticketRepository;
+    private final EventRepository eventRepository;
     private final EventSigningKeyRepository eventSigningKeyRepository;
     private final EmailService emailService;
 
     public TicketService
     (
         TicketRepository ticketRepository,
+        EventRepository eventRepository,
         EventSigningKeyRepository eventSigningKeyRepository,
         EmailService emailService
     )
     {
         this.ticketRepository = ticketRepository;
+        this.eventRepository = eventRepository;
         this.eventSigningKeyRepository = eventSigningKeyRepository;
         this.emailService = emailService;
     }
@@ -268,5 +278,74 @@ public class TicketService
         foundTicket = ticketRepository.save(foundTicket);
 
         return new SingleMessageResponse("Responded to invitation with response: " + request.invitationResponse());
+    }
+
+    /**
+     * Services a request to let a logged in event host retrieve
+     * a list of records on tickets for a specific event.
+     * Only the event host who created the event should be
+     * allowed to manage those records.
+     * @param eventHost the logged in event host
+     * @param publicId the event's public ID
+     * @return a GetTicketsByEventPublicIdResponse on success
+     */
+    public GetTicketsByEventPublicIdResponse getTicketsByEventPublicId(EventHost eventHost, String publicId)
+    {
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+
+        if (publicId == null)
+        {
+            throw new InvalidRequestException("Event public id cannot be null.");
+        }
+
+        if (publicId.length() > AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH)
+        {
+            throw new InvalidRequestException
+            (
+                "Event public id cannot be longer than " +
+                AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH +
+                " characters."
+            );
+        }
+
+        Optional<Event> event = eventRepository.findByPublicId(publicId);
+        if (event.isEmpty())
+        {
+            throw new EntityNotFoundException("Could not find an event with the provided public id.");
+        }
+
+        Event foundEvent = event.get();
+
+        if (Long.compare(foundEvent.getEventHost().getId(), eventHost.getId()) != 0)
+        {
+            throw new InvalidCredentialsException("Only the event host who created the event can manage its registrations.");
+        }
+
+        List<Ticket> foundTickets = ticketRepository.findAllActiveTicketsByEventId(foundEvent.getId());
+        List<EventTicketInfo> ticketRecords = foundTickets
+            .stream()
+            .map(ticket ->
+            {
+                EventTicketInfo record =
+                    new EventTicketInfo
+                    (
+                        ticket.getAttendee().getFirstName(),
+                        ticket.getAttendee().getMiddleName(),
+                        ticket.getAttendee().getLastName(),
+                        ticket.getAttendee().getEmail(),
+                        ticket.isPresent(),
+                        ticket.getInvitationStatus(),
+                        ticket.getCreated(),
+                        ticket.getDeletedAt(),
+                        ticket.getLastUpdated()
+                    );
+                return record;
+            })
+            .toList();
+
+        return new GetTicketsByEventPublicIdResponse(ticketRecords);
     }
 }
