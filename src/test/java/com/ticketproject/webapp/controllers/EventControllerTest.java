@@ -970,8 +970,8 @@ class EventControllerTest
         }
 
         @Test
-        @DisplayName("Dates edit for published event returns 409")
-        void publishedEventReturns409() throws Exception
+        @DisplayName("Dates edit for published event returns 200")
+        void publishedEventReturns200() throws Exception
         {
             EventHost host = createVerifiedEventHost(TEST_EMAIL, TEST_PASSWORD);
             Event event = createEvent(host, EventType.PUBLIC);
@@ -994,8 +994,8 @@ class EventControllerTest
                     .header("Authorization", "Bearer " + jwt)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestBody))
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.status").value(409));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Event dates updated."));
         }
     }
 

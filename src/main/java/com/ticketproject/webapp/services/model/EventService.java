@@ -613,11 +613,6 @@ public class EventService
             throw new InvalidCredentialsException("Only the event host who created the event can edit it.");
         }
 
-        if (foundEvent.getEventStatus() == EventStatus.PUBLISHED)
-        {
-            throw new EventAlreadyPublishedException("Event dates cannot be changed because the event is already published.");
-        }
-
         if (request.startDateTime().isEqual(request.endDateTime()))
         {
             throw new InvalidRequestException("Event start date/time cannot be the same as the event end date/time.");
