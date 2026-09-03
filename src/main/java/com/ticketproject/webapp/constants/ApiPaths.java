@@ -136,5 +136,6 @@ public final class ApiPaths
 
         public static final String ROOT = "/tickets";
         public static final String INVITATION = "/invitation";
+        public static final String BY_EVENT_PUBLIC_ID = "/{publicId}";
     }
 }
