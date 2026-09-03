@@ -31,6 +31,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -630,6 +635,15 @@ class EventControllerTest
                     .content(requestBody))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Event name changed."));
+
+            // Verify that the event name changed email was sent.
+            verify(emailService).sendEventNameChangedEmail
+            (
+                anyList(),
+                eq("Event Tester"),
+                eq("Test Event"),
+                eq("Updated Event Name")
+            );
         }
 
         @Test
@@ -702,6 +716,15 @@ class EventControllerTest
                     .content(requestBody))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Event description changed."));
+
+            // Verify that the event description changed email was sent.
+            verify(emailService).sendEventDescriptionChangedEmail
+            (
+                anyList(),
+                eq("Event Tester"),
+                eq("Test Event"),
+                eq("Updated event description")
+            );
         }
 
         @Test
@@ -778,6 +801,20 @@ class EventControllerTest
                     .content(requestBody))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Event address updated."));
+
+            // Verify that the event address changed email was sent.
+            verify(emailService).sendEventAddressChangedEmail
+            (
+                anyList(),
+                eq("Event Tester"),
+                eq("Test Event"),
+                eq("456 New Street"),
+                isNull(),
+                eq("New City"),
+                eq("New State"),
+                eq("New Country"),
+                eq("54321")
+            );
         }
 
         @Test
@@ -862,6 +899,16 @@ class EventControllerTest
                     .content(requestBody))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Event dates updated."));
+
+            // Verify that the event dates changed email was sent.
+            verify(emailService).sendEventDatesChangedEmail
+            (
+                anyList(),
+                eq("Event Tester"),
+                eq("Test Event"),
+                any(LocalDateTime.class),
+                any(LocalDateTime.class)
+            );
         }
 
         @Test
@@ -1024,6 +1071,16 @@ class EventControllerTest
                     .content(requestBody))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("The event has been changed into a public event."));
+
+            // Verify that the event type changed email was sent.
+            verify(emailService).sendEventTypeChangedEmail
+            (
+                anyList(),
+                eq("Event Tester"),
+                eq("Test Event"),
+                eq(EventType.PRIVATE),
+                eq(EventType.PUBLIC)
+            );
         }
 
         @Test
@@ -1235,6 +1292,16 @@ class EventControllerTest
                     .content(requestBody))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("The event has been changed into a private event."));
+
+            // Verify that the event type changed email was sent.
+            verify(emailService).sendEventTypeChangedEmail
+            (
+                anyList(),
+                eq("Event Tester"),
+                eq("Test Event"),
+                eq(EventType.PUBLIC),
+                eq(EventType.PRIVATE)
+            );
         }
 
         @Test
@@ -1395,6 +1462,15 @@ class EventControllerTest
                     .content(requestBody))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Max number of attendees has been updated."));
+
+            // Verify that the event max attendees changed email was sent.
+            verify(emailService).sendEventMaxAttendeesChangedEmail
+            (
+                anyList(),
+                eq("Event Tester"),
+                eq("Test Event"),
+                eq(200L)
+            );
         }
 
         @Test
