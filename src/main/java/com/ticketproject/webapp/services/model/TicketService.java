@@ -1,6 +1,7 @@
 package com.ticketproject.webapp.services.model;
 
 import com.ticketproject.webapp.constants.AppConstants;
+import com.ticketproject.webapp.dtos.requests.DeleteTicketsRequest;
 import com.ticketproject.webapp.dtos.requests.RespondToInvitationRequest;
 import com.ticketproject.webapp.dtos.responses.EventTicketInfo;
 import com.ticketproject.webapp.dtos.responses.GetTicketsByEventPublicIdResponse;
@@ -40,6 +41,7 @@ import com.ticketproject.webapp.model.enums.InvitationStatus;
 import com.ticketproject.webapp.model.repositories.EventRepository;
 import com.ticketproject.webapp.model.repositories.EventSigningKeyRepository;
 import com.ticketproject.webapp.model.repositories.TicketRepository;
+import com.ticketproject.webapp.services.database.BlindIndexService;
 import com.ticketproject.webapp.services.email.EmailService;
 
 /**
@@ -53,19 +55,22 @@ public class TicketService
     private final EventRepository eventRepository;
     private final EventSigningKeyRepository eventSigningKeyRepository;
     private final EmailService emailService;
+    private final BlindIndexService blindIndexService;
 
     public TicketService
     (
         TicketRepository ticketRepository,
         EventRepository eventRepository,
         EventSigningKeyRepository eventSigningKeyRepository,
-        EmailService emailService
+        EmailService emailService,
+        BlindIndexService blindIndexService
     )
     {
         this.ticketRepository = ticketRepository;
         this.eventRepository = eventRepository;
         this.eventSigningKeyRepository = eventSigningKeyRepository;
         this.emailService = emailService;
+        this.blindIndexService = blindIndexService;
     }
 
     /**
@@ -347,5 +352,90 @@ public class TicketService
             .toList();
 
         return new GetTicketsByEventPublicIdResponse(ticketRecords);
+    }
+
+    /**
+     * Handles a request to let a logged in event host delete
+     * a list of tickets for a specific event (identified by a
+     * list of email addresses which the tickets are designated for).
+     * Only the event host who created the event should be allowed
+     * to delete those tickets.
+     * @param eventHost the logged in event host
+     * @param request the request body
+     * @return a SingleMessageResponse on success
+     */
+    public SingleMessageResponse deleteTickets(EventHost eventHost, DeleteTicketsRequest request)
+    {
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+
+        if (request.publicId() == null)
+        {
+            throw new InvalidRequestException("Event public id cannot be null.");
+        }
+
+        if (request.emails() == null)
+        {
+            throw new InvalidRequestException("List of emails cannot be null.");
+        }
+
+        if (request.emails().isEmpty())
+        {
+            throw new InvalidRequestException("List of emails cannot be empty.");
+        }
+
+        if (request.publicId().length() > AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH)
+        {
+            throw new InvalidRequestException
+            (
+                "Event public id cannot be longer than " +
+                AppConstants.Database.Events.Sizes.PUBLIC_ID_LENGTH +
+                " characters."
+            );
+        }
+
+        Optional<Event> event = eventRepository.findByPublicId(request.publicId());
+        if (event.isEmpty())
+        {
+            throw new EntityNotFoundException("Could not find an event with the provided public id.");
+        }
+
+        Event foundEvent = event.get();
+
+        if (Long.compare(foundEvent.getEventHost().getId(), eventHost.getId()) != 0)
+        {
+            throw new InvalidCredentialsException("Only the event host who created the event can delete its tickets.");
+        }
+
+        List<byte[]> emailBlindIndexes = request
+            .emails()
+            .stream()
+            .map(email ->
+            {
+                byte[] blindIndex = blindIndexService.computeIndex(email);
+                return blindIndex;
+            })
+            .toList();
+        List<Ticket> foundTickets = ticketRepository
+            .findAllActiveTicketsByEmailBlindIndex(emailBlindIndexes, foundEvent.getId());
+
+        if (foundTickets.isEmpty())
+        {
+            throw new EntityNotFoundException("Could not find any active tickets using the provided emails and event public ID.");
+        }
+
+        List<Long> foundTicketIds = foundTickets
+            .stream()
+            .map(ticket -> ticket.getId())
+            .toList();
+        ticketRepository.deleteAllById(foundTicketIds);
+
+        // TODO: Send an email to each person notifying them
+        // that their ticket for the event was deleted.
+
+        return new SingleMessageResponse
+        ("Deleted " + foundTicketIds.size() + " ticket" + (foundTicketIds.size() > 1 ? "s" : "") + ".");
     }
 }

@@ -7,8 +7,8 @@ publicId=""
 # Parse named parameters
 while [ $# -gt 0 ]; do
     case "$1" in
-        --public-id) publicId="$2" shift 2 ;;
-        --token)     token="$2"    shift 2 ;;
+        --public-id) publicId="$2"; shift 2 ;;
+        --token)     token="$2";    shift 2 ;;
         *)           shift ;;
     esac
 done

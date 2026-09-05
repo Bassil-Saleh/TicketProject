@@ -4,6 +4,7 @@ import com.ticketproject.webapp.constants.ApiPaths;
 import com.ticketproject.webapp.constants.AppConstants;
 import com.ticketproject.webapp.exceptions.UnauthorizedException;
 import com.ticketproject.webapp.services.model.TicketService;
+import com.ticketproject.webapp.dtos.requests.DeleteTicketsRequest;
 import com.ticketproject.webapp.dtos.requests.RespondToInvitationRequest;
 import com.ticketproject.webapp.dtos.responses.GetTicketsByEventPublicIdResponse;
 import com.ticketproject.webapp.dtos.responses.SingleMessageResponse;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -100,5 +102,41 @@ public class TicketController
             throw new UnauthorizedException("Authentication required");
         }
         return ticketService.getTicketsByEventPublicId(eventHost, publicId);
+    }
+
+    /**
+     * Handles a request to let a logged in event host delete a
+     * list of tickets for a specific event (using a list of
+     * email addresses which the tickets are designated to).
+     * Only the event host who created the event should be
+     * allowed to delete those tickets.
+     * @param request the request body
+     * @param servletRequest the HTTP Servlet request
+     * @return a SingleMessageResponse on success
+     */
+    @Operation
+    (
+        summary = "Delete a list of tickets for a specific event",
+        description =
+            "Deletes a list of tickets (using a list of email addresses which " +
+            "the tickets are designated to) for a specific event. " +
+            "Only the event host who created the event should be allowed " +
+            "to delete those tickets. Requires authentication."
+    )
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.OK)
+    public SingleMessageResponse deleteTickets
+    (
+        @Valid
+        @RequestBody DeleteTicketsRequest request,
+        HttpServletRequest servletRequest
+    )
+    {
+        EventHost eventHost = (EventHost) servletRequest.getAttribute(AppConstants.Jwt.Filter.AUTHENTICATED_EVENT_HOST_ATTRIBUTE);
+        if (eventHost == null)
+        {
+            throw new UnauthorizedException("Authentication required");
+        }
+        return ticketService.deleteTickets(eventHost, request);
     }
 }
